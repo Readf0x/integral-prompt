@@ -4,6 +4,22 @@ autoload -U add-zle-hook-widget
 
 export VI_KEYMAP=${VI_KEYMAP:-"INSERT"}
 
+export integral_vim_color="true"
+local rc_locations=(
+  ~/.integralrc
+  $XDG_CONFIG_HOME/integralrc
+  $XDG_CONFIG_HOME/integral/rc
+  $XDG_CONFIG_HOME/integral/rc.zsh
+  ~/.config/integralrc
+  ~/.config/integral/rc
+  ~/.config/integral/rc.zsh
+)
+for f in $rc_locations; do
+  if [[ -f $f ]]; then
+    source $f
+  fi
+done
+
 integral:helpers:cursor-shape() {
   if [[ $1 ]]; then
     echo -ne '\e[1 q'
