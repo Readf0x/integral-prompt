@@ -4,7 +4,17 @@ autoload -U add-zle-hook-widget
 
 export VI_KEYMAP=${VI_KEYMAP:-"INSERT"}
 
+# === OPTIONS ===
 export integral_vim_color="true"
+export integral_vim_indicators=(
+  "○"
+  "◒"
+  "◐"
+  "●"
+  "◍"
+)
+
+# === CONFIG LOADING ===
 local rc_locations=(
   ~/.integralrc
   $XDG_CONFIG_HOME/integralrc
@@ -20,6 +30,7 @@ for f in $rc_locations; do
   fi
 done
 
+# === HELPERS ===
 integral:helpers:cursor-shape() {
   if [[ $1 ]]; then
     echo -ne '\e[1 q'
@@ -32,49 +43,66 @@ integral:helpers:real-length() {
   export debug_len=$x
   print ${#x}
 }
+
+# === MAIN LOGIC ===
 integral:prompt() {
-  case $VI_KEYMAP in
-    INSERT)
-      visym="%{%F{112}%}○"
-      ;;
-    VISUAL)
-      visym="%{%F{92}%}◒"
-      ;;
-    V-LINE)
-      visym="%{%F{92}%}◐"
-      ;;
-    NORMAL)
-      visym="%{%F{160}%}●"
-      ;;
-    REPLACE)
-      visym="%{%F{32}%}◍"
-      ;;
-  esac
+
+  # Constants
   local newline=$'\n'
   local prompt_top="$newline%{%F{11}%}⌠$visym "
   local prompt_bot="$newline%{%F{11}%}⌡%{%F{255}%}"
 
+  # Variables
+  case $VI_KEYMAP in
+    INSERT)
+      visym="%{%F{112}%}${integral_vim_indicators[0]}"
+      ;;
+    VISUAL)
+      visym="%{%F{92}%}${integral_vim_indicators[1]}"
+      ;;
+    V-LINE)
+      visym="%{%F{92}%}${integral_vim_indicators[2]}"
+      ;;
+    NORMAL)
+      visym="%{%F{160}%}${integral_vim_indicators[3]}"
+      ;;
+    REPLACE)
+      visym="%{%F{32}%}${integral_vim_indicators[4]}"
+      ;;
+  esac
   local dir=${PWD/$HOME/\~}
   local git
   if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
+    # TODO: add support for more than just the current branch
     git="%{%F{11}%}$(git rev-parse --abbrev-ref HEAD)"
   fi
+  # BUG: this will not work if other modules push the prompt past the terminal width
   if (( ${#dir} >= $COLUMNS )); then
+    # This is where stuff gets messy, shell string concatenation is less than readable.
+    # Set the first line, must be done seperately because of the indicator
     prompt_top="$prompt_top%{%F{32}%}${dir:0:$(($COLUMNS - 3))}"
+    # Determine the number of lines the rest of the directory path will take up
     local x=$((${#dir} / $COLUMNS + 1))
     for ((i = 1; i < x; i++)); do
+      # Append the correct section of the path by offsetting the substring based on $i
       prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{32}%}${dir:$((($COLUMNS - 1) * $i - 3)):$((($COLUMNS - 1)))}"
     done
+    # TODO: detect if the last line is short enough to not need a new line and if the
+    # rest of the "modules" need to go through a similar process to the directory path.
     if [[ $git ]]; then
       prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{32}%}$git"
     fi
   else
+    # real simple if the directory path is short enough
     prompt_top="$prompt_top%{%F{32}%}$dir $git"
   fi
 
   PROMPT="$prompt_top$prompt_bot"
 }
 
+# === ZLE ===
+# shamelessly stolen from p10k
+# https://github.com/romkatv/powerlevel10k/issues/888
 integral:zle-line-init() {
   emulate -L zsh
 
@@ -87,8 +115,6 @@ integral:zle-line-init() {
     [[ -o ignore_eof ]] || exit 0
   done
 
-  local saved_prompt=$PROMPT
-  local saved_rprompt=$RPROMPT
   PROMPT="%{%F{11}%}∫%{$reset_color%}"
   RPROMPT=''
   zle .reset-prompt
@@ -135,6 +161,7 @@ integral:line-pre-redraw() {
   fi
 }
 
+# === INIT ===
 add-zsh-hook precmd integral:prompt
 add-zsh-hook precmd integral:helpers:cursor-shape
 zle -N integral:line-pre-redraw
