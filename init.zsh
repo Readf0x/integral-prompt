@@ -45,12 +45,6 @@ integral:helpers:real-length() {
 
 # === MAIN LOGIC ===
 integral:prompt() {
-
-  # Constants
-  local newline=$'\n'
-  local prompt_top="$newline%{%F{11}%}⌠$visym "
-  local prompt_bot="$newline%{%F{11}%}⌡%{%F{255}%}"
-
   # Variables
   case $VI_KEYMAP in
     INSERT)
@@ -68,6 +62,12 @@ integral:prompt() {
   esac
   local dir=${PWD/$HOME/\~}
   local git
+
+  # Constants
+  local newline=$'\n'
+  local prompt_top="$newline%{%F{11}%}⌠$visym "
+  local prompt_bot="$newline%{%F{11}%}⌡%{%F{255}%}"
+
   if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
     # TODO: add support for more than just the current branch
     git="%{%F{11}%}$(git rev-parse --abbrev-ref HEAD)"
