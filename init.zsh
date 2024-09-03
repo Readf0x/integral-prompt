@@ -112,6 +112,7 @@ integral:prompt() {
 }
 
 # === ZLE ===
+# TODO: rerender on sigwinch
 # shamelessly stolen from p10k
 # https://github.com/romkatv/powerlevel10k/issues/888
 integral:zle-line-init() {

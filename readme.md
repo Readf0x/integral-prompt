@@ -14,6 +14,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [x] Configuration files
 - [x] Transient Prompt
 - [x] Multi-line prompt
+- [ ] Rerender on terminal resize
 - [ ] Module loader
     - [ ] Colors
     - [ ] Postions
