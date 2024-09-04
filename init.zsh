@@ -42,6 +42,7 @@ integral:helpers:real-length() {
   export debug_len=$x
   print ${#x}
 }
+# TODO: Create "class" functions
 
 # === MAIN LOGIC ===
 integral:prompt() {
@@ -68,19 +69,23 @@ integral:prompt() {
   local prompt_top="$newline%{%F{11}%}⌠$visym%(?.. %{%F{9}%}⚠)"
   local prompt_bot="$newline%{%F{11}%}⌡%{%F{255}%}"
 
-  if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
-    # TODO: add support for unstaged changes, untracked files, etc
-    git="%{%F{11}%}$(git rev-parse --abbrev-ref HEAD)⎇"
-    if ! git diff --quiet --ignore-submodules 2>/dev/null; then
-      git="$git %{%F{9}%}$(git diff --no-ext-diff --ignore-submodules --stat | tail -n1 | cut -d' ' -f2)✘"
+  if ! $(git rev-parse --is-bare-repository 2>/dev/null); then
+    if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
+      git="%{%F{11}%}$(git rev-parse --abbrev-ref HEAD 2>/dev/null)⎇"
+      if ! git diff --quiet --ignore-submodules 1>/dev/null 2>&1 || [[ $(git ls-files -o --exclude-standard) ]]; then
+        git="$git %{%F{9}%}$(($(git ls-files -o --exclude-standard | wc -l) + $(git diff --name-only | wc -l)))✘"
+      fi
+      if ! git diff --quiet --ignore-submodules --cached 1>/dev/null 2>&1; then
+        git="$git %{%F{11}%}$(git diff --ignore-submodules --cached --name-only | wc -l)+"
+      fi
+      if [[ $(git remote) ]] && git cherry >/dev/null 2>&1 && [[ $(git cherry | wc -l) -gt 0 ]]; then
+        git="$git %{%F{14}%}$(git cherry | wc -l)↑"
+      fi
+      if [[ $(git rev-list FETCH_HEAD --not HEAD 2>/dev/null) ]]; then
+        git="$git %{%F{14}%}$(git rev-list FETCH_HEAD --not HEAD --count)↓"
+      fi
     fi
-    if ! git diff --quiet --ignore-submodules --cached 2>/dev/null; then
-      git="$git %{%F{11}%}$(git diff --no-ext-diff --ignore-submodules --stat --cached | tail -n1 | cut -d' ' -f2)+"
-    fi
-    if [[ $(git cherry | wc -l) -gt 0 ]]; then
-      git="$git %{%F{14}%}$(git cherry | wc -l)↑"
-    fi
-  fi
+  else git="%{%F{11}%}bare⎇"; fi
   # BUG: this will not work if other modules push the prompt past the terminal width
   # TODO: Change the loop method to be more efficient
   #   Instead of whatever the hell is happening here, we can create static module
@@ -113,6 +118,7 @@ integral:prompt() {
 
 # === ZLE ===
 # TODO: rerender on sigwinch
+#   This can supposedly be done with zsh-async
 # shamelessly stolen from p10k
 # https://github.com/romkatv/powerlevel10k/issues/888
 integral:zle-line-init() {
