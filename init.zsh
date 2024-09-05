@@ -170,11 +170,14 @@ integral:line-pre-redraw() {
 }
 
 # === INIT ===
+TRAPWINCH() {
+  integral:prompt
+  zle reset-prompt
+}
 add-zsh-hook precmd integral:prompt
 add-zsh-hook precmd integral:helpers:cursor-shape
 zle -N integral:line-pre-redraw
 add-zle-hook-widget zle-line-pre-redraw integral:line-pre-redraw
 integral:prompt
 zle -N zle-line-init integral:zle-line-init
-trap 'integral:prompt' SIGWINCH
 
