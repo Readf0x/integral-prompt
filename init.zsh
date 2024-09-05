@@ -181,6 +181,10 @@ integral:line-pre-redraw() {
 }
 
 # === INIT ===
+TRAPWINCH() {
+  integral:prompt
+  zle reset-prompt
+}
 add-zsh-hook precmd integral:prompt
 add-zsh-hook precmd integral:helpers:cursor-shape
 zle -N integral:line-pre-redraw
