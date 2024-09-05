@@ -122,8 +122,6 @@ integral:prompt() {
 }
 
 # === ZLE ===
-# TODO: rerender on sigwinch
-#   This can supposedly be done with zsh-async
 # shamelessly stolen from p10k
 # https://github.com/romkatv/powerlevel10k/issues/888
 integral:zle-line-init() {
@@ -183,7 +181,7 @@ integral:line-pre-redraw() {
 # === INIT ===
 TRAPWINCH() {
   integral:prompt
-  zle reset-prompt
+  zle && zle reset-prompt
 }
 add-zsh-hook precmd integral:prompt
 add-zsh-hook precmd integral:helpers:cursor-shape
