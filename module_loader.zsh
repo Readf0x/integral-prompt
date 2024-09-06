@@ -1,5 +1,6 @@
 # === MODULES ===
 integral:module:git() {
+  # TODO: improve efficiency by storing repeated calls in variables
   local format_str length
   if ! $(git rev-parse --is-bare-repository 2>/dev/null); then
     if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
@@ -21,8 +22,8 @@ integral:module:git() {
         length=$(($length + $num + 2))
         format_str="$format_str %{%F{14}%}$num↑"
       fi
-      if [[ $(git rev-list FETCH_HEAD --not HEAD 2>/dev/null) ]]; then
-        local num=$(git rev-list FETCH_HEAD --not HEAD | wc -l)
+      if [[ $(git rev-list origin/${branch} --not HEAD 2>/dev/null) ]]; then
+        local num=$(git rev-list origin/${branch} --not HEAD --count)
         length=$(($length + $num + 2))
         format_str="$format_str %{%F{14}%}$num↓"
       fi
@@ -86,62 +87,31 @@ integral:module:error() {
   if [[ $1 ]]; then
     print "$sig"
   else
-    print "%{%F{9}%}$sig"
+    if [[ $sig -eq 1 ]]; then
+      print "%{%F{11}%}⚠"
+    else
+      print "%{%F{9}%}✘"
+    fi
   fi
 }
 
 export INTEGRAL_MODULES=(
-  "git"
   "visym"
-  "dir"
   "error"
+  "dir"
+  "git"
 )
 
 integral:loop_modules() {
+  newline=$'\n'
+  PROMPT="$newline%{%F{11}%}$integral_top"
   for module in $INTEGRAL_MODULES; do
     local length=$(integral:module:$module 1)
     local format_str=$(integral:module:$module)
     if [[ $length -gt 0 ]]; then
-      print -P "$format_str"
+      PROMPT+="$format_str "
     fi
   done
-}
-
-# TODO: Create "class" functions
-# === MAIN LOGIC ===
-_integral:prompt() {
-  # Constants
-  local newline=$'\n'
-  local prompt_top="$newline%{%F{11}%}⌠"
-  local prompt_bot="$newline%{%F{11}%}⌡%{%F{15}%}"
-
-  # BUG: this will not work if other modules push the prompt past the terminal width
-  # TODO: Change the loop method to be more efficient
-  #   Instead of whatever the hell is happening here, we can create static module
-  #   "classes" (just a function that follows a certain schema in this case) that output
-  #   a preformatted string as well as their raw length. Then we can loop through all
-  #   the modules and add their length to the current length of the line. If it exceeds
-  #   the terminal width, we just insert our newline and set the length back to 0.
-  if (( ${#dir} >= $COLUMNS )); then
-    # This is where stuff gets messy, shell string concatenation is less than readable.
-    # Set the first line, must be done seperately because of the indicator
-    prompt_top="$prompt_top %{%F{12}%}${dir:0:$(($COLUMNS - 3))}"
-    # Determine the number of lines the rest of the directory path will take up
-    local x=$((${#dir} / $COLUMNS + 1))
-    for ((i = 1; i < x; i++)); do
-      # Append the correct section of the path by offsetting the substring based on $i
-      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{12}%}${dir:$((($COLUMNS - 1) * $i - 3)):$((($COLUMNS - 1)))}"
-    done
-    # TODO: detect if the last line is short enough to not need a new line and if the
-    # rest of the "modules" need to go through a similar process to the directory path.
-    if [[ $git ]]; then
-      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{12}%}$git"
-    fi
-  else
-    # real simple if the directory path is short enough
-    prompt_top="$prompt_top %{%F{12}%}$dir $git"
-  fi
-
-  PROMPT="$prompt_top$prompt_bot"
+  PROMPT+="$newline%{%F{11}%}$integral_bot%{${reset_color}%}"
 }
 
