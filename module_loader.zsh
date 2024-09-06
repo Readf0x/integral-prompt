@@ -95,7 +95,7 @@ integral:module:error() {
   fi
 }
 
-export INTEGRAL_MODULES=(
+export integral_modules=(
   "visym"
   "error"
   "dir"
@@ -105,7 +105,7 @@ export INTEGRAL_MODULES=(
 integral:loop_modules() {
   newline=$'\n'
   PROMPT="$newline%{%F{11}%}$integral_top"
-  for module in $INTEGRAL_MODULES; do
+  for module in $integral_modules; do
     local length=$(integral:module:$module 1)
     local format_str=$(integral:module:$module)
     if [[ $length -gt 0 ]]; then
