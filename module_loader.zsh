@@ -83,6 +83,7 @@ integral:module:dir() {
   fi
 }
 
+export sig=0
 error_hook() {
   export sig=$?
 }
@@ -145,6 +146,6 @@ integral:loop_modules() {
       fi
     fi
   done
-  PROMPT+="$newline%{%F{11}%}$integral_bot%{${reset_color}%}"
+  PROMPT+="$newline%{%F{11}%}$integral_bot%{%F{15}%}"
 }
 
