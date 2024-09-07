@@ -1,3 +1,4 @@
+# TODO: Make modules configurable
 # === OPTIONS ===
 export integral_vim_color="true"
 export integral_vim_indicators=(
