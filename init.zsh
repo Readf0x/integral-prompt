@@ -7,7 +7,12 @@ export integral_plugins=(
   './zle.zsh'
 )
 for f in $integral_plugins; do
-  source $f
+  if [[ -f $f ]]; then
+    source $f
+  else
+    print "Plugin not found: $f"
+    exit 1
+  fi
 done
 autoload -U colors; colors
 autoload -Uz add-zsh-hook
