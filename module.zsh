@@ -166,9 +166,9 @@ integral:loop_modules() {
     local -i length=$(integral:module:$module 1)
     local format_str=$(integral:module:$module)
 
-    if [[ $length > 0 ]]; then
+    if [[ $length -gt 0 ]]; then
       local new_pos=$(($position + $length + 1))
-      if [[ $length > $max_len ]] && ! integral:module:$module w; then
+      if [[ $length -gt $max_len ]] && ! integral:module:$module w; then
         local raw_str=$(integral:module:$module r)
         local color=$(integral:module:$module c)
         local -i i=0
@@ -183,7 +183,7 @@ integral:loop_modules() {
         done
         PROMPT+=" "
         position=$((${#raw_str} % $max_len))
-      elif [[ $new_pos > $max_len ]]; then
+      elif [[ $new_pos -gt $max_len ]]; then
         PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$format_str "
         position=$length
       else
@@ -194,4 +194,3 @@ integral:loop_modules() {
   done
   PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[3]}%{%F{15}%}"
 }
-
