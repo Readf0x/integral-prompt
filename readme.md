@@ -28,14 +28,14 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [ ] Documentation
 
 ### Planned Modules
-- [ ] Background Jobs
+- [x] Background Jobs
 - [ ] Battery
 - [ ] CPU
 - [x] CWD
-- [ ] Clock
+- [x] Clock
 - [x] Error Codes
 - [x] Git
 - [x] Nix Shell
 - [ ] SSH
-- [ ] Uptime
+- [x] Uptime
 - [x] Vim
