@@ -76,6 +76,10 @@ integral:module:dir() {
   local dir=${PWD/$HOME/\~}
   if [[ $1 == "w" ]]; then
     return 1
+  elif [[ $1 == "r" ]]; then
+    print "$dir"
+  elif [[ $1 == "c" ]]; then
+    print "%{%F{12}%}"
   elif [[ $1 ]]; then
     print "${#dir}"
   else
@@ -141,15 +145,18 @@ integral:loop_modules() {
       local new_pos=$(($position + $length + 1))
       [[ $1 ]] && print -P "%{%F{14}%}\$new_pos: %{%F{13}%}$new_pos"
       if [[ $length -gt $max_len ]] && ! integral:module:$module w; then
+        local raw_str=$(integral:module:$module r)
+        local color=$(integral:module:$module c)
         [[ $1 ]] && print -P "%{%F{14}%}length > max_len: %{%F{13}%}$length > $max_len"
         local -i i=0
-        while [[ $i -le $(($length / $max_len)) ]]; do
-          PROMPT+="$newline$integral_mid${format_str:$(($i * $max_len)):$max_len}"
+        while [[ $i -le $((${#raw_str} / $max_len)) ]]; do
+          PROMPT+="$newline$integral_mid$color${raw_str:$(($i * $max_len)):$max_len}"
           [[ $1 == "1" ]] && print "${(%):-%F{15}PROMPT: $PROMPT" #}" #idk why but treesitter is freaking out over this
           [[ $1 == "2" ]] && print -P $PROMPT
           i+=1
         done
-        position=$(($length % $max_len))
+        PROMPT+=" "
+        position=$((${#raw_str} % $max_len))
         [[ $1 ]] && print -P "%{%F{14}%}position changed to: %{%F{13}%}$position"
       elif [[ $new_pos -gt $max_len ]]; then
         [[ $1 ]] && print -P "%{%F{14}%}new_pos > max_len: %{%F{13}%}$new_pos > $max_len"
