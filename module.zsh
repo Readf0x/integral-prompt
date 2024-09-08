@@ -106,13 +106,6 @@ integral:module:error() {
   fi
 }
 
-export integral_modules=(
-  "visym"
-  "error"
-  "dir"
-  "git"
-)
-
 # BUG: leaves <space> at end of prompt
 integral:loop_modules() {
   local -i position=0
