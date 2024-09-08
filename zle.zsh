@@ -15,7 +15,7 @@ integral:zle-line-init() {
     [[ -o ignore_eof ]] || exit 0
   done
 
-  PROMPT="%{%F{11}%}∫%{%F{15}%}"
+  PROMPT="%{%F{$integral_prompt_color}%}${integral_prompt[4]}%{%F{15}%}"
   RPROMPT=''
   zle .reset-prompt
 

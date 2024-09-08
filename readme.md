@@ -16,11 +16,14 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [x] Multi-line prompt
 - [x] Rerender on terminal resize
 - [x] Module loader
-    - [ ] Colors
+    - [x] Colors
+    - [x] Formatting
+    - [x] Icons
     - [x] Positions
     - [x] Order
     - [ ] Seperators
     - [x] Dynamic triggers
+    - [ ] Right prompt
 - [x] Plugin Support
 - [ ] Documentation
 
