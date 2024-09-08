@@ -28,7 +28,7 @@ integral:prompt() {
 # === INIT ===
 TRAPWINCH() {
   integral:prompt
-  zle .reset-prompt
+  zle && zle reset-prompt
 }
 add-zsh-hook precmd error_hook
 add-zsh-hook precmd integral:prompt
