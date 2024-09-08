@@ -106,6 +106,37 @@ integral:module:error() {
   fi
 }
 
+integral:module:jobs() {
+  local -i num=$(jobs | wc -l)
+  if [[ $1 ]]; then
+    if [[ $num == 0 ]]; then
+      print "0"
+    else
+      print $((${#num} + 1))
+    fi
+  else
+    print "%{%F{13}%}$num⚙"
+  fi
+}
+
+integral:module:nix() {
+  if [[ $1 ]]; then
+    if [[ $IN_NIX_SHELL ]] || [[ $name ]]; then
+      print "1"
+    else
+      print "0"
+    fi
+  else
+    local color="14"
+    [[ $IN_NIX_SHELL == "impure" ]] && color="13"
+    if $integral_nerd_fonts; then
+      print "%{%F{$color}%}"
+    else
+      print "%{%F{$color}%}❄"
+    fi
+  fi
+}
+
 # BUG: leaves <space> at end of prompt
 integral:loop_modules() {
   local -i position=0
@@ -125,7 +156,12 @@ integral:loop_modules() {
         local color=$(integral:module:$module c)
         local -i i=0
         while [[ $i -le $((${#raw_str} / $max_len)) ]]; do
-          PROMPT+="$newline$integral_mid$color${raw_str:$(($i * $max_len)):$max_len}"
+          if ! [[ $position == 0 ]]; then
+            PROMPT+="$color${raw_str:$(($i * $max_len)):$(($max_len - $position))}"
+          else
+            PROMPT+="$newline$integral_mid$color${raw_str:$(($i * $max_len + $position)):$max_len}"
+          fi
+          position=0
           i+=1
         done
         PROMPT+=" "
