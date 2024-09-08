@@ -22,6 +22,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
     - [ ] Seperators
     - [ ] Dynamic triggers
 - [x] Plugin Support
+- [ ] Documentation
 
 ### Planned Modules
 - [ ] Background Jobs

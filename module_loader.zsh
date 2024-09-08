@@ -67,12 +67,6 @@ integral:module:visym() {
 }
 
 integral:module:dir() {
-  # this one is gonna be pretty difficult, idk how I'm gonna handle it tbh
-  #   potential solutions:
-  #     - append 'w' to length to indicate wrapping
-  #     - add settings option (e.g. "$format_str:$length:w")
-  #     - hardcode wrapping into module loader (bad idea)
-
   local dir=${PWD/$HOME/\~}
   if [[ $1 == "w" ]]; then
     return 1
