@@ -43,16 +43,16 @@ integral:line-pre-redraw() {
           VI_KEYMAP="NORMAL"
           ;;
       esac
-      integral:helpers:cursor-shape 1
+      integral helpers cursor-shape 1
       ;;
     viins|main)
       VI_KEYMAP="INSERT"
-      integral:helpers:cursor-shape
+      integral helpers cursor-shape
       ;;
   esac
 
   if [[ $VI_KEYMAP != ${previous_vi_keymap} ]]; then
-    integral:prompt
+    integral loop-modules
     zle reset-prompt
   fi
 }

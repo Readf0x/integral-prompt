@@ -1,5 +1,8 @@
 # === MODULES ===
 # BUG: length gets printed to console in some repos
+integral:module() {
+  integral:module:$1 $@[2,-1]
+}
 integral:module:git() {
   # TODO: improve efficiency by storing repeated calls in variables
   local format_str length
@@ -158,41 +161,42 @@ integral:module:uptime() {
 #   Will require a refactor, this method will introduce complications.
 #   Should create a subfunction to handle inserting newlines that inserts the right prompt.
 #   Might require the entire right prompt to be rendered before the left one.
-integral:loop_modules() {
+integral:loop-modules() {
   local -i position=0
   local -i max_len=$(($COLUMNS - 1))
 
-  local newline=$'\n'
-  PROMPT="$newline%{%F{$integral_prompt_color}%}${integral_prompt[1]}"
+  integral helpers newline 1 reset
 
   for module in $integral_modules; do
-    local -i length=$(integral:module:$module 1)
-    local format_str=$(integral:module:$module)
+    local -i length=$(integral module $module 1)
+    local format_str=$(integral module $module)
 
     if [[ $length -gt 0 ]]; then
       local new_pos=$(($position + $length + 1))
-      if [[ $length -gt $max_len ]] && ! integral:module:$module w; then
-        local raw_str=$(integral:module:$module r)
-        local color=$(integral:module:$module c)
+      if [[ $length -gt $max_len ]] && ! integral module $module w; then
+        local raw_str=$(integral module $module r)
+        local color=$(integral module $module c)
         local -i i=0
         while [[ $i -le $((${#raw_str} / $max_len)) ]]; do
           if [[ $i == 0 ]]; then
-            PROMPT+="$color${raw_str:$(($i * $max_len)):$(($max_len - $position))}"
+            integral helpers add-prompt "$color${raw_str:$(($i * $max_len)):$(($max_len - $position))}"
           else
-            PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$color${raw_str:$(($i * $max_len - $position)):$max_len}"
+            integral helpers add-prompt "$color${raw_str:$(($i * $max_len - $position)):$max_len}"
           fi
           i+=1
         done
-        PROMPT+=" "
+        integral helpers add-prompt " "
         position=$(($position + (${#raw_str} % $max_len)))
       elif [[ $new_pos -gt $max_len ]]; then
-        PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$format_str "
+        integral helpers newline
+        integral helpers add-prompt "$format_str "
         position=$length
       else
-        PROMPT+="$format_str "
+        integral helpers add-prompt "$format_str "
         position=$new_pos
       fi
     fi
   done
-  PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[3]}%{%F{15}%}"
+  integral helpers newline 3
+  integral helpers add-prompt "%{%F{15}%}"
 }

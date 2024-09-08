@@ -1,0 +1,11 @@
+#compdef integral
+
+# Syntax: integral [command] [command2] ... [args]
+# where command is a function named integral:command, and
+# command2 is a function named integral:command:command2, etc.
+
+_integral() {
+  _arguments -s -S -C \
+    '(-h --help)'{-h,--help}'[show help for command]'
+}
+
