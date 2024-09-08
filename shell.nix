@@ -3,9 +3,11 @@
 pkgs.mkShell {
   
   packages = with pkgs; [
-    zsh
+    coreutils
+    gawk
     git
     openssh
+    zsh
   ];
 
   shellHook = ''
