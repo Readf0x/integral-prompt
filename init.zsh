@@ -24,7 +24,6 @@ for f in $integral_plugins; do
     exit 1
   fi
 done
-fpath+="$int_path/comp"
 autoload -Uz add-zsh-hook
 autoload -U add-zle-hook-widget
 
