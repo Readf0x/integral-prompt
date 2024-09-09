@@ -1,11 +1,21 @@
-local version='0.1.0'
+local version='0.2.0'
 
 integral() {
-  integral:$1 $@[2,-1]
-}
+  case $1 in
+    --version)
+      print "v$version"
+      ;;
+    -h|--help)
+      cat <<EOF
+integral [ group ... ] <function> [ args ... ]
 
-integral:--version() {
-  print "v$version"
+$(print -l ${(ok)functions} | rg -e '^integral:' | sed s/integral:// | sed 's/:/ /')
+EOF
+      ;;
+    *)
+      integral:$1 $@[2,-1]
+      ;;
+  esac
 }
 
 # https://github.com/spaceship-prompt/spaceship-prompt/commit/111c6f160c4376001d5469f8e8771ee89ea4158a
@@ -24,6 +34,7 @@ for f in $integral_plugins; do
     exit 1
   fi
 done
+fpath+="$int_path/comp"
 autoload -Uz add-zsh-hook
 autoload -U add-zle-hook-widget
 

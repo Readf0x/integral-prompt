@@ -11,13 +11,16 @@ integral:helpers:cursor-shape() {
 }
 integral:helpers:add-prompt() {
   PROMPT+="$1"
+  if [[ $2 ]]; then
+    print -P $PROMPT
+  fi
 }
 integral:helpers:newline() {
   local newline=$'\n'
   if [[ $2 == "reset" ]]; then
     PROMPT="$newline%{%F{$integral_prompt_color}%}${integral_prompt[${1:-2}]}"
   else
-    PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[${1:-2}]}"
+    integral helpers add-prompt "$newline%{%F{$integral_prompt_color}%}${integral_prompt[${1:-2}]}"
   fi
 }
 

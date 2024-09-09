@@ -37,6 +37,7 @@ integral_vim_colors=(
   "9"  # normal
 )
 
+integral_dir_color="11"
 integral_dir_format() { print ${PWD/$HOME/\⌂} }
 
 integral_git_colors=(

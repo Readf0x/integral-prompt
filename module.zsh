@@ -163,40 +163,52 @@ integral:module:uptime() {
 #   Might require the entire right prompt to be rendered before the left one.
 integral:loop-modules() {
   local -i position=0
-  local -i max_len=$(($COLUMNS - 1))
+  local -i max_len
+  if [[ $1 ]]; then
+    max_len=$1
+  else
+    max_len=$(($COLUMNS - 1))
+  fi
 
   integral helpers newline 1 reset
 
   for module in $integral_modules; do
+    [[ $1 ]] && print -P "%{%F{15}%}module: $module"
     local -i length=$(integral module $module 1)
     local format_str=$(integral module $module)
 
     if [[ $length -gt 0 ]]; then
       local new_pos=$(($position + $length + 1))
       if [[ $length -gt $max_len ]] && ! integral module $module w; then
+        [[ $1 ]] && print -P "%{%F{15}%}wrapping!"
         local raw_str=$(integral module $module r)
         local color=$(integral module $module c)
         local -i i=0
         while [[ $i -le $((${#raw_str} / $max_len)) ]]; do
           if [[ $i == 0 ]]; then
-            integral helpers add-prompt "$color${raw_str:$(($i * $max_len)):$(($max_len - $position))}"
+            integral helpers add-prompt "$color${raw_str:$(($i * $max_len)):$(($max_len - $position))}" $1
           else
-            integral helpers add-prompt "$color${raw_str:$(($i * $max_len - $position)):$max_len}"
+            integral helpers newline
+            integral helpers add-prompt "$color${raw_str:$(($i * $max_len - $position)):$max_len}" $1
           fi
           i+=1
         done
-        integral helpers add-prompt " "
+        integral helpers add-prompt " " $1
         position=$(($position + (${#raw_str} % $max_len)))
       elif [[ $new_pos -gt $max_len ]]; then
+        [[ $1 ]] && print -P "%{%F{15}%}new line"
         integral helpers newline
-        integral helpers add-prompt "$format_str "
+        integral helpers add-prompt "$format_str " $1
         position=$length
       else
-        integral helpers add-prompt "$format_str "
+        integral helpers add-prompt "$format_str " $1
         position=$new_pos
       fi
+    elif [[ $1 ]]; then
+      print -P "%{%F{15}%}skipping"
     fi
   done
   integral helpers newline 3
-  integral helpers add-prompt "%{%F{15}%}"
+  integral helpers add-prompt "%{%F{15}%}" $1
+  [[ $1 ]] && print "====="
 }
