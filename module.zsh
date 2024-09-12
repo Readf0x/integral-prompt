@@ -111,14 +111,13 @@ integral:module:error() {
 integral:module:jobs() {
   local -i num=$(jobs | wc -l)
   if [[ $num == 0 ]]; then
+    print "0"
+  else
     if [[ $1 ]]; then
-        print $((${#num} + ${#integral_jobs_icon}))
-      fi
+      print $((${#num} + ${#integral_jobs_icon}))
     else
       print "%F{$integral_jobs_color}$num$integral_jobs_icon"
     fi
-  else
-    print "0"
   fi
 }
 
