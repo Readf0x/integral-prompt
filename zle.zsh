@@ -15,7 +15,7 @@ integral:zle-line-init() {
     [[ -o ignore_eof ]] || exit 0
   done
 
-  PROMPT="%{%F{$integral_prompt_color}%}${integral_prompt[4]}%{%F{15}%}"
+  PROMPT="%F{$integral_prompt_color}${integral_prompt[4]}%F{15}"
   RPROMPT=''
   zle .reset-prompt
 
@@ -52,7 +52,7 @@ integral:line-pre-redraw() {
   esac
 
   if [[ $VI_KEYMAP != ${previous_vi_keymap} ]]; then
-    integral loop-modules
+    integral render
     zle reset-prompt
   fi
 }
