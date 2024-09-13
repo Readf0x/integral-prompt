@@ -1,5 +1,15 @@
 # Integral Prompt
 
+**Potential users be warned!** This plugin is very new, and has yet to reach feature maturity. Issues are expected, but should hopefully be minor.
+
+## About
+This prompt theme was created mostly due to my dissatisfaction with existing ones. My main issues were:
+- overcomplicated configuration
+- feature bloat
+- wrapping issues
+
+I have successfully solved these issues (in my opinion).
+
 ## Usage
 Load with your favorite plugin loader (only officially supports [antidote](https://github.com/zsh-users/antidote)), or source `init.zsh` in your `.zshrc`.
 To configure, add a `~/.integralrc` file. It can also be placed at:
