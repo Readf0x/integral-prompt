@@ -46,6 +46,7 @@ export integral_error_format() {
     2|127) print "%F{11}?" ;;
     126) print "%F{9}⚠" ;;
     130) print "%F{15}☠" ;;
+    148) print "%F{13}✱" ;;
     *) print "%F{9}✘" ;;
   esac
 }
