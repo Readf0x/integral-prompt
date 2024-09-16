@@ -1,6 +1,6 @@
 # TODO: Make modules configurable
 # === OPTIONS ===
-export integral_modules=(
+export int_modules=(
   "direnv"
   "nix"
   "visym"
@@ -9,38 +9,38 @@ export integral_modules=(
   "git"
   "jobs"
 )
-export integral_right_modules=(
+export int_right_modules=(
   "time"
 )
-export integral_kitty_integration="false"
-export integral_prompt_color="11"
-export integral_prompt=(
+export int_kitty_integration="false"
+export int_prompt_color="11"
+export int_prompt=(
   "⌠"
   "⎮"
   "⌡"
   "∫"
 )
-export integral_nix_icons=(
+export int_nix_icons=(
   "❄"
   ""
 )
-export integral_nix_color=(
+export int_nix_color=(
   "14"
   "13"
 )
-export integral_vim_indicators=(
+export int_vim_indicators=(
   "○" # insert
   "◒" # visual
   "◐" # v-line
   "●" # normal
 )
-export integral_vim_colors=(
+export int_vim_colors=(
   "10" # insert
   "13" # visual
   "13" # v-line
   "9"  # normal
 )
-export integral_error_format() {
+export int_error_format() {
   case $1 in
     1) print "%F{9}✘" ;;
     2|127) print "%F{11}?" ;;
@@ -50,35 +50,35 @@ export integral_error_format() {
     *) print "%F{9}✘" ;;
   esac
 }
-export integral_dir_format() { print ${PWD/$HOME/\~} }
-export integral_dir_color="12"
-export integral_git_icons=(
+export int_dir_format() { print ${PWD/$HOME/\~} }
+export int_dir_color="12"
+export int_git_icons=(
   "⎇"
   "✘"
   "+"
   "↑"
   "↓"
 )
-export integral_git_colors=(
+export int_git_colors=(
   "11"
   "9"
   "11"
   "14"
   "14"
 )
-export integral_jobs_icon="⚙"
-export integral_jobs_color="13"
-export integral_time_format="%T"
-export integral_uptime_icon="⏲"
-export integral_uptime_color="12"
-export integral_battery_icons=(
+export int_jobs_icon="⚙"
+export int_jobs_color="13"
+export int_time_format="%T"
+export int_uptime_icon="⏲"
+export int_uptime_color="12"
+export int_battery_icons=(
   "🗲"
   "󰁹"
 )
-export integral_battery_color="10"
-export integral_ssh_format="%F{12}${USER}%F{13}@%F{14}${HOSTNAME}"
+export int_battery_color="10"
+export int_ssh_format="%F{12}${USER}%F{13}@%F{14}${HOSTNAME}"
 
-export integral_direnv_format() {
+export int_direnv_format() {
   case $1 in
     *) print "%F{11}⌁" ;;
   esac
@@ -100,8 +100,8 @@ for f in $rc_locations; do
     source $f
   fi
 done
-if $integral_kitty_integration && [[ $KITTY_PID ]] && [[ $(kitty +kitten query_terminal | grep font) =~ "NF|Nerd ?Font" ]]; then
-  export integral_nerd_fonts="true"
+if $int_kitty_integration && [[ $KITTY_PID ]] && [[ $(kitty +kitten query_terminal | grep font) =~ "NF|Nerd ?Font" ]]; then
+  export int_nerd_fonts="true"
 else
-  export integral_nerd_fonts="false"
+  export int_nerd_fonts="false"
 fi
