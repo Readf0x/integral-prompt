@@ -192,6 +192,14 @@ integral:module:direnv() {
   fi
 }
 
+integral:module:cpu() {
+  local cpu="$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')%"
+  if [[ $1 ]]; then
+    print "${#cpu}"
+  fi
+  print "${int_cpu_color}${cpu}"
+}
+
 # BUG: leaves <space> at end of prompt
 # TODO: add right prompt
 #   Will require a refactor, this method will introduce complications.
