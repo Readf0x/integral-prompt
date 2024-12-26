@@ -35,7 +35,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
     - [x] Dynamic triggers
     - [ ] Right prompt
 - [x] Plugin Support
-- [ ] Documentation
+- [x] Documentation
 
 ### Planned Modules
 - [x] Background Jobs
