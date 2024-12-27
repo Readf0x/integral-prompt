@@ -214,6 +214,8 @@ integral:render() {
     max_len=$(($COLUMNS - 1))
   fi
 
+  if [[ ${#int_separator} -gt 1 ]]; then echo "Unsupported separator size!"; fi
+
   integral helpers newline 1 reset
 
   for module in $int_modules; do
@@ -237,15 +239,15 @@ integral:render() {
           fi
           i+=1
         done
-        integral helpers add-prompt " " $1
+        integral helpers add-prompt "${int_separator}" $1
         position=$(($position + (${#raw_str} % $max_len)))
       elif [[ $new_pos -gt $max_len ]]; then
         [[ $1 ]] && print -P "%F{15}new line"
         integral helpers newline
-        integral helpers add-prompt "$format_str " $1
+        integral helpers add-prompt "$format_str${int_separator}" $1
         position=$length
       else
-        integral helpers add-prompt "$format_str " $1
+        integral helpers add-prompt "$format_str${int_separator}" $1
         position=$new_pos
       fi
     elif [[ $1 ]]; then

@@ -31,7 +31,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
     - [x] Icons
     - [x] Positions
     - [x] Order
-    - [ ] Seperators
+    - [x] Seperators
     - [x] Dynamic triggers
     - [ ] Right prompt
 - [x] Plugin Support
