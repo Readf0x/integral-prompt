@@ -203,7 +203,7 @@ integral:module:cpu() {
 integral:module:distrobox() {
   if [[ $CONTAINER_ID ]]; then
     if [[ $1 ]]; then
-      print $#CONTAINER_ID
+      print ${#CONTAINER_ID}
     fi
     print "%F${int_distrobox_color}${CONTAINER_ID}"
   else
