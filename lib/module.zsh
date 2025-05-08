@@ -206,8 +206,9 @@ integral:module:distrobox() {
       print $#CONTAINER_ID
     fi
     print "%F${int_distrobox_color}${CONTAINER_ID}"
+  else
+    print "0"
   fi
-  print 0
 }
 
 # BUG: leaves <space> at end of prompt
