@@ -6,6 +6,7 @@ export int_modules=(
   "visym"
   "error"
   "dir"
+  "distrobox"
   "ssh"
   "git"
   "jobs"
@@ -87,6 +88,8 @@ export int_direnv_format() {
     *) print "%F{3}⌁" ;;
   esac
 }
+
+export int_distrobox_color="12"
 
 # === CONFIG LOADING ===
 local rc_locations=(
