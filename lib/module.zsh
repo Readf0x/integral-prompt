@@ -169,7 +169,7 @@ integral:module:battery() {
 
 integral:module:ssh() {
   if [[ $SSH_CONNECTION ]]; then
-    local format_str=$(int_ssh_format || print "%F{13}${USER}%F{12}@%F{14}${HOSTNAME}" )
+    local format_str=$(int_ssh_format || print "%F{13}${USER}%F{8}@%F{14}${HOSTNAME}" )
     if [[ $1 ]]; then
       print ${#format_str};
     else
@@ -218,7 +218,7 @@ integral:module:sshplus() {
   local db=$(integral module distrobox)
   local format_str
   if [[ $ssh != 0 ]] && [[ $db != 0 ]]; then
-    format_str="$ssh%F{12}[$db%F{12}]"
+    format_str="$ssh%F{8}[$db%F{8}]"
   elif [[ $ssh != 0 ]]; then
     format_str=$ssh
   elif [[ $db != 0 ]]; then
