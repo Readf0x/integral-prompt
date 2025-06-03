@@ -1,4 +1,4 @@
-# TODO: Make modules configurable
+# Colors are in ansi base16, run the colors.sh script to see what your terminal colors look like.
 # === OPTIONS ===
 export int_modules=(
   "direnv"
@@ -23,7 +23,7 @@ export int_prompt=(
 )
 export int_nix_icons=(
   "❄"
-  ""
+  ""
 )
 export int_nix_color=(
   "6"
@@ -88,7 +88,16 @@ export int_direnv_format() {
   esac
 }
 
-export int_distrobox_color="12"
+export int_distrobox_color="2"
+export int_distrobox_format() {
+  case $1 in
+    fedora) print "%F{6}" ;;
+    ubuntu) print "%F{1}" ;;
+    debian) print "%F{9}" ;;
+    arch) print "%F{4}" ;;
+    *) print "%F{7}" ;;
+  esac
+}
 
 # === CONFIG LOADING ===
 local rc_locations=(

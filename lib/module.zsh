@@ -206,7 +206,7 @@ integral:module:distrobox() {
     if [[ $1 ]]; then
       print ${#CONTAINER_ID}
     else
-      print "%F{${int_distrobox_color}}${CONTAINER_ID}"
+      print "%F{${int_distrobox_color}}${CONTAINER_ID}$(int_distrobox_format $(cat /etc/os-release | sed -nE 's/ID=(\w+)/\1/p'))"
     fi
   else
     print "0"
