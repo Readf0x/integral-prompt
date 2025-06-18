@@ -21,10 +21,10 @@ integral:init() {
   # https://github.com/spaceship-prompt/spaceship-prompt/commit/111c6f160c4376001d5469f8e8771ee89ea4158a
   local int_path=${${(%):-%x}:A:h}
   export core_plugins=(
-    "$int_path/lib/config.zsh"
-    "$int_path/lib/helpers.zsh"
-    "$int_path/lib/module.zsh"
-    "$int_path/lib/zle.zsh"
+    "$int_path/zsh/config.zsh"
+    "$int_path/zsh/helpers.zsh"
+    "$int_path/zsh/module.zsh"
+    "$int_path/zsh/zle.zsh"
   )
   for f in $core_plugins; do
     if [[ -f $f ]]; then

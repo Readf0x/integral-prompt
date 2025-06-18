@@ -8,10 +8,14 @@
 
   outputs = { self, flake-utils, nixpkgs, ... }@inputs:
   flake-utils.lib.eachDefaultSystem (system:
-    let pkgs = nixpkgs.legacyPackages.${system}; in
-    {
-      devShells.default = import ./shell.nix {
-        inherit pkgs;
+    let pkgs = nixpkgs.legacyPackages.${system}; in {
+      devShells = {
+        default = import ./shell.nix {
+          inherit pkgs;
+        };
+        direnv = import ./direnv.nix {
+          inherit pkgs;
+        };
       };
       packages = rec {
         integral = import ./default.nix {

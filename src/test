@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+IFS=$'\n'
+print -lP $(go run *.go)

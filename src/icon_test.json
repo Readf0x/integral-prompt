@@ -1,0 +1,30 @@
+{
+  // single icon, really easy
+  "uptime": {
+    "color": "blue",
+    "icon": "⏲"
+  },
+  // multiple icons, all the same color
+  // requires hardcoded positions
+  "battery": {
+    "color": "green",
+    "icons": [ "🗲", "󰁹" ]
+  },
+  // multiple icons, different colors, dynamic display
+  "exit_signal": {
+    "default_icon": {
+      "color": "red",
+      "icon": "✘"
+    }
+    "icons": [
+      // not sure on calling it "name"
+      { "name": "1", "color": "red", "icon": "✘" },
+      { "name": "2", "color": "cyan", "icon": "?" },
+      { "name": "127", "color": "cyan", "icon": "?" },
+      { "name": "126", "color": "yellow", "icon": "⚠" },
+      { "name": "130", "color": "bright_black", "icon": "☠" },
+      { "name": "137", "color": "bright_red", "icon": "☠" },
+      { "name": "148", "color": "magenta", "icon": "*" },
+    ],
+  }
+}
