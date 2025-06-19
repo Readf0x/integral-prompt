@@ -18,13 +18,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	prompt := assemble(config.GetDefault(), width, true)
+	// prompt := assemble(config.GetDefault(), width, true)
 
 	fmt.Println(fg("Width:", config.Yellow), bold(strconv.Itoa(width)))
 	fmt.Println(fg("=========", config.BrightBlack))
-	for _, line := range prompt {
-		fmt.Println(line)
-	}
+	// for _, line := range prompt {
+	// 	fmt.Println(line)
+	// }
+	b := BatteryModule{}
+	b.initialize(config.GetDefault())
+	fmt.Println(b.render(config.GetDefault()).Raw)
 	fmt.Println(fg("=========", config.BrightBlack))
 }
 

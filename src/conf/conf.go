@@ -114,6 +114,7 @@ var defaultConfig = PromptConfig{
 		Symbols: [3]rune{'⌠', '⎮', '⌡'},
 	},
 	Battery: BatteryConfig{
+		Id: 0,
 		IconEntries: &BatteryIconConfig{
 			Charging: IconEntry{
 				Color: BrightGreen,

@@ -29,6 +29,13 @@ type RenderedModule struct {
 	Wrap bool
 }
 
+func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
+	return RenderedModule{
+		Raw:  fg(fmt.Sprintf("%d%c", num, icon), color),
+		Wrap: false,
+	}
+}
+
 type Module interface {
 	initialize(cfg *config.PromptConfig) bool
 	render(*config.PromptConfig) RenderedModule
@@ -68,14 +75,14 @@ func (m *BatteryModule) render(cfg *config.PromptConfig) RenderedModule {
 			color = cfg.Battery.IconEntries.Discharging.Color
 		}
 	}
-	return RenderedModule{
-		Raw:  fmt.Sprintf("%d%s", m.Charge, fg(string(icon), color)),
-		Wrap: false,
-	}
+	return renderCounter(m.Charge, icon, color)
 }
 
 type CpuModule struct {
 	Usage uint8
+}
+func (m *CpuModule) initialize(cfg *config.PromptConfig) bool {
+	
 }
 
 type DirModule struct {
