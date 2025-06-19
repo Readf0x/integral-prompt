@@ -12,8 +12,4 @@ pkgs.mkShell {
     zsh
   ];
 
-  shellHook=''
-    source ./helpers/functions.zsh
-  '';
-
 }
