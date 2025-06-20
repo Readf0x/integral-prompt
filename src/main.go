@@ -18,30 +18,45 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// prompt := assemble(config.GetDefault(), width, true)
+	prompt := render(config.GetDefault(), &defmodules)
 
 	fmt.Println(fg("Width:", config.Yellow), bold(strconv.Itoa(width)))
 	fmt.Println(fg("=========", config.BrightBlack))
-	// for _, line := range prompt {
-	// 	fmt.Println(line)
-	// }
-	b := BatteryModule{}
-	b.initialize(config.GetDefault())
-	fmt.Println(b.render(config.GetDefault()).Raw)
+	for _, line := range prompt {
+		fmt.Println(line)
+	}
 	fmt.Println(fg("=========", config.BrightBlack))
 }
 
 func assemble(cfg *config.PromptConfig, size int, debug bool) []string {
-	lines := make([]string, 0, cfg.Length+2)
+	lines := make([]string, 0, *cfg.Length+2)
 
-	// rc := make(chan string)
 	// render right prompt
+	// rc := make(chan string)
+
+	// render main prompt
+	render(cfg, cfg.Modules)
 
 	return lines
 }
 
-func render() {
-
+func render(cfg *config.PromptConfig, modules *[]string) []RenderedModule {
+	rendered := make([]RenderedModule, 0, len(*modules))
+	for _, module := range *modules {
+		var m Module
+		switch module {
+		case "battery":
+			m = &BatteryModule{}
+		case "cpu":
+			m = &CpuModule{}
+		}
+		if m != nil {
+			if m.initialize(cfg) {
+				rendered = append(rendered, m.render(cfg))
+			}
+		}
+	}
+	return rendered
 }
 
 // Formatting

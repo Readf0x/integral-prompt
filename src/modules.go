@@ -5,9 +5,10 @@ import (
 	config "integral/conf"
 
 	"github.com/distatus/battery"
+	"github.com/shirou/gopsutil/v4/cpu"
 )
 
-var modules = []string{
+var defmodules = []string{
 	"battery",
 	"cpu",
 	"dir",
@@ -30,14 +31,18 @@ type RenderedModule struct {
 }
 
 func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
+	i := string(icon)
+	if icon == '%' {
+		i = "%%"
+	}
 	return RenderedModule{
-		Raw:  fg(fmt.Sprintf("%d%c", num, icon), color),
+		Raw:  fg(fmt.Sprintf("%d%s", num, i), color),
 		Wrap: false,
 	}
 }
 
 type Module interface {
-	initialize(cfg *config.PromptConfig) bool
+	initialize(*config.PromptConfig) bool
 	render(*config.PromptConfig) RenderedModule
 }
 
@@ -47,9 +52,16 @@ type BatteryModule struct {
 }
 
 func (m *BatteryModule) initialize(cfg *config.PromptConfig) bool {
-	b, err := battery.Get(cfg.Battery.Id)
+	batteries, err := battery.GetAll()
 	if err != nil {
 		logger.Println(err)
+		return false
+	}
+	if len(batteries) == 0 {
+		return false
+	}
+	b := batteries[cfg.Battery.Id]
+	if b.Full == 0 {
 		return false
 	}
 	m.Charge = uint8(b.Current / b.Full * 100)
@@ -60,7 +72,7 @@ func (m *BatteryModule) render(cfg *config.PromptConfig) RenderedModule {
 	var icon rune
 	var color config.Color
 	if cfg.Battery.Icons != nil {
-		color = *cfg.Battery.Color
+		color = cfg.Battery.Color
 		if m.Charging {
 			icon = cfg.Battery.Icons[0]
 		} else {
@@ -82,7 +94,17 @@ type CpuModule struct {
 	Usage uint8
 }
 func (m *CpuModule) initialize(cfg *config.PromptConfig) bool {
-	
+	percent, err := cpu.Percent(cfg.Cpu.Time, false)
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+	m.Usage = uint8(percent[0])
+	return true
+}
+func (m *CpuModule) render(cfg *config.PromptConfig) RenderedModule {
+	// [TODO] add multi icon support
+	return renderCounter(m.Usage, cfg.Cpu.Icon, cfg.Cpu.Color)
 }
 
 type DirModule struct {

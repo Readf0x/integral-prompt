@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 const Version = "v0.1"
 
 // [TODO] add jsonschema info
@@ -18,15 +20,15 @@ type SingleIconConfig struct {
 type IconConfig struct {
 	Color Color  `json:"color,omitempty"`
 	Icon  rune   `json:"icon,omitempty"`
-	Icons []rune `json:"icons,omitempty"`
+	Icons *[]rune `json:"icons,omitempty"`
 
 	DefaultIcon *SingleIconConfig `json:"default_icon,omitempty"`
-	IconEntries []IconEntry       `json:"icons,omitempty"`
+	IconEntries *[]IconEntry       `json:"icons,omitempty"`
 }
 
 type BatteryConfig struct {
 	Id			 		int   						`json:"battery,omitempty"`
-	Color       *Color             `json:"color,omitempty"`
+	Color       Color             `json:"color,omitempty"`
 	Icons       *[2]rune           `json:"icons,omitempty"`
 	IconEntries *BatteryIconConfig `json:"icons,omitzero"`
 }
@@ -38,10 +40,10 @@ type BatteryIconConfig struct {
 type ErrorConfig struct {
 	Color Color  `json:"color,omitempty"`
 	Icon  rune   `json:"icon,omitempty"`
-	Icons []rune `json:"icons,omitempty"`
+	Icons *[]rune `json:"icons,omitempty"`
 
-	DefaultIcon SingleIconConfig `json:"default_icon,omitzero"`
-	IconEntries []ErrorEntry     `json:"icons,omitempty"`
+	DefaultIcon *SingleIconConfig `json:"default_icon,omitzero"`
+	IconEntries *[]ErrorEntry     `json:"icons,omitempty"`
 }
 type ErrorEntry struct {
 	Code  uint8 `json:"code,omitempty"`
@@ -51,14 +53,14 @@ type ErrorEntry struct {
 
 type ViModeConfig struct {
 	Color       Color            `json:"color,omitempty"`
-	Icons       [2]rune          `json:"icons,omitempty"`
-	IconEntries ViModeIconConfig `json:"icons,omitzero"`
+	Icons       *[2]rune          `json:"icons,omitempty"`
+	IconEntries *ViModeIconConfig `json:"icons,omitzero"`
 }
 type ViModeIconConfig struct {
-	Insert     IconEntry `json:"insert"`
-	Normal     IconEntry `json:"normal"`
-	Visual     IconEntry `json:"visual"`
-	VisualLine IconEntry `json:"visual_line"`
+	Insert     *IconEntry `json:"insert"`
+	Normal     *IconEntry `json:"normal"`
+	Visual     *IconEntry `json:"visual"`
+	VisualLine *IconEntry `json:"visual_line"`
 }
 
 type CounterConfig struct {
@@ -72,31 +74,42 @@ type LineConfig struct {
 }
 
 type GitConfig struct {
-	Branch   CounterConfig `json:"branch"`
-	Unstaged CounterConfig `json:"unstaged"`
-	Staged   CounterConfig `json:"staged"`
-	Push     CounterConfig `json:"push"`
-	Pull     CounterConfig `json:"pull"`
+	Branch   *CounterConfig `json:"branch"`
+	Unstaged *CounterConfig `json:"unstaged"`
+	Staged   *CounterConfig `json:"staged"`
+	Push     *CounterConfig `json:"push"`
+	Pull     *CounterConfig `json:"pull"`
+}
+
+type CpuConfig struct {
+	Time  time.Duration `json:"time"`
+	Color Color         `json:"color,omitempty"`
+	Icon  rune          `json:"icon,omitempty"`
+	Icons *[]rune       `json:"icons,omitempty"`
+
+	DefaultIcon *SingleIconConfig `json:"default_icon,omitempty"`
+	IconEntries *[]IconEntry       `json:"icons,omitempty"`
 }
 
 type PromptConfig struct {
-	Version      string     `json:"version,omitempty"`
-	ModulesLeft  []string   `json:"modules_left,omitempty"`
-	ModulesRight []string   `json:"modules_right,omitempty"`
-	Length       uint8      `json:"length"`
-	Line         LineConfig `json:"line,omitzero"`
+	Version      string      `json:"version,omitempty"`
+	Modules      *[]string   `json:"modules,omitempty"`
+	ModulesRight *[]string   `json:"modules_right,omitempty"`
+	Length       *uint8      `json:"length"`
+	Line         *LineConfig `json:"line,omitzero"`
 	// Per Module Config
-	Battery  BatteryConfig    `json:"battery,omitzero"`
-	Direnv   IconConfig       `json:"direnv,omitzero"`
-	Error    ErrorConfig      `json:"error,omitzero"`
-	Git      GitConfig        `json:"git,omitzero"`
-	NixShell SingleIconConfig `json:"nix_shell,omitzero"`
-	ViMode   ViModeConfig     `json:"vi_mode,omitzero"`
+	Battery  *BatteryConfig    `json:"battery,omitzero"`
+	Direnv   *IconConfig       `json:"direnv,omitzero"`
+	Error    *ErrorConfig      `json:"error,omitzero"`
+	Git      *GitConfig        `json:"git,omitzero"`
+	NixShell *SingleIconConfig `json:"nix_shell,omitzero"`
+	ViMode   *ViModeConfig     `json:"vi_mode,omitzero"`
+	Cpu 		 *CpuConfig 			`json:"cpu,omitzero"`
 }
 
 var defaultConfig = PromptConfig{
 	Version: Version,
-	ModulesLeft: []string{
+	Modules: &[]string{
 		"direnv",
 		"nix",
 		"visym",
@@ -106,14 +119,14 @@ var defaultConfig = PromptConfig{
 		"git",
 		"jobs",
 	},
-	ModulesRight: []string{
+	ModulesRight: &[]string{
 		"time",
 	},
-	Line: LineConfig{
+	Line: &LineConfig{
 		Color:   Yellow,
 		Symbols: [3]rune{'⌠', '⎮', '⌡'},
 	},
-	Battery: BatteryConfig{
+	Battery: &BatteryConfig{
 		Id: 0,
 		IconEntries: &BatteryIconConfig{
 			Charging: IconEntry{
@@ -126,12 +139,12 @@ var defaultConfig = PromptConfig{
 			},
 		},
 	},
-	Direnv: IconConfig{
+	Direnv: &IconConfig{
 		Color: Magenta,
 		Icon:  '⌁',
 	},
-	Error: ErrorConfig{
-		IconEntries: []ErrorEntry{
+	Error: &ErrorConfig{
+		IconEntries: &[]ErrorEntry{
 			{Code: 1, Color: Red, Icon: '✘'},
 			{Code: 2, Color: Blue, Icon: '?'},
 			{Code: 127, Color: Blue, Icon: '?'},
@@ -140,53 +153,58 @@ var defaultConfig = PromptConfig{
 			{Code: 137, Color: BrightRed, Icon: '☠'},
 			{Code: 148, Color: Cyan, Icon: '*'},
 		},
-		DefaultIcon: SingleIconConfig{Color: Red, Icon: '✘'},
+		DefaultIcon: &SingleIconConfig{Color: Red, Icon: '✘'},
 	},
-	Git: GitConfig{
-		Branch: CounterConfig{
+	Git: &GitConfig{
+		Branch: &CounterConfig{
 			Color: Yellow,
 			Icon:  '⎇',
 		},
-		Unstaged: CounterConfig{
+		Unstaged: &CounterConfig{
 			Color: Red,
 			Icon:  '✘',
 		},
-		Staged: CounterConfig{
+		Staged: &CounterConfig{
 			Color: Green,
 			Icon:  '+',
 		},
-		Push: CounterConfig{
+		Push: &CounterConfig{
 			Color: Cyan,
 			Icon:  '↑',
 		},
-		Pull: CounterConfig{
+		Pull: &CounterConfig{
 			Color: Cyan,
 			Icon:  '↓',
 		},
 	},
-	NixShell: SingleIconConfig{
+	NixShell: &SingleIconConfig{
 		Color: Cyan,
 		Icon:  '❄',
 	},
-	ViMode: ViModeConfig{
-		IconEntries: ViModeIconConfig{
-			Insert: IconEntry{
+	ViMode: &ViModeConfig{
+		IconEntries: &ViModeIconConfig{
+			Insert: &IconEntry{
 				Color: Green,
 				Icon:  '○',
 			},
-			Normal: IconEntry{
+			Normal: &IconEntry{
 				Color: Red,
 				Icon:  '●',
 			},
-			Visual: IconEntry{
+			Visual: &IconEntry{
 				Color: Magenta,
 				Icon:  '◒',
 			},
-			VisualLine: IconEntry{
+			VisualLine: &IconEntry{
 				Color: Magenta,
 				Icon:  '◐',
 			},
 		},
+	},
+	Cpu: &CpuConfig{
+		Time: time.Millisecond*100,
+		Color: White,
+		Icon: '%',
 	},
 }
 
