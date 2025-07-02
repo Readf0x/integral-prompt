@@ -1,4 +1,17 @@
 #!/usr/bin/env zsh
 
-IFS=$'\n'
-print -lP $(go run *.go)
+if [[ $1 = "benchmark" ]]; then
+  go build
+  hyperfine "./integral 1" -iN --export-json benchmark.json
+  if [[ $(jq -r '.results.[].mean' benchmark.json) < 0.05 ]]; then
+    print -P "%F{2}Pass!%f"
+  else
+    print -P "%F{1}Fail!%f"
+  fi
+else
+  export DIRENV_DIR=$PWD
+  export CONTAINER_ID=linux
+  IFS=$'\n'
+  print -lP $(go run *.go 1)
+fi
+

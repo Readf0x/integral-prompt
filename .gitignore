@@ -2,3 +2,4 @@
 .zcompdump
 result
 src/integral
+src/benchmark.json
