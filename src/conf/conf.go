@@ -43,10 +43,10 @@ type ErrorEntry struct {
 }
 
 type ViModeConfig struct {
-	Insert     *IconEntry `json:"insert,omitempty"`
-	Normal     *IconEntry `json:"normal,omitempty"`
-	Visual     *IconEntry `json:"visual,omitempty"`
-	VisualLine *IconEntry `json:"visual_line,omitempty"`
+	Insert *IconEntry `json:"insert,omitempty"`
+	Normal *IconEntry `json:"normal,omitempty"`
+	Visual *IconEntry `json:"visual,omitempty"`
+	ViLine *IconEntry `json:"visual_line,omitempty"`
 }
 
 type CounterConfig struct {
@@ -134,7 +134,7 @@ var defaultConfig = PromptConfig{
 		"visym",
 		"error",
 		"dir",
-		"sshplus",
+		"ssh+",
 		"git",
 		"jobs",
 	},
@@ -215,7 +215,7 @@ var defaultConfig = PromptConfig{
 			Color: Magenta,
 			Icon:  '◒',
 		},
-		VisualLine: &IconEntry{
+		ViLine: &IconEntry{
 			Color: Magenta,
 			Icon:  '◐',
 		},
@@ -254,6 +254,20 @@ var defaultConfig = PromptConfig{
 		// Icon: idfk man does anyone even really use this? I know I don't.
 		// Look if you *actually* want me to finish the time module and make all the icons work
 		// make an issue, because otherwise I'm not touching this thing.
+	},
+	Ssh: &SshConfig{
+		User: &DisplayConfig{
+			Color: Magenta,
+			Visible: true,
+		},
+		At: &DisplayConfig{
+			Color: BrightBlack,
+			Visible: true,
+		},
+		Host: &DisplayConfig{
+			Color: Cyan,
+			Visible: true,
+		},
 	},
 }
 

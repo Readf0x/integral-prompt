@@ -102,30 +102,32 @@ func render(cfg *config.PromptConfig, modules *[]string, c chan []RenderedModule
 		var m Module
 		var M MultiModule
 		switch module {
-		case "battery":
-			m = &BatteryModule{}
-		case "cpu":
-			m = &CpuModule{}
+		case "visym":
+			m = &ViModeModule{}
 		case "dir":
 			m = &DirModule{}
-		case "direnv":
-			m = &DirenvModule{}
-		case "distrobox":
-			m = &DistroboxModule{}
 		case "error":
 			m = &ErrorModule{}
 		// case "git":
 		// 	M = &GitModule{}
+		case "battery":
+			m = &BatteryModule{}
+		case "cpu":
+			m = &CpuModule{}
+		case "direnv":
+			m = &DirenvModule{}
+		case "distrobox":
+			m = &DistroboxModule{}
 		case "jobs":
 			m = &JobsModule{}
 		case "nix":
 			m = &NixModule{}
+		case "ssh":
+			m = &SshModule{}
 		case "ssh+":
 			m = &SshPlus{}
 		case "time":
 			m = &TimeModule{}
-		case "visym":
-			m = &ViModeModule{}
 		}
 		if m != nil {
 			if m.initialize(cfg) {

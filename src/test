@@ -9,8 +9,9 @@ if [[ $1 = "benchmark" ]]; then
     print -P "%F{1}Fail!%f"
   fi
 else
+  export SSH_CONNECTION=asdf
   export DIRENV_DIR=$PWD
-  export CONTAINER_ID=linux
+  export CONTAINER_ID=debian
   IFS=$'\n'
   print -lP $(go run *.go 1 3)
 fi

@@ -14,23 +14,6 @@ import (
 	"github.com/shirou/gopsutil/v4/cpu"
 )
 
-var defmodules = []string{
-	"battery",
-	"cpu",
-	"dir",
-	"direnv",
-	"distrobox",
-	"error",
-	"git",
-	"jobs",
-	"nix",
-	"ssh",
-	"sshplus",
-	"time",
-	"uptime",
-	"visym",
-}
-
 type RenderedModule struct {
 	Raw   string
 	Wrap  bool
@@ -310,7 +293,7 @@ type SshModule struct {
 	Host string
 }
 func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
-	if os.Getenv("SSH_CONNECTION") != "" {
+	if _, set := os.LookupEnv("SSH_CONNECTION"); set {
 		m.User = os.Getenv("USER")
 		m.Host = os.Getenv("HOSTNAME")
 		return true
@@ -420,16 +403,16 @@ func (m *ViModeModule) initialize(cfg *config.PromptConfig) bool {
 	return set
 }
 func (m *ViModeModule) render(cfg *config.PromptConfig) RenderedModule {
-	var final string
+	var final RenderedModule
 	switch m.Mode {
 	case "NORMAL":
 		final = renderIcon(cfg.ViMode.Normal.Icon, cfg.ViMode.Normal.Color)
 	case "INSERT":
-		m.Mode = ViInsert
+		final = renderIcon(cfg.ViMode.Insert.Icon, cfg.ViMode.Insert.Color)
 	case "VISUAL":
-		m.Mode = ViVisual
+		final = renderIcon(cfg.ViMode.Visual.Icon, cfg.ViMode.Visual.Color)
 	case "V-LINE":
-		m.Mode = ViVisualLine
+		final = renderIcon(cfg.ViMode.ViLine.Icon, cfg.ViMode.ViLine.Color)
 	}
-	return renderIcon()
+	return final
 }
