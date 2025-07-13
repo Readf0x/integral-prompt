@@ -21,7 +21,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - `~/.config/integral/rc.zsh`
 
 ## Planned Features
-- [x] Configuration files
+- [ ] Configuration files
 - [x] Transient Prompt
 - [x] Multi-line prompt
 - [x] Rerender on terminal resize
@@ -35,7 +35,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
     - [x] Dynamic triggers
     - [ ] Right prompt
 - [ ] Plugin Support
-- [x] Documentation
+- [ ] Documentation
 
 ### Planned Modules
 - [x] Background Jobs

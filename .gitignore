@@ -1,5 +1,5 @@
 .direnv
 .zcompdump
 result
-src/integral
-src/benchmark.json
+integral
+benchmark.json

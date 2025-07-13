@@ -258,6 +258,7 @@ func (m *GitModule) render(cfg *config.PromptConfig) []RenderedModule {
 type JobsModule struct {
 	Jobs uint8
 }
+
 func (m *JobsModule) initialize(cfg *config.PromptConfig) bool {
 	j, err := strconv.ParseUint(os.Args[4], 10, 8)
 	if err != nil {
@@ -277,6 +278,7 @@ func (m *JobsModule) render(cfg *config.PromptConfig) RenderedModule {
 type NixModule struct {
 	InNixShell bool
 }
+
 func (m *NixModule) initialize(cfg *config.PromptConfig) bool {
 	path := strings.Split(os.Getenv("PATH"), ":")
 	if strings.HasPrefix(path[0], "/nix/store/") {
@@ -293,6 +295,7 @@ type SshModule struct {
 	User string
 	Host string
 }
+
 func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
 	if _, set := os.LookupEnv("SSH_CONNECTION"); set {
 		m.User = os.Getenv("USER")
@@ -301,6 +304,7 @@ func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
 	}
 	return false
 }
+
 // [TODO] make really fancy wrapping logic to make this wrappable
 func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
 	var user, at, host string
@@ -314,7 +318,7 @@ func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
 		host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
 	}
 	return RenderedModule{
-		Raw: fmt.Sprint(user, at, host),
+		Raw:  fmt.Sprint(user, at, host),
 		Wrap: false,
 	}
 }
@@ -324,6 +328,7 @@ type SshPlus struct {
 	Host   string
 	Distro string
 }
+
 func (m *SshPlus) initialize(cfg *config.PromptConfig) bool {
 	if os.Getenv("SSH_CONNECTION") != "" {
 		m.User = os.Getenv("USER")
@@ -367,7 +372,7 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 		final = db
 	}
 	return RenderedModule{
-		Raw: final,
+		Raw:  final,
 		Wrap: false,
 	}
 }
@@ -375,14 +380,15 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 type TimeModule struct {
 	Time string
 }
+
 func (m *TimeModule) initialize(cfg *config.PromptConfig) bool {
 	m.Time = time.Now().Format(cfg.Time.Format)
 	return true
 }
 func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
-		Raw: shell.Fg(m.Time, cfg.Time.Color),
-		Wrap: true,
+		Raw:   shell.Fg(m.Time, cfg.Time.Color),
+		Wrap:  true,
 		Color: cfg.Time.Color,
 	}
 }
@@ -396,6 +402,7 @@ type UptimeModule struct {
 type ViModeModule struct {
 	Mode string
 }
+
 func (m *ViModeModule) initialize(cfg *config.PromptConfig) bool {
 	var set bool
 	m.Mode, set = os.LookupEnv("VI_KEYMAP")

@@ -7,22 +7,43 @@
   };
 
   outputs = { self, flake-utils, nixpkgs, ... }@inputs:
-  flake-utils.lib.eachDefaultSystem (system:
-    let pkgs = nixpkgs.legacyPackages.${system}; in {
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+      inherit (nixpkgs) lib;
+    in {
       devShells = {
-        default = import ./shell.nix {
-          inherit pkgs;
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            coreutils
+            gawk
+            git
+            openssh
+            zsh
+          ];
+
+          shellHook = ''
+            exec zsh
+          '';
+
+          ZDOTDIR = builtins.toString ./.;
         };
-        direnv = import ./direnv.nix {
-          inherit pkgs;
-        };
+        direnv = import ./direnv.nix { inherit pkgs; };
       };
       packages = rec {
-        integral = import ./default.nix {
-          inherit pkgs;
-        };
+        integral = pkgs.buildGoModule (finalAttrs: rec {
+          name = "integral";
+          pname = name;
+          version = "v0.2.2";
+
+          src = ./.;
+
+          meta = {
+            description = "Cross shell prompt theme written in Golang";
+            homepage = "https://github.com/Readf0x/integral-prompt";
+            license = lib.licenses.gpl3;
+          };
+        });
         default = integral;
       };
-    }
-  );
+    });
 }
