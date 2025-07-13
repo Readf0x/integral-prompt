@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/distatus/battery"
 	"github.com/go-git/go-git/v6"
@@ -308,30 +309,127 @@ type SshModule struct {
 	User string
 	Host string
 }
+func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
+	if os.Getenv("SSH_CONNECTION") != "" {
+		m.User = os.Getenv("USER")
+		m.Host = os.Getenv("HOSTNAME")
+		return true
+	}
+	return false
+}
+// [TODO] make really fancy wrapping logic to make this wrappable
+func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
+	var user, at, host string
+	if cfg.Ssh.User.Visible {
+		user = fg(m.User, cfg.Ssh.User.Color)
+	}
+	if cfg.Ssh.At.Visible {
+		at = fg("@", cfg.Ssh.At.Color)
+	}
+	if cfg.Ssh.Host.Visible {
+		host = fg(m.Host, cfg.Ssh.Host.Color)
+	}
+	return RenderedModule{
+		Raw: fmt.Sprint(user, at, host),
+		Wrap: false,
+	}
+}
 
 type SshPlus struct {
 	User   string
 	Host   string
 	Distro string
 }
+func (m *SshPlus) initialize(cfg *config.PromptConfig) bool {
+	if os.Getenv("SSH_CONNECTION") != "" {
+		m.User = os.Getenv("USER")
+		m.Host = os.Getenv("HOSTNAME")
+	}
+	m.Distro, _ = os.LookupEnv("CONTAINER_ID")
+	if m.User != "" || m.Distro != "" {
+		return true
+	}
+	return false
+}
+func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
+	var ssh, db, final string
+	if m.User != "" {
+		var user, at, host string
+		if cfg.Ssh.User.Visible {
+			user = fg(m.User, cfg.Ssh.User.Color)
+		}
+		if cfg.Ssh.At.Visible {
+			at = fg("@", cfg.Ssh.At.Color)
+		}
+		if cfg.Ssh.Host.Visible {
+			host = fg(m.Host, cfg.Ssh.Host.Color)
+		}
+		ssh = fmt.Sprint(user, at, host)
+	}
+	if m.Distro != "" {
+		color, icon := cfg.Distrobox.DefaultIcon.Color, cfg.Distrobox.DefaultIcon.Icon
+		for _, distro := range *cfg.Distrobox.IconEntries {
+			if m.Distro == distro.Name {
+				color, icon = distro.Color, distro.Icon
+			}
+		}
+		db = fmt.Sprint(fg(m.Distro, cfg.Distrobox.TextColor), fg(string(icon), color))
+	}
+	if ssh != "" && db != "" {
+		final = ssh + fg("[", cfg.Ssh.At.Color) + db + fg("]", cfg.Ssh.At.Color)
+	} else if ssh != "" {
+		final = ssh
+	} else if db != "" {
+		final = db
+	}
+	return RenderedModule{
+		Raw: final,
+		Wrap: false,
+	}
+}
 
 type TimeModule struct {
 	Time string
 }
+func (m *TimeModule) initialize(cfg *config.PromptConfig) bool {
+	m.Time = time.Now().Format(cfg.Time.Format)
+	return true
+}
+func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
+	return RenderedModule{
+		Raw: fg(m.Time, cfg.Time.Color),
+		Wrap: true,
+		Color: cfg.Time.Color,
+	}
+}
 
+// [TODO] uptime
+// frankly I have no clue how to read /proc/uptime
 type UptimeModule struct {
 	Uptime string
 }
 
 type Mode uint8
 
-const (
-	ViNormal Mode = iota
-	ViInsert
-	ViVisual
-	ViVisualLine
-)
-
 type ViModeModule struct {
-	Mode Mode
+	Mode string
+}
+func (m *ViModeModule) initialize(cfg *config.PromptConfig) bool {
+	var set bool
+	m.Mode, set = os.LookupEnv("VI_KEYMAP")
+	return set
+}
+func (m *ViModeModule) render(cfg *config.PromptConfig) RenderedModule {
+	var final string
+	switch m.Mode {
+	case "NORMAL":
+		final = renderIcon(cfg.ViMode.Normal.Icon, cfg.ViMode.Normal.Color)
+	case "INSERT":
+		m.Mode = ViInsert
+	case "VISUAL":
+		m.Mode = ViVisual
+	case "V-LINE":
+		m.Mode = ViVisualLine
+	}
+	return renderIcon()
 }

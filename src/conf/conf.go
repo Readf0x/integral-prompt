@@ -244,6 +244,17 @@ var defaultConfig = PromptConfig{
 			{ Name: "arch",   Color: Cyan,      Icon: '' },
 		},
 	},
+	Jobs: &CounterConfig{
+		Color: Magenta,
+		Icon: '⚙',
+	},
+	Time: &TimeConfig{
+		Format: time.TimeOnly,
+		Color: White,
+		// Icon: idfk man does anyone even really use this? I know I don't.
+		// Look if you *actually* want me to finish the time module and make all the icons work
+		// make an issue, because otherwise I'm not touching this thing.
+	},
 }
 
 // Returns a pointer to the default configuration.

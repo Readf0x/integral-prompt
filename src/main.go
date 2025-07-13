@@ -120,6 +120,12 @@ func render(cfg *config.PromptConfig, modules *[]string, c chan []RenderedModule
 			m = &JobsModule{}
 		case "nix":
 			m = &NixModule{}
+		case "ssh+":
+			m = &SshPlus{}
+		case "time":
+			m = &TimeModule{}
+		case "visym":
+			m = &ViModeModule{}
 		}
 		if m != nil {
 			if m.initialize(cfg) {

@@ -12,6 +12,6 @@ else
   export DIRENV_DIR=$PWD
   export CONTAINER_ID=linux
   IFS=$'\n'
-  print -lP $(go run *.go 1)
+  print -lP $(go run *.go 1 3)
 fi
 
