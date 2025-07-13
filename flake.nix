@@ -30,19 +30,21 @@
         direnv = import ./direnv.nix { inherit pkgs; };
       };
       packages = rec {
-        integral = pkgs.buildGoModule (finalAttrs: rec {
+        integral = pkgs.buildGoModule rec {
           name = "integral";
           pname = name;
           version = "v0.2.2";
 
           src = ./.;
 
+          vendorHash = "sha256-nrQ5rkXBAu2prVlJaqHHLIarQsW+/6oH+LMLqpjWvYc=";
+
           meta = {
             description = "Cross shell prompt theme written in Golang";
             homepage = "https://github.com/Readf0x/integral-prompt";
             license = lib.licenses.gpl3;
           };
-        });
+        };
         default = integral;
       };
     });
