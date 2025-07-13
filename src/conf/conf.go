@@ -56,7 +56,7 @@ type CounterConfig struct {
 
 type LineConfig struct {
 	Color   Color   `json:"color,omitempty"`
-	Symbols [3]rune `json:"symbols,omitempty"`
+	Symbols [4]rune `json:"symbols,omitempty"`
 }
 
 type GitConfig struct {
@@ -143,7 +143,7 @@ var defaultConfig = PromptConfig{
 	},
 	Line: &LineConfig{
 		Color:   Yellow,
-		Symbols: [3]rune{'⌠', '⎮', '⌡'},
+		Symbols: [4]rune{'⌠', '⎮', '⌡', '∫'},
 	},
 	Battery: &BatteryConfig{
 		Id: 0,

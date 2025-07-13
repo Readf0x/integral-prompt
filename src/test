@@ -13,6 +13,6 @@ else
   export DIRENV_DIR=$PWD
   export CONTAINER_ID=debian
   IFS=$'\n'
-  print -lP $(go run *.go 1 3)
+  print -lP $(go run *.go render zsh 1 3)
 fi
 

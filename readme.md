@@ -25,7 +25,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [x] Transient Prompt
 - [x] Multi-line prompt
 - [x] Rerender on terminal resize
-- [x] Module loader
+- [ ] Module loader
     - [x] Colors
     - [x] Formatting
     - [x] Icons
@@ -34,7 +34,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
     - [x] Seperators
     - [x] Dynamic triggers
     - [ ] Right prompt
-- [x] Plugin Support
+- [ ] Plugin Support
 - [x] Documentation
 
 ### Planned Modules
@@ -45,8 +45,8 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [x] Clock
 - [x] [Direnv](https://github.com/direnv/direnv)
 - [x] Error Codes
-- [x] Git
+- [ ] Git
 - [x] Nix Shell
 - [x] SSH
-- [x] Uptime
+- [ ] Uptime
 - [x] Vim

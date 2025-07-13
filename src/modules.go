@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	config "integral/conf"
+	"integral/shell"
 	"os"
 	"os/exec"
 	"strconv"
@@ -22,14 +23,14 @@ type RenderedModule struct {
 
 func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
 	return RenderedModule{
-		Raw:   fg(fmt.Sprintf("%d%c", num, icon), color),
+		Raw:   shell.Fg(fmt.Sprintf("%d%c", num, icon), color),
 		Wrap:  false,
 		Color: color,
 	}
 }
 func renderIcon(icon rune, color config.Color) RenderedModule {
 	return RenderedModule{
-		Raw:   fg(string(icon), color),
+		Raw:   shell.Fg(string(icon), color),
 		Wrap:  false,
 		Color: color,
 	}
@@ -119,7 +120,7 @@ func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
 }
 func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
-		Raw:   fg(m.CWD, cfg.Dir.Color),
+		Raw:   shell.Fg(m.CWD, cfg.Dir.Color),
 		Wrap:  true,
 		Color: cfg.Dir.Color,
 	}
@@ -166,7 +167,7 @@ func (m *DistroboxModule) render(cfg *config.PromptConfig) RenderedModule {
 		}
 	}
 	return RenderedModule{
-		Raw:   fmt.Sprint(fg(m.Distro, cfg.Distrobox.TextColor), fg(string(icon), color)),
+		Raw:   fmt.Sprint(shell.Fg(m.Distro, cfg.Distrobox.TextColor), shell.Fg(string(icon), color)),
 		Wrap:  true,
 		Color: color,
 	}
@@ -177,7 +178,7 @@ type ErrorModule struct {
 }
 
 func (m *ErrorModule) initialize(cfg *config.PromptConfig) bool {
-	c, err := strconv.ParseUint(os.Args[1], 10, 8)
+	c, err := strconv.ParseUint(os.Args[3], 10, 8)
 	if err != nil {
 		logger.Panicln(err)
 		return false
@@ -258,7 +259,7 @@ type JobsModule struct {
 	Jobs uint8
 }
 func (m *JobsModule) initialize(cfg *config.PromptConfig) bool {
-	j, err := strconv.ParseUint(os.Args[2], 10, 8)
+	j, err := strconv.ParseUint(os.Args[4], 10, 8)
 	if err != nil {
 		logger.Println(err)
 		return false
@@ -304,13 +305,13 @@ func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
 func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
 	var user, at, host string
 	if cfg.Ssh.User.Visible {
-		user = fg(m.User, cfg.Ssh.User.Color)
+		user = shell.Fg(m.User, cfg.Ssh.User.Color)
 	}
 	if cfg.Ssh.At.Visible {
-		at = fg("@", cfg.Ssh.At.Color)
+		at = shell.Fg("@", cfg.Ssh.At.Color)
 	}
 	if cfg.Ssh.Host.Visible {
-		host = fg(m.Host, cfg.Ssh.Host.Color)
+		host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
 	}
 	return RenderedModule{
 		Raw: fmt.Sprint(user, at, host),
@@ -339,13 +340,13 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 	if m.User != "" {
 		var user, at, host string
 		if cfg.Ssh.User.Visible {
-			user = fg(m.User, cfg.Ssh.User.Color)
+			user = shell.Fg(m.User, cfg.Ssh.User.Color)
 		}
 		if cfg.Ssh.At.Visible {
-			at = fg("@", cfg.Ssh.At.Color)
+			at = shell.Fg("@", cfg.Ssh.At.Color)
 		}
 		if cfg.Ssh.Host.Visible {
-			host = fg(m.Host, cfg.Ssh.Host.Color)
+			host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
 		}
 		ssh = fmt.Sprint(user, at, host)
 	}
@@ -356,10 +357,10 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 				color, icon = distro.Color, distro.Icon
 			}
 		}
-		db = fmt.Sprint(fg(m.Distro, cfg.Distrobox.TextColor), fg(string(icon), color))
+		db = fmt.Sprint(shell.Fg(m.Distro, cfg.Distrobox.TextColor), shell.Fg(string(icon), color))
 	}
 	if ssh != "" && db != "" {
-		final = ssh + fg("[", cfg.Ssh.At.Color) + db + fg("]", cfg.Ssh.At.Color)
+		final = ssh + shell.Fg("[", cfg.Ssh.At.Color) + db + shell.Fg("]", cfg.Ssh.At.Color)
 	} else if ssh != "" {
 		final = ssh
 	} else if db != "" {
@@ -380,7 +381,7 @@ func (m *TimeModule) initialize(cfg *config.PromptConfig) bool {
 }
 func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
-		Raw: fg(m.Time, cfg.Time.Color),
+		Raw: shell.Fg(m.Time, cfg.Time.Color),
 		Wrap: true,
 		Color: cfg.Time.Color,
 	}
@@ -391,8 +392,6 @@ func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 type UptimeModule struct {
 	Uptime string
 }
-
-type Mode uint8
 
 type ViModeModule struct {
 	Mode string
