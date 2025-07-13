@@ -2,7 +2,7 @@ package shell
 
 import (
 	"fmt"
-	config "integral/conf"
+	"integral/config"
 	"strings"
 )
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	config "integral/conf"
+	"integral/config"
 	"integral/shell"
 	"os"
 	"os/exec"
