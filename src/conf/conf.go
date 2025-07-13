@@ -119,7 +119,7 @@ type PromptConfig struct {
 	Error     *ErrorConfig      `json:"error,omitempty"`
 	Git       *GitConfig        `json:"git,omitempty"`
 	Jobs      *CounterConfig    `json:"jobs,omitempty"`
-	NixShell  *SingleIconEntry `json:"nix_shell,omitempty"`
+	NixShell  *SingleIconEntry  `json:"nix_shell,omitempty"`
 	Ssh       *SshConfig        `json:"ssh,omitempty"`
 	Time      *TimeConfig       `json:"time,omitempty"`
 	Uptime    *CounterConfig    `json:"uptime,omitempty"`

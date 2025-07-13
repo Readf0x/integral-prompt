@@ -15,7 +15,7 @@ import (
 var logger = log.New(os.Stderr, fmt.Sprintf("\033[%dmError:\033[%dm ", 31, 39), 1)
 
 func main() {
-	if len(os.Args) < 2 {
+	if len(os.Args) < 3 {
 		logger.Fatalln("Not enough arguments!")
 	}
 	width, _, err := term.GetSize(int(os.Stdin.Fd()))
@@ -25,6 +25,7 @@ func main() {
 
 	prompt := finalize(config.GetDefault(), width)
 
+	fmt.Println()
 	for _, line := range prompt {
 		fmt.Println(line)
 	}
@@ -113,6 +114,12 @@ func render(cfg *config.PromptConfig, modules *[]string, c chan []RenderedModule
 			m = &DistroboxModule{}
 		case "error":
 			m = &ErrorModule{}
+		// case "git":
+		// 	M = &GitModule{}
+		case "jobs":
+			m = &JobsModule{}
+		case "nix":
+			m = &NixModule{}
 		}
 		if m != nil {
 			if m.initialize(cfg) {

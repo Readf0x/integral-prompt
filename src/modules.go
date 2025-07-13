@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/distatus/battery"
-	// "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v6"
 	"github.com/shirou/gopsutil/v4/cpu"
 )
 
@@ -99,6 +99,7 @@ func (m *BatteryModule) render(cfg *config.PromptConfig) RenderedModule {
 type CpuModule struct {
 	Usage uint8
 }
+
 func (m *CpuModule) initialize(cfg *config.PromptConfig) bool {
 	percent, err := cpu.Percent(cfg.Cpu.Time, false)
 	if err != nil {
@@ -116,6 +117,7 @@ func (m *CpuModule) render(cfg *config.PromptConfig) RenderedModule {
 type DirModule struct {
 	CWD string
 }
+
 func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
 	var err error
 	m.CWD, err = os.Getwd()
@@ -141,6 +143,7 @@ func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
 
 type DirenvModule struct {
 }
+
 func (m *DirenvModule) initialize(cfg *config.PromptConfig) bool {
 	if _, set := os.LookupEnv("DIRENV_DIR"); set {
 		return true
@@ -188,6 +191,7 @@ func (m *DistroboxModule) render(cfg *config.PromptConfig) RenderedModule {
 type ErrorModule struct {
 	ExitCode uint64
 }
+
 func (m *ErrorModule) initialize(cfg *config.PromptConfig) bool {
 	c, err := strconv.ParseUint(os.Args[1], 10, 8)
 	if err != nil {
@@ -212,32 +216,92 @@ func (m *ErrorModule) render(cfg *config.PromptConfig) RenderedModule {
 
 type GitModule struct {
 	Branch   string
-	Unstaged uint16
-	Staged   uint16
-	Push     uint16
-	Pull     uint16
+	Unstaged uint8
+	Staged   uint8
+	Push     uint8
+	Pull     uint8
 }
-// func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
-// 	cwd, err := os.Getwd()
-// 	if err != nil {
-// 		logger.Println(err)
-// 		return false
-// 	}
-// 	repo, err := git.PlainOpen(cwd)
-// 	if err != nil {
-// 		logger.Println(err)
-// 		return false
-// 	}
-// 	// repo.
-// 	return true
-// }
+
+func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
+	cwd, err := os.Getwd()
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+	repo, err := git.PlainOpen(cwd)
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+
+	head, err := repo.Head()
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+	m.Branch = head.Name().Short()
+
+	wt, err := repo.Worktree()
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+	status, err := wt.Status()
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+
+	for _, entry := range status {
+		switch {
+		case entry.Worktree != git.Unmodified:
+			m.Unstaged++
+		case entry.Staging != git.Unmodified:
+			m.Staged++
+		}
+	}
+
+	// [TODO] implement push and pull detection
+
+	return true
+}
+func (m *GitModule) render(cfg *config.PromptConfig) []RenderedModule {
+	// [TODO] implement git render
+	return []RenderedModule{}
+}
 
 type JobsModule struct {
 	Jobs uint8
 }
+func (m *JobsModule) initialize(cfg *config.PromptConfig) bool {
+	j, err := strconv.ParseUint(os.Args[2], 10, 8)
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+	if j != 0 {
+		m.Jobs = uint8(j)
+		return true
+	}
+	return false
+}
+func (m *JobsModule) render(cfg *config.PromptConfig) RenderedModule {
+	return renderCounter(m.Jobs, cfg.Jobs.Icon, cfg.Jobs.Color)
+}
 
 type NixModule struct {
 	InNixShell bool
+}
+func (m *NixModule) initialize(cfg *config.PromptConfig) bool {
+	path := strings.Split(os.Getenv("PATH"), ":")
+	if strings.HasPrefix(path[0], "/nix/store/") {
+		m.InNixShell = true
+		return true
+	}
+	return false
+}
+func (m *NixModule) render(cfg *config.PromptConfig) RenderedModule {
+	return renderIcon(cfg.NixShell.Icon, cfg.NixShell.Color)
 }
 
 type SshModule struct {
