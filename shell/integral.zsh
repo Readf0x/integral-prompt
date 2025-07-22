@@ -1,6 +1,6 @@
 # shamelessly stolen from p10k
 # https://github.com/romkatv/powerlevel10k/issues/888
-_I_zle-line-init() {
+__integral_zle-line-init() {
   emulate -L zsh
 
   [[ $CONTEXT == start ]] || return 0
@@ -24,7 +24,7 @@ _I_zle-line-init() {
   return ret
 }
 
-_I_cursor-shape() {
+__integral_cursor-shape() {
   if [[ $1 ]]; then
     echo -ne '\e[1 q'
   else
@@ -33,15 +33,15 @@ _I_cursor-shape() {
 }
 
 export sig=0
-_I_error_hook() {
+__integral_error_hook() {
   export sig=$?
 }
 
-_I_render() {
+__integral_render() {
   eval "$(integral render zsh $sig $(jobs | wc -l))"
 }
 
-_I_line-pre-redraw() {
+__integral_line-pre-redraw() {
   local previous_vi_keymap="$VI_KEYMAP"
 
   case $KEYMAP in
@@ -57,16 +57,16 @@ _I_line-pre-redraw() {
           VI_KEYMAP="NORMAL"
           ;;
       esac
-      _I_cursor-shape 1
+      __integral_cursor-shape 1
       ;;
     viins|main)
       VI_KEYMAP="INSERT"
-      _I_cursor-shape
+      __integral_cursor-shape
       ;;
   esac
 
   if [[ $VI_KEYMAP != ${previous_vi_keymap} ]]; then
-    _I_render
+    __integral_render
     zle reset-prompt
   fi
 }
@@ -80,13 +80,13 @@ export INTEGRAL_INSTALL_PATH=$int_path
 
 # === INIT ===
 TRAPWINCH() {
-  _I_render
+  __integral_render
   zle && zle reset-prompt
 }
-add-zsh-hook precmd _I_error_hook
-add-zsh-hook precmd _I_render
-add-zsh-hook precmd _I_cursor-shape
-zle -N _I_line-pre-redraw
-add-zle-hook-widget zle-line-pre-redraw _I_line-pre-redraw
-_I_render
-zle -N zle-line-init _I_zle-line-init
+add-zsh-hook precmd __integral_error_hook
+add-zsh-hook precmd __integral_render
+add-zsh-hook precmd __integral_cursor-shape
+zle -N __integral_line-pre-redraw
+add-zle-hook-widget zle-line-pre-redraw __integral_line-pre-redraw
+__integral_render
+zle -N zle-line-init __integral_zle-line-init

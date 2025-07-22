@@ -3,37 +3,15 @@ package shell
 import (
 	"fmt"
 	"integral/config"
-	"strings"
 )
 
-type Shell uint8
-const (
-	ZSH Shell = iota
-	NUSH
-)
-
-// Formatting
-
-// Foreground color
 func Fg(str string, color config.Color) string {
-	str = strings.ReplaceAll(str, "%", "%%")
-	return fmt.Sprintf("%%F{%d}%s%%f", color, str)
+	return fmt.Sprintf("\033[%dm%s\033[39m", color, str)
 }
-
-// Bold text
 func Bold(str string) string {
-	str = strings.ReplaceAll(str, "%", "%%")
-	return fmt.Sprintf("%%B%s%%b", str)
+	return fmt.Sprintf("\033[1m%s\033[0m", str)
 }
-
-// Underline text
 func Underline(str string) string {
-	str = strings.ReplaceAll(str, "%", "%%")
-	return fmt.Sprintf("%%U%s%%u", str)
+	return fmt.Sprintf("\033[4m%s\033[0m", str)
 }
 
-// Standout text
-func Standout(str string) string {
-	str = strings.ReplaceAll(str, "%", "%%")
-	return fmt.Sprintf("%%S%s%%s", str)
-}

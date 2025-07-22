@@ -21,6 +21,10 @@ func main() {
 		fmt.Print(shell.Fg(string(cfg.Line.Symbols[3]), cfg.Line.Color))
 	case "render":
 		render(cfg)
+	case "init":
+		
+	default:
+		logger.Fatalln("Unknown command")
 	}
 }
 

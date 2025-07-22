@@ -16,23 +16,28 @@ import (
 )
 
 type RenderedModule struct {
-	Raw   string
+	Length int
+	Fmt   string
 	Wrap  bool
 	Color config.Color
 }
 
 func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
+	raw := fmt.Sprintf("%d%c", num, icon)
 	return RenderedModule{
-		Raw:   shell.Fg(fmt.Sprintf("%d%c", num, icon), color),
-		Wrap:  false,
-		Color: color,
+		Length: len(raw),
+		Fmt:    shell.Fg(raw, color),
+		Wrap:   false,
+		Color:  color,
 	}
 }
 func renderIcon(icon rune, color config.Color) RenderedModule {
+	raw := string(icon)
 	return RenderedModule{
-		Raw:   shell.Fg(string(icon), color),
-		Wrap:  false,
-		Color: color,
+		Length: 1,
+		Fmt:    shell.Fg(raw, color),
+		Wrap:   false,
+		Color:  color,
 	}
 }
 
@@ -120,9 +125,10 @@ func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
 }
 func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
-		Raw:   shell.Fg(m.CWD, cfg.Dir.Color),
-		Wrap:  true,
-		Color: cfg.Dir.Color,
+		Length: len(m.CWD),
+		Fmt:    shell.Fg(m.CWD, cfg.Dir.Color),
+		Wrap:   true,
+		Color:  cfg.Dir.Color,
 	}
 }
 
@@ -167,9 +173,10 @@ func (m *DistroboxModule) render(cfg *config.PromptConfig) RenderedModule {
 		}
 	}
 	return RenderedModule{
-		Raw:   fmt.Sprint(shell.Fg(m.Distro, cfg.Distrobox.TextColor), shell.Fg(string(icon), color)),
-		Wrap:  true,
-		Color: color,
+		Length: len(m.Distro) + 1,
+		Fmt:    fmt.Sprint(shell.Fg(m.Distro, cfg.Distrobox.TextColor), shell.Fg(string(icon), color)),
+		Wrap:   true,
+		Color:  color,
 	}
 }
 
@@ -308,17 +315,22 @@ func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
 // [TODO] make really fancy wrapping logic to make this wrappable
 func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
 	var user, at, host string
+	var ln int
 	if cfg.Ssh.User.Visible {
+		ln += len(m.User)
 		user = shell.Fg(m.User, cfg.Ssh.User.Color)
 	}
 	if cfg.Ssh.At.Visible {
+		ln += 1
 		at = shell.Fg("@", cfg.Ssh.At.Color)
 	}
 	if cfg.Ssh.Host.Visible {
+		ln += len(m.Host)
 		host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
 	}
 	return RenderedModule{
-		Raw:  fmt.Sprint(user, at, host),
+		Length:	ln,
+		Fmt:  fmt.Sprint(user, at, host),
 		Wrap: false,
 	}
 }
@@ -342,20 +354,25 @@ func (m *SshPlus) initialize(cfg *config.PromptConfig) bool {
 }
 func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 	var ssh, db, final string
+	var ln int
 	if m.User != "" {
 		var user, at, host string
 		if cfg.Ssh.User.Visible {
+			ln += len(m.User)
 			user = shell.Fg(m.User, cfg.Ssh.User.Color)
 		}
 		if cfg.Ssh.At.Visible {
+			ln += 1
 			at = shell.Fg("@", cfg.Ssh.At.Color)
 		}
 		if cfg.Ssh.Host.Visible {
+			ln += len(m.Host)
 			host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
 		}
 		ssh = fmt.Sprint(user, at, host)
 	}
 	if m.Distro != "" {
+		ln += len(m.Distro)
 		color, icon := cfg.Distrobox.DefaultIcon.Color, cfg.Distrobox.DefaultIcon.Icon
 		for _, distro := range *cfg.Distrobox.IconEntries {
 			if m.Distro == distro.Name {
@@ -366,14 +383,16 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 	}
 	if ssh != "" && db != "" {
 		final = ssh + shell.Fg("[", cfg.Ssh.At.Color) + db + shell.Fg("]", cfg.Ssh.At.Color)
+		ln += 2
 	} else if ssh != "" {
 		final = ssh
 	} else if db != "" {
 		final = db
 	}
 	return RenderedModule{
-		Raw:  final,
-		Wrap: false,
+		Length: ln,
+		Fmt:    final,
+		Wrap:   false,
 	}
 }
 
@@ -387,9 +406,10 @@ func (m *TimeModule) initialize(cfg *config.PromptConfig) bool {
 }
 func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
-		Raw:   shell.Fg(m.Time, cfg.Time.Color),
-		Wrap:  true,
-		Color: cfg.Time.Color,
+		Length: len(m.Time),
+		Fmt:    shell.Fg(m.Time, cfg.Time.Color),
+		Wrap:   true,
+		Color:  cfg.Time.Color,
 	}
 }
 

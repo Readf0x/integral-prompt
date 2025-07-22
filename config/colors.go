@@ -3,7 +3,7 @@ package config
 type Color uint8
 
 const (
-	Black Color = iota
+	Black Color = iota + 30
 	Red
 	Green
 	Yellow
@@ -11,7 +11,7 @@ const (
 	Magenta
 	Cyan
 	White
-	BrightBlack
+	BrightBlack Color = iota + 82
 	BrightRed
 	BrightGreen
 	BrightYellow

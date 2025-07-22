@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strings"
 	"unicode/utf8"
 
 	"golang.org/x/term"
@@ -49,7 +48,7 @@ func finalize(cfg *config.PromptConfig, size int) []string {
 }
 
 func trueLength(str string) int {
-	return utf8.RuneCountInString(regexp.MustCompile(`%[FfBbUuSs]({\d*})?`).ReplaceAllString(strings.ReplaceAll(str, "%%", "%"), ""))
+	return utf8.RuneCountInString(regexp.MustCompile(`\033.*?m`).ReplaceAllString(str, ""))
 }
 func digit(num int) int {
 	if num < 10 {
@@ -64,28 +63,28 @@ func assemble(width int, mods []RenderedModule, maxLines int, cfg *config.LineCo
 	maxm := len(mods) - 1
 	for i, mod := range mods {
 		curLength := trueLength(lines[currentLine])
-		modLength := trueLength(mod.Raw)
+		modLength := trueLength(mod.Fmt)
 		if curLength+modLength > width {
 			if mod.Wrap {
-				wrapPos := width - curLength + 4 + digit(int(cfg.Color))
+				wrapPos := width - curLength + 3 + digit(int(cfg.Color))
 				rag := modLength / width
-				lines[currentLine] += fmt.Sprintf("%%F{%d}", mod.Color) + mod.Raw[:wrapPos]
+				lines[currentLine] += fmt.Sprintf("\033[%dm", mod.Color) + mod.Fmt[:wrapPos]
 				for i := range rag {
 					lines = append(lines, shell.Fg(string(cfg.Symbols[1]), cfg.Color))
 					currentLine += 1
 					if i != rag-1 {
-						lines[currentLine] += fmt.Sprintf("%%F{%d}", mod.Color) + mod.Raw[wrapPos+((width-1)*i):wrapPos+((width-1)*(i+1))]
+						lines[currentLine] += fmt.Sprintf("\033[%dm", mod.Color) + mod.Fmt[wrapPos+((width-1)*i):wrapPos+((width-1)*(i+1))]
 					} else {
-						lines[currentLine] += fmt.Sprintf("%%F{%d}", mod.Color) + mod.Raw[wrapPos+((width-1)*i):]
+						lines[currentLine] += fmt.Sprintf("\033[%dm", mod.Color) + mod.Fmt[wrapPos+((width-1)*i):]
 					}
 				}
 			} else {
 				lines = append(lines, shell.Fg(string(cfg.Symbols[1]), cfg.Color))
-				lines[currentLine+1] += mod.Raw
+				lines[currentLine+1] += mod.Fmt
 				currentLine += 1
 			}
 		} else {
-			lines[currentLine] += mod.Raw
+			lines[currentLine] += mod.Fmt
 		}
 		if i != maxm {
 			lines[currentLine] += " "
