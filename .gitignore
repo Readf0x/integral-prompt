@@ -1,6 +1,6 @@
-.direnv
-.zcompdump
-vendor
-result
-integral
-benchmark.json
+/.direnv
+/.zcompdump
+/vendor
+/result
+/integral
+/benchmark.json

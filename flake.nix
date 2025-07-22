@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       inherit (nixpkgs) lib;
-    in {
+    in rec {
       devShells = {
         default = pkgs.mkShell {
           packages = with pkgs; [
@@ -19,10 +19,12 @@
             git
             openssh
             zsh
+            packages.default
           ];
 
           shellHook = ''
             exec zsh
+            export XDG_DATA_DIRS="$PWD/share:$XDG_DATA_DIRS"
           '';
 
           ZDOTDIR = builtins.toString ./.;
@@ -39,12 +41,21 @@
 
           vendorHash = "sha256-nrQ5rkXBAu2prVlJaqHHLIarQsW+/6oH+LMLqpjWvYc=";
 
+          postInstall = ''
+            mkdir -p $out/share
+            cp -r share/integral $out/share/integral
+          '';
+
           meta = {
             description = "Cross shell prompt theme written in Golang";
             homepage = "https://github.com/Readf0x/integral-prompt";
             license = lib.licenses.gpl3;
           };
         };
+        default = integral;
+      };
+      homeManagerModules = rec {
+        integral = import ./hm.nix self;
         default = integral;
       };
     });

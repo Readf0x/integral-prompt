@@ -23,10 +23,7 @@ func render(cfg *config.PromptConfig) {
 
 	prompt := finalize(cfg, width)
 
-	fmt.Println()
-	for _, line := range prompt {
-		fmt.Println(line)
-	}
+	fmt.Println(shell.PromptFmt(prompt))
 }
 
 func finalize(cfg *config.PromptConfig, size int) []string {

@@ -22,7 +22,7 @@ func main() {
 	case "render":
 		render(cfg)
 	case "init":
-		
+		shell.Init()
 	default:
 		logger.Fatalln("Unknown command")
 	}
