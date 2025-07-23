@@ -54,9 +54,10 @@
         };
         default = integral;
       };
+    }) // {
       homeManagerModules = rec {
         integral = import ./hm.nix self;
         default = integral;
       };
-    });
+    };
 }
