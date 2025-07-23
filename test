@@ -8,11 +8,17 @@ if [[ $1 = "benchmark" ]]; then
   else
     print -P "%F{1}Fail!%f"
   fi
+elif [[ $1 = "debug" ]]; then
+  go build -gcflags="all=-N -l"
+  ./integral render raw ${2:-20} ${3:-0} ${4:-0} &
+  pid=$!
+  kill -STOP $pid
+  dlv attach $pid & kill -CONT $pid
 else
-  go run *.go render raw 1 0
+  go run *.go render raw $COLUMNS 1 0
   export SSH_CONNECTION=asdf
-  go run *.go render raw 2 1
+  go run *.go render raw $COLUMNS 2 1
   export CONTAINER_ID=debian
-  go run *.go render raw 126 2
+  go run *.go render raw $COLUMNS 126 2
 fi
 

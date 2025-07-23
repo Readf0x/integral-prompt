@@ -43,8 +43,11 @@ func finalize(cfg *config.PromptConfig, size int) []string {
 	return lines
 }
 
+var ansiRegexp = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
 func trueLength(str string) int {
-	return utf8.RuneCountInString(regexp.MustCompile(`\033.*?m`).ReplaceAllString(str, ""))
+	clean := ansiRegexp.ReplaceAllString(str, "")
+	return utf8.RuneCountInString(clean)
 }
 func digit(num int) int {
 	if num < 10 {
@@ -52,42 +55,63 @@ func digit(num int) int {
 	}
 	return 2
 }
-func assemble(width int, mods []RenderedModule, maxLines int, cfg *config.LineConfig) []string {
+
+func assemble(width int, modules []RenderedModule, maxLines int, cfg *config.LineConfig) []string {
 	lines := make([]string, 0, maxLines)
 	lines = append(lines, shell.Fg(string(cfg.Symbols[0]), cfg.Color))
-	var currentLine = 0
-	maxm := len(mods) - 1
-	for i, mod := range mods {
-		curLength := trueLength(lines[currentLine])
-		modLength := trueLength(mod.Fmt)
-		if curLength+modLength > width {
+
+	currentLine := 0
+	lastIndex := len(modules) - 1
+
+	for i, mod := range modules {
+		lineLen := trueLength(lines[currentLine])
+		modLen := trueLength(mod.Fmt)
+
+		if lineLen+modLen > width {
 			if mod.Wrap {
-				wrapPos := width - curLength + 3 + digit(int(cfg.Color))
-				rag := modLength / width
-				lines[currentLine] += fmt.Sprintf("\033[%dm", mod.Color) + mod.Fmt[:wrapPos]
-				for i := range rag {
-					lines = append(lines, shell.Fg(string(cfg.Symbols[1]), cfg.Color))
-					currentLine += 1
-					if i != rag-1 {
-						lines[currentLine] += fmt.Sprintf("\033[%dm", mod.Color) + mod.Fmt[wrapPos+((width-1)*i):wrapPos+((width-1)*(i+1))]
-					} else {
-						lines[currentLine] += fmt.Sprintf("\033[%dm", mod.Color) + mod.Fmt[wrapPos+((width-1)*i):]
+				wrapped := wrapModule(mod, width, lineLen, cfg)
+				for j, segment := range wrapped {
+					if j > 0 {
+						lines = append(lines, shell.Fg(string(cfg.Symbols[1]), cfg.Color))
+						currentLine++
 					}
+					lines[currentLine] += segment
 				}
 			} else {
 				lines = append(lines, shell.Fg(string(cfg.Symbols[1]), cfg.Color))
-				lines[currentLine+1] += mod.Fmt
-				currentLine += 1
+				currentLine++
+				lines[currentLine] += mod.Fmt
 			}
 		} else {
 			lines[currentLine] += mod.Fmt
 		}
-		if i != maxm {
+
+		if i != lastIndex {
 			lines[currentLine] += " "
 		}
 	}
 
 	return lines
+}
+
+func wrapModule(mod RenderedModule, width, currentLineLen int, cfg *config.LineConfig) []string {
+	var segments []string
+
+	// ANSI overhead for your coloring
+	colorOverhead := 3 + digit(int(cfg.Color))
+	firstWrapLimit := width - currentLineLen + colorOverhead
+
+	segments = append(segments, mod.Fmt[:firstWrapLimit])
+
+	remaining := mod.Fmt[firstWrapLimit:]
+	for trueLength(remaining) > 0 {
+		chunkSize := width - 1
+		chunkSize = min(chunkSize, trueLength(remaining))
+		segments = append(segments, fmt.Sprintf("\033[%dm%s", mod.Color, remaining[:chunkSize]))
+		remaining = remaining[chunkSize:]
+	}
+
+	return segments
 }
 
 func generate(cfg *config.PromptConfig, modules *[]string, c chan []RenderedModule) {
