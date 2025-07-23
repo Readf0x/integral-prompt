@@ -224,7 +224,6 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 	}
 	repo, err := git.PlainOpen(cwd)
 	if err != nil {
-		logger.Println(err)
 		return false
 	}
 
@@ -263,23 +262,20 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 	branchCfg, ok := config.Branches[m.Branch]
 	if ok {
 		remoteRef, err := repo.Reference(plumbing.NewRemoteReferenceName(branchCfg.Remote, m.Branch), true)
-		if err != nil {
-			logger.Println(err)
-			return false
-		}
+		if err == nil {
+			local, err := getCommits(repo, head.Hash())
+			if err != nil {
+				logger.Println(err)
+				return false
+			}
+			remote, err := getCommits(repo, remoteRef.Hash())
+			if err != nil {
+				logger.Println(err)
+				return false
+			}
 
-		local, err := getCommits(repo, head.Hash())
-		if err != nil {
-			logger.Println(err)
-			return false
+			m.Push, m.Pull = diffCommits(local, remote)
 		}
-		remote, err := getCommits(repo, remoteRef.Hash())
-		if err != nil {
-			logger.Println(err)
-			return false
-		}
-
-		m.Push, m.Pull = diffCommits(local, remote)
 	}
 
 	return true
