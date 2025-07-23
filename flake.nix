@@ -39,11 +39,16 @@
 
           src = ./.;
 
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+
           vendorHash = "sha256-nrQ5rkXBAu2prVlJaqHHLIarQsW+/6oH+LMLqpjWvYc=";
 
           postInstall = ''
             mkdir -p $out/share
             cp -r share/integral $out/share/integral
+
+            wrapProgram $out/bin/${pname} \
+              --prefix XDG_DATA_DIRS : $out/share
           '';
 
           meta = {
