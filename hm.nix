@@ -1,8 +1,8 @@
 self: { config, lib, ... }: let
   cfg = config.integral-prompt;
 in {
-  options.integral = {
-    enable = lib.mkEnableOption "integral";
+  options.programs.zsh.integral-prompt = {
+    enable = lib.mkEnableOption "integral prompt";
     package = lib.mkPackageOption self.packages "integral";
     enableZshIntegration = lib.hm.shell.mkZshIntegrationOption { inherit config; };
   };
