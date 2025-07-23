@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"integral/config"
-	"integral/shell"
 	"os"
 	"os/exec"
 	"strconv"
@@ -28,7 +27,7 @@ func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
 	raw := fmt.Sprintf("%d%c", num, icon)
 	return RenderedModule{
 		Length: len(raw),
-		Fmt:    shell.Fg(raw, color),
+		Fmt:    sh.Fg(raw, color),
 		Wrap:   false,
 		Color:  color,
 	}
@@ -37,7 +36,7 @@ func renderIcon(icon rune, color config.Color) RenderedModule {
 	raw := string(icon)
 	return RenderedModule{
 		Length: 1,
-		Fmt:    shell.Fg(raw, color),
+		Fmt:    sh.Fg(raw, color),
 		Wrap:   false,
 		Color:  color,
 	}
@@ -128,7 +127,7 @@ func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
 func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
 		Length: len(m.CWD),
-		Fmt:    shell.Fg(m.CWD, cfg.Dir.Color),
+		Fmt:    sh.Fg(m.CWD, cfg.Dir.Color),
 		Wrap:   true,
 		Color:  cfg.Dir.Color,
 	}
@@ -176,7 +175,7 @@ func (m *DistroboxModule) render(cfg *config.PromptConfig) RenderedModule {
 	}
 	return RenderedModule{
 		Length: len(m.Distro) + 1,
-		Fmt:    fmt.Sprint(shell.Fg(m.Distro, cfg.Distrobox.TextColor), shell.Fg(string(icon), color)),
+		Fmt:    fmt.Sprint(sh.Fg(m.Distro, cfg.Distrobox.TextColor), sh.Fg(string(icon), color)),
 		Wrap:   true,
 		Color:  color,
 	}
@@ -318,7 +317,7 @@ func (m *GitModule) render(cfg *config.PromptConfig) []RenderedModule {
 	list := []RenderedModule{
 		{
 			Length: len(m.Branch),
-			Fmt: shell.Fg(m.Branch, cfg.Git.Branch.Color),
+			Fmt: sh.Fg(m.Branch, cfg.Git.Branch.Color),
 			Wrap: true,
 			Color: cfg.Git.Branch.Color,
 		},
@@ -396,15 +395,15 @@ func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
 	var ln int
 	if cfg.Ssh.User.Visible {
 		ln += len(m.User)
-		user = shell.Fg(m.User, cfg.Ssh.User.Color)
+		user = sh.Fg(m.User, cfg.Ssh.User.Color)
 	}
 	if cfg.Ssh.At.Visible {
 		ln += 1
-		at = shell.Fg("@", cfg.Ssh.At.Color)
+		at = sh.Fg("@", cfg.Ssh.At.Color)
 	}
 	if cfg.Ssh.Host.Visible {
 		ln += len(m.Host)
-		host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
+		host = sh.Fg(m.Host, cfg.Ssh.Host.Color)
 	}
 	return RenderedModule{
 		Length: ln,
@@ -437,15 +436,15 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 		var user, at, host string
 		if cfg.Ssh.User.Visible {
 			ln += len(m.User)
-			user = shell.Fg(m.User, cfg.Ssh.User.Color)
+			user = sh.Fg(m.User, cfg.Ssh.User.Color)
 		}
 		if cfg.Ssh.At.Visible {
 			ln += 1
-			at = shell.Fg("@", cfg.Ssh.At.Color)
+			at = sh.Fg("@", cfg.Ssh.At.Color)
 		}
 		if cfg.Ssh.Host.Visible {
 			ln += len(m.Host)
-			host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
+			host = sh.Fg(m.Host, cfg.Ssh.Host.Color)
 		}
 		ssh = fmt.Sprint(user, at, host)
 	}
@@ -457,10 +456,10 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 				color, icon = distro.Color, distro.Icon
 			}
 		}
-		db = fmt.Sprint(shell.Fg(m.Distro, cfg.Distrobox.TextColor), shell.Fg(string(icon), color))
+		db = fmt.Sprint(sh.Fg(m.Distro, cfg.Distrobox.TextColor), sh.Fg(string(icon), color))
 	}
 	if ssh != "" && db != "" {
-		final = ssh + shell.Fg("[", cfg.Ssh.At.Color) + db + shell.Fg("]", cfg.Ssh.At.Color)
+		final = ssh + sh.Fg("[", cfg.Ssh.At.Color) + db + sh.Fg("]", cfg.Ssh.At.Color)
 		ln += 2
 	} else if ssh != "" {
 		final = ssh
@@ -485,7 +484,7 @@ func (m *TimeModule) initialize(cfg *config.PromptConfig) bool {
 func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
 		Length: len(m.Time),
-		Fmt:    shell.Fg(m.Time, cfg.Time.Color),
+		Fmt:    sh.Fg(m.Time, cfg.Time.Color),
 		Wrap:   true,
 		Color:  cfg.Time.Color,
 	}
