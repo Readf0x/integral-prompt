@@ -21,7 +21,7 @@ func Underline(str string) string {
 }
 
 func PromptFmt(prompt []string) string {
-	return "PROMPT=\"\n" + strings.Join(prompt, "\n") + "\""
+	return "PROMPT=\"\n%{" + strings.Join(prompt, "%}\n%{%G") + "%}\""
 }
 func RPromptFmt(prompt string) string {
 	return "RPROMPT=\"" + prompt + "\""
