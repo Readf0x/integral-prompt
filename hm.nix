@@ -1,5 +1,5 @@
 self: { config, lib, ... }: let
-  cfg = config.integral-prompt;
+  cfg = config.programs.zsh.integral-prompt;
 in {
   options.programs.zsh.integral-prompt = {
     enable = lib.mkEnableOption "integral prompt";
