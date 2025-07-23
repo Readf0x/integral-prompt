@@ -13,6 +13,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    home.packages = lib.mkIf (cfg.package != null) [ cfg.package ];
+
     programs.zsh.initContent = lib.mkIf cfg.enableZshIntegration (
       lib.mkOrder 600 ''
         eval "$(${lib.getExe cfg.package} init zsh)"
