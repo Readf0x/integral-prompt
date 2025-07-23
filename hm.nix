@@ -9,13 +9,12 @@ in {
       defaultText = "integral-prompt.packages.\${system}.default";
       description = "The package used for integral-prompt";
     };
-    enableZshIntegration = lib.hm.shell.mkZshIntegrationOption { inherit config; };
   };
 
   config = lib.mkIf cfg.enable {
     home.packages = lib.mkIf (cfg.package != null) [ cfg.package ];
 
-    programs.zsh.initContent = lib.mkIf cfg.enableZshIntegration (
+    programs.zsh.initContent = (
       lib.mkOrder 600 ''
         eval "$(${lib.getExe cfg.package} init zsh)"
       ''
