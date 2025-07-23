@@ -1,2 +1,2 @@
-source $ZDOTDIR/integral.zsh-theme
+eval "$(integral init zsh)"
 autoload -U compinit && compinit

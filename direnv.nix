@@ -4,15 +4,12 @@ pkgs.mkShell {
   
   packages = with pkgs; [
     coreutils
+    delve
     gawk
     git
+    go
     openssh
     zsh
   ];
 
-  shellHook = ''
-    exec zsh
-  '';
-
-  ZDOTDIR = builtins.toString ./.;
 }
