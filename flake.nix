@@ -55,6 +55,7 @@
             description = "Cross shell prompt theme written in Golang";
             homepage = "https://github.com/Readf0x/integral-prompt";
             license = lib.licenses.gpl3;
+            mainProgram = pname;
           };
         };
         default = integral;
