@@ -6,7 +6,6 @@ require (
 	github.com/distatus/battery v0.11.0
 	github.com/go-git/go-git/v6 v6.0.0-20250711134917-1f24ae85fe16
 	github.com/shirou/gopsutil/v4 v4.25.5
-	golang.org/x/term v0.33.0
 )
 
 require (

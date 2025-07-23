@@ -24,7 +24,7 @@
 
           shellHook = ''
             exec zsh
-            export XDG_DATA_DIRS="$PWD/share:$XDG_DATA_DIRS"
+            export XDG_DATA_DIRS="${builtins.toString ./.}/share:$XDG_DATA_DIRS"
           '';
 
           ZDOTDIR = builtins.toString ./.;
@@ -41,7 +41,7 @@
 
           nativeBuildInputs = [ pkgs.makeWrapper ];
 
-          vendorHash = "sha256-nrQ5rkXBAu2prVlJaqHHLIarQsW+/6oH+LMLqpjWvYc=";
+          vendorHash = "sha256-mr41Xq3D5V/T3oWp1TCSykRtu5r703JXY7PYooJtB/s=";
 
           postInstall = ''
             mkdir -p $out/share
