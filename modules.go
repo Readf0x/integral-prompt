@@ -11,15 +11,17 @@ import (
 	"time"
 
 	"github.com/distatus/battery"
-	"github.com/go-git/go-git/v6"
+	git "github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing"
+	"github.com/go-git/go-git/v6/plumbing/object"
 	"github.com/shirou/gopsutil/v4/cpu"
 )
 
 type RenderedModule struct {
 	Length int
-	Fmt   string
-	Wrap  bool
-	Color config.Color
+	Fmt    string
+	Wrap   bool
+	Color  config.Color
 }
 
 func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
@@ -253,13 +255,93 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 		}
 	}
 
-	// [TODO] implement push and pull detection
+	config, err := repo.Config()
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+	branchCfg, ok := config.Branches[m.Branch]
+	if ok {
+		remoteRef, err := repo.Reference(plumbing.NewRemoteReferenceName(branchCfg.Remote, m.Branch), true)
+		if err != nil {
+			logger.Println(err)
+			return false
+		}
+
+		local, err := getCommits(repo, head.Hash())
+		if err != nil {
+			logger.Println(err)
+			return false
+		}
+		remote, err := getCommits(repo, remoteRef.Hash())
+		if err != nil {
+			logger.Println(err)
+			return false
+		}
+
+		m.Push, m.Pull = diffCommits(local, remote)
+	}
 
 	return true
 }
+func getCommits(repo *git.Repository, hash plumbing.Hash) ([]plumbing.Hash, error) {
+	var hashes []plumbing.Hash
+
+	commit, err := repo.CommitObject(hash)
+	if err != nil {
+		return nil, err
+	}
+
+	err = object.NewCommitPreorderIter(commit, nil, nil).ForEach(func(c *object.Commit) error {
+		hashes = append(hashes, c.Hash)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return hashes, nil
+}
+func diffCommits(a, b []plumbing.Hash) (onlyInA, onlyInB uint8) {
+	set := make(map[plumbing.Hash]struct{}, len(a))
+	for _, h := range a {
+		set[h] = struct{}{}
+	}
+	for _, h := range b {
+		if _, ok := set[h]; ok {
+			delete(set, h)
+		} else {
+			onlyInB++
+		}
+	}
+	onlyInA = uint8(len(set))
+	return
+}
+
 func (m *GitModule) render(cfg *config.PromptConfig) []RenderedModule {
-	// [TODO] implement git render
-	return []RenderedModule{}
+	list := []RenderedModule{
+		{
+			Length: len(m.Branch),
+			Fmt: shell.Fg(m.Branch, cfg.Git.Branch.Color),
+			Wrap: true,
+			Color: cfg.Git.Branch.Color,
+		},
+	}
+
+	if m.Unstaged != 0 {
+		list = append(list, renderCounter(m.Unstaged, cfg.Git.Unstaged.Icon, cfg.Git.Unstaged.Color))
+	}
+	if m.Staged != 0 {
+		list = append(list, renderCounter(m.Staged, cfg.Git.Staged.Icon, cfg.Git.Staged.Color))
+	}
+	if m.Push != 0 {
+		list = append(list, renderCounter(m.Push, cfg.Git.Push.Icon, cfg.Git.Push.Color))
+	}
+	if m.Pull != 0 {
+		list = append(list, renderCounter(m.Pull, cfg.Git.Pull.Icon, cfg.Git.Pull.Color))
+	}
+
+	return list
 }
 
 type JobsModule struct {
@@ -329,9 +411,9 @@ func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
 		host = shell.Fg(m.Host, cfg.Ssh.Host.Color)
 	}
 	return RenderedModule{
-		Length:	ln,
-		Fmt:  fmt.Sprint(user, at, host),
-		Wrap: false,
+		Length: ln,
+		Fmt:    fmt.Sprint(user, at, host),
+		Wrap:   false,
 	}
 }
 

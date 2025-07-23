@@ -65,9 +65,8 @@ func assemble(width int, modules []RenderedModule, maxLines int, cfg *config.Lin
 
 	for i, mod := range modules {
 		lineLen := trueLength(lines[currentLine])
-		modLen := trueLength(mod.Fmt)
 
-		if lineLen+modLen > width {
+		if lineLen+mod.Length > width {
 			if mod.Wrap {
 				wrapped := wrapModule(mod, width, lineLen, cfg)
 				for j, segment := range wrapped {
@@ -93,7 +92,6 @@ func assemble(width int, modules []RenderedModule, maxLines int, cfg *config.Lin
 
 	return lines
 }
-
 func wrapModule(mod RenderedModule, width, currentLineLen int, cfg *config.LineConfig) []string {
 	var segments []string
 
@@ -126,8 +124,8 @@ func generate(cfg *config.PromptConfig, modules *[]string, c chan []RenderedModu
 			m = &DirModule{}
 		case "error":
 			m = &ErrorModule{}
-		// case "git":
-		// 	M = &GitModule{}
+		case "git":
+			M = &GitModule{}
 		case "battery":
 			m = &BatteryModule{}
 		case "cpu":
