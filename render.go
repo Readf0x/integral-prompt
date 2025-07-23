@@ -7,16 +7,15 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"unicode/utf8"
-
-	"golang.org/x/term"
 )
 
 func render(cfg *config.PromptConfig) {
-	if len(os.Args) > 5 {
+	if len(os.Args) < 6 {
 		logger.Fatalln("Not enough arguments!")
 	}
-	width, _, err := term.GetSize(int(os.Stdin.Fd()))
+	width, err := strconv.Atoi(os.Args[3])
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -185,7 +185,7 @@ type ErrorModule struct {
 }
 
 func (m *ErrorModule) initialize(cfg *config.PromptConfig) bool {
-	c, err := strconv.ParseUint(os.Args[3], 10, 8)
+	c, err := strconv.ParseUint(os.Args[4], 10, 8)
 	if err != nil {
 		logger.Panicln(err)
 		return false
@@ -267,7 +267,7 @@ type JobsModule struct {
 }
 
 func (m *JobsModule) initialize(cfg *config.PromptConfig) bool {
-	j, err := strconv.ParseUint(os.Args[4], 10, 8)
+	j, err := strconv.ParseUint(os.Args[5], 10, 8)
 	if err != nil {
 		logger.Println(err)
 		return false

@@ -38,7 +38,7 @@ __integral_error_hook() {
 }
 
 __integral_render() {
-  eval "$(integral render zsh $sig $(jobs | wc -l))"
+  eval "$(integral render zsh $COLUMNS $sig $(jobs | wc -l))"
 }
 
 __integral_line-pre-redraw() {
@@ -67,7 +67,7 @@ __integral_line-pre-redraw() {
 
   if [[ $VI_KEYMAP != ${previous_vi_keymap} ]]; then
     __integral_render
-    zle reset-prompt
+    zle .reset-prompt
   fi
 }
 
@@ -87,6 +87,7 @@ add-zsh-hook precmd __integral_error_hook
 add-zsh-hook precmd __integral_render
 add-zsh-hook precmd __integral_cursor-shape
 zle -N __integral_line-pre-redraw
+zle -N __integral_render
 add-zle-hook-widget zle-line-pre-redraw __integral_line-pre-redraw
 __integral_render
 zle -N zle-line-init __integral_zle-line-init
