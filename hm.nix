@@ -1,11 +1,11 @@
-{ config, lib, pkgs, ... }: let
+self: { config, lib, pkgs, ... }: let
   cfg = config.programs.zsh.integral-prompt;
 in {
   options.programs.zsh.integral-prompt = {
     enable = lib.mkEnableOption "integral prompt";
     package = lib.mkOption {
       type = lib.types.package;
-      default = config._module.args.self.packages.${pkgs.system}.default;
+      default = self.packages.${pkgs.system}.default;
       defaultText = "integral-prompt.packages.\${system}.default";
       description = "The package used for integral-prompt";
     };
