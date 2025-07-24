@@ -21,7 +21,7 @@ func main() {
 	}
 	switch os.Args[1] {
 	case "transient":
-		fmt.Print(shell.Generic.Fg(string(cfg.Line.Symbols[3]), cfg.Line.Color))
+		fmt.Print(shell.Raw.Fg(string(cfg.Line.Symbols[3]), cfg.Line.Color))
 	case "render":
 		var err error
 		sh, err = shell.GetShell(os.Args[2])

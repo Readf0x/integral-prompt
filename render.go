@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"integral/config"
+	"integral/shell"
 	"log"
 	"os"
-	"regexp"
 	"strconv"
-	"unicode/utf8"
+	"strings"
 )
 
 func render(cfg *config.PromptConfig) {
@@ -19,35 +19,32 @@ func render(cfg *config.PromptConfig) {
 		log.Fatal(err)
 	}
 
-	prompt := finalize(cfg, width)
+	prompt, rprompt := finalize(cfg, width)
 
-	fmt.Println(sh.PromptFmt(prompt))
+	fmt.Print(sh.PromptFmt(prompt))
+	if rprompt != "" {
+		fmt.Println(sh.RPromptFmt(rprompt))
+	}
 }
 
-func finalize(cfg *config.PromptConfig, size int) []string {
+func finalize(cfg *config.PromptConfig, size int) ([]string, string) {
 	// lines := make([]string, 0, cfg.Length+2)
 
 	// render right prompt
-	// right := make(chan []RenderedModule)
-	// go render(cfg, cfg.ModulesRight, right)
+	right := make(chan []RenderedModule)
+	go generate(cfg, cfg.ModulesRight, right)
 
 	// render main prompt
 	main := make(chan []RenderedModule)
 	go generate(cfg, cfg.Modules, main)
 
 	//assembly
-	lines := assemble(size, <-main, int(cfg.Length+2), cfg.Line)
+	lines, rprompt := assemble(size, <-main, assembleRight(<-right, cfg.RightSize), int(cfg.Length+2), cfg.Line)
 
 	lines = append(lines, sh.Fg(string(cfg.Line.Symbols[2]), cfg.Line.Color))
-	return lines
+	return lines, rprompt
 }
 
-var ansiRegexp = regexp.MustCompile(`\x1b\[[0-9;]*m`)
-
-func trueLength(str string) int {
-	clean := ansiRegexp.ReplaceAllString(str, "")
-	return utf8.RuneCountInString(clean)
-}
 func digit(num int) int {
 	if num < 10 {
 		return 1
@@ -55,28 +52,95 @@ func digit(num int) int {
 	return 2
 }
 
-func assemble(width int, modules []RenderedModule, maxLines int, cfg *config.LineConfig) []string {
+func assemble(width int, modules []RenderedModule, rightPrompt []string, maxLines int, cfg *config.LineConfig) ([]string, string) {
 	lines := make([]string, 0, maxLines)
 	lines = append(lines, sh.Fg(string(cfg.Symbols[0]), cfg.Color))
 
 	currentLine := 0
 	lastIndex := len(modules) - 1
+  maxWidth := width
+	var rprompt string
+	if len(rightPrompt) > 0 {
+		for _, s := range rightPrompt {
+			maxWidth = min(maxWidth, width - shell.TrueLength(s)) - 1
+		}
+	}
 
 	for i, mod := range modules {
-		lineLen := trueLength(lines[currentLine])
+		lineLen := shell.TrueLength(lines[currentLine])
 
-		if lineLen+mod.Length > width {
+		if lineLen+mod.Length > maxWidth {
 			if mod.Wrap {
-				wrapped := wrapModule(mod, width, lineLen, cfg)
+				wrapped := wrapModule(mod, maxWidth, lineLen, cfg.Color)
 				for j, segment := range wrapped {
 					if j > 0 {
 						lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
 						currentLine++
 					}
 					lines[currentLine] += segment
+					if len(rightPrompt) - 1 >= currentLine {
+						lines[currentLine] += " " + rightPrompt[currentLine]
+					}
 				}
 			} else {
+				if len(rightPrompt) - 1 >= currentLine {
+					lines[currentLine] += strings.Repeat(" ", maxWidth - shell.TrueLength(lines[currentLine]) + 1) + rightPrompt[currentLine]
+				}
 				lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
+				currentLine++
+				lines[currentLine] += mod.Fmt
+			}
+		} else {
+			lines[currentLine] += mod.Fmt
+		}
+
+		if i != lastIndex {
+			lines[currentLine] += " "
+		} else {
+			if len(rightPrompt) - 1 >= currentLine {
+				lines[currentLine] += strings.Repeat(" ", width - shell.TrueLength(lines[currentLine]) - shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
+			}
+		}
+	}
+	if len(rightPrompt) > currentLine + 1 {
+		if len(rightPrompt) - currentLine - 2 > 0 {
+			for i := 0; i < len(rightPrompt) - 1; i++ {
+				lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
+				currentLine++
+				lines[currentLine] += strings.Repeat(" ", width - 1 - shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
+			}
+		}
+		if sh.SupportsRP {
+			rprompt = rightPrompt[currentLine+1]
+		} else {
+			lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
+			currentLine++
+			lines[currentLine] += strings.Repeat(" ", width - 1 - shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
+		}
+	}
+
+	return lines, rprompt
+}
+func assembleRight(modules []RenderedModule, width int) []string {
+	lines := make([]string, 0, 10)
+	lines = append(lines, "")
+
+	currentLine := 0
+	lastIndex := len(modules) - 1
+
+	for i, mod := range modules {
+		if mod.Length > width {
+			if mod.Wrap {
+				wrapped := wrapModule(mod, width, 0, 0)
+				for j, segment := range wrapped {
+					if j > 0 {
+						lines = append(lines, "")
+						currentLine++
+					}
+					lines[currentLine] += segment
+				}
+			} else {
+				lines = append(lines, "")
 				currentLine++
 				lines[currentLine] += mod.Fmt
 			}
@@ -91,19 +155,22 @@ func assemble(width int, modules []RenderedModule, maxLines int, cfg *config.Lin
 
 	return lines
 }
-func wrapModule(mod RenderedModule, width, currentLineLen int, cfg *config.LineConfig) []string {
+func wrapModule(mod RenderedModule, width, currentLineLen int, color config.Color) []string {
 	var segments []string
 
 	// ANSI overhead for your coloring
-	colorOverhead := 3 + digit(int(cfg.Color))
+	colorOverhead := 3 + digit(int(color))
+	if color == 0 {
+		colorOverhead = 0
+	}
 	firstWrapLimit := width - currentLineLen + colorOverhead
 
 	segments = append(segments, mod.Fmt[:firstWrapLimit])
 
 	remaining := mod.Fmt[firstWrapLimit:]
-	for trueLength(remaining) > 0 {
+	for shell.TrueLength(remaining) > 0 {
 		chunkSize := width - 1
-		chunkSize = min(chunkSize, trueLength(remaining))
+		chunkSize = min(chunkSize, shell.TrueLength(remaining))
 		segments = append(segments, fmt.Sprintf("\033[%dm%s", mod.Color, remaining[:chunkSize]))
 		remaining = remaining[chunkSize:]
 	}

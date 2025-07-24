@@ -317,9 +317,9 @@ func (m *GitModule) render(cfg *config.PromptConfig) []RenderedModule {
 	list := []RenderedModule{
 		{
 			Length: len(m.Branch),
-			Fmt: sh.Fg(m.Branch, cfg.Git.Branch.Color),
-			Wrap: true,
-			Color: cfg.Git.Branch.Color,
+			Fmt:    sh.Fg(m.Branch, cfg.Git.Branch.Color),
+			Wrap:   true,
+			Color:  cfg.Git.Branch.Color,
 		},
 	}
 
