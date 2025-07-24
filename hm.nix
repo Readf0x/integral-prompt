@@ -10,7 +10,7 @@ in {
       description = "The package used for integral-prompt";
     };
     config = lib.mkOption {
-      type = lib.types.attr;
+      type = lib.types.attrs;
       default = {};
       defaultText = "{}";
       description = "JSON attribute set";
@@ -26,8 +26,8 @@ in {
       ''
     );
 
-    home.file.".config/integralrc" = builtins.toJSON {
+    home.file.".config/integralrc".text = builtins.toJSON ({
       "$schema" = "${self.packages.${pkgs.system}.default}/share/integral/schema.json";
-    } // cfg.config;
+    } // cfg.config);
   };
 }
