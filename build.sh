@@ -1,12 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
+mkdir build
 rm -rf build/*
-mkdir -p build/bin
 go generate
-go build
-cp integral build/bin
-cp -r share build
-# package step
 case "$1" in
   deb)
     TAG="$(git describe --tags --abbrev=0)"
@@ -21,12 +17,15 @@ Maintainer: Jean <https://github.com/readf0x>
 Description: Math themed shell prompt
 EOF
     mkdir -p build/usr/local/bin
-    chmod 755 build/bin/*
-    mv build/bin/* build/usr/local/bin/
-    rmdir build/bin
+    cp integral build/usr/local/bin
+    chmod 755 build/usr/local/bin/*
     dpkg-deb --build build
   ;;
   *)
+    mkdir build/usr/bin
+    CGO_ENABLED=0 go build -ldflags="-extldflags=-static"
+    cp integral build/usr/bin
+    cp -r share build
     tar -cJf build.tar.xz -C build .
   ;;
 esac
