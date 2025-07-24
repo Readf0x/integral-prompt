@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-mkdir build
+mkdir -p build
 rm -rf build/*
 go generate
 case "$1" in
@@ -22,7 +22,7 @@ EOF
     dpkg-deb --build build
   ;;
   *)
-    mkdir build/usr/bin
+    mkdir -p build/usr/bin
     CGO_ENABLED=0 go build -ldflags="-extldflags=-static"
     cp integral build/usr/bin
     cp -r share build

@@ -7,15 +7,15 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"io"
+	"integral/config"
 	"log"
 	"os"
 	"text/template"
-	"integral/config"
+	"time"
 
 	"github.com/go-git/go-git/v6"
+	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/invopop/jsonschema"
 )
 
@@ -43,27 +43,59 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		hash = head.Hash().String()
+
 		tags, err := repo.Tags()
 		if err != nil {
 			log.Fatal(err)
 		}
-		tagRef, err := tags.Next()
-		if err == nil {
-			tag = tagRef.Name().Short()
-		} else if errors.Is(err, io.EOF) {
-			tag = "unset"
+
+		var latestTag string
+		var latestTime time.Time
+
+		err = tags.ForEach(func(ref *plumbing.Reference) error {
+			tagObj, err := repo.TagObject(ref.Hash())
+			if err == nil {
+				// Annotated tag
+				commit, err := tagObj.Commit()
+				if err != nil {
+					return err
+				}
+				if commit.Committer.When.After(latestTime) {
+					latestTag = ref.Name().Short()
+					latestTime = commit.Committer.When
+				}
+			} else {
+				// Lightweight tag
+				commit, err := repo.CommitObject(ref.Hash())
+				if err != nil {
+					return nil // skip invalid ref
+				}
+				if commit.Committer.When.After(latestTime) {
+					latestTag = ref.Name().Short()
+					latestTime = commit.Committer.When
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			log.Fatal(err)
 		}
-		hash = head.Hash().String()
+		if latestTag == "" {
+			tag = "unset"
+		} else {
+			tag = latestTag
+		}
 	} else {
 		hash = os.Args[1]
 		tag = os.Args[2]
 	}
 
 	fmt.Printf("Commit: %s\nTag: %s\n", hash, tag)
-	
+
 	temp.Execute(bFile, buildinfo{
 		Commit: hash,
-		Tag: tag,
+		Tag:    tag,
 	})
 
 	jFile, err := os.Create(schemaFile)
