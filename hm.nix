@@ -9,6 +9,12 @@ in {
       defaultText = "integral-prompt.packages.\${system}.default";
       description = "The package used for integral-prompt";
     };
+    config = lib.mkOption {
+      type = lib.types.attr;
+      default = {};
+      defaultText = "{}";
+      description = "JSON attribute set";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -19,5 +25,9 @@ in {
         eval "$(${lib.getExe cfg.package} init zsh)"
       ''
     );
+
+    home.file.".config/integralrc" = builtins.toJSON {
+      "$schema" = "${self.packages.${pkgs.system}.default}/share/integral/schema.json";
+    } // cfg.config;
   };
 }
