@@ -5,7 +5,7 @@ go 1.24.3
 require (
 	github.com/distatus/battery v0.11.0
 	github.com/go-git/go-git/v6 v6.0.0-20250711134917-1f24ae85fe16
-	github.com/shirou/gopsutil/v4 v4.25.5
+	github.com/shirou/gopsutil/v4 v4.25.6
 )
 
 require (

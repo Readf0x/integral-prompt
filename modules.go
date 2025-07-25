@@ -14,6 +14,7 @@ import (
 	"github.com/go-git/go-git/v6/plumbing"
 	"github.com/go-git/go-git/v6/plumbing/object"
 	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/host"
 )
 
 type RenderedModule struct {
@@ -490,10 +491,26 @@ func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 	}
 }
 
-// [TODO] uptime
-// frankly I have no clue how to read /proc/uptime
 type UptimeModule struct {
-	Uptime string
+	Uptime time.Duration
+}
+func (m *UptimeModule) initialize(cfg *config.PromptConfig) bool {
+	raw, err := host.Uptime()
+	if err != nil {
+		logger.Println(err)
+		return false
+	}
+	m.Uptime = time.Duration(raw)
+	return true
+}
+// m.Uptime = time.Duration(raw).String()
+func (m *UptimeModule) render(cfg *config.PromptConfig) RenderedModule {
+	str := m.Uptime.String()
+	return RenderedModule{
+		Length: len(str),
+		Fmt: sh.Fg(str + string(cfg.Uptime.Icon), cfg.Uptime.Color),
+		Wrap: false,
+	}
 }
 
 type ViModeModule struct {

@@ -35,13 +35,13 @@
         integral = pkgs.buildGoModule rec {
           name = "integral";
           pname = name;
-          version = "v0.3.2";
+          version = "v0.3.3";
 
           src = ./.;
 
           nativeBuildInputs = [ pkgs.makeWrapper ];
 
-          vendorHash = "sha256-iwM67cYB1SaJhoXP6OpocarQB1kp0miv+MUS+SyYDFo=";
+          vendorHash = "sha256-/gzW1vihul19oMf016fhk32JpuTv3ssSoulo5M05I5E=";
 
           ldflags = [ "-X 'main.VersionString=%s, %s'" ];
 
