@@ -69,7 +69,7 @@ actual documentation as well.
     - [x] Order
     - [x] Seperators
     - [x] Dynamic triggers
-    - [ ] Right prompt
+    - [x] Right prompt
 - [ ] Plugin Support
 - [ ] Documentation
 
