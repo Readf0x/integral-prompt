@@ -40,7 +40,7 @@ Install golang and run `./build.sh` to generate a tarball for generic linux.
 For Debian based distros, run `./build.sh deb`.
 
 ## Usage
-~~To configure, add a `~/.integralrc` file. It can also be placed at:~~
+To configure, add a `~/.integralrc` file. It can also be placed at:
 - `$XDG_CONFIG_HOME/integralrc`
 - `$XDG_CONFIG_HOME/integral/rc`
 - `$XDG_CONFIG_HOME/integral/rc.zsh`
@@ -48,7 +48,13 @@ For Debian based distros, run `./build.sh deb`.
 - `~/.config/integral/rc`
 - `~/.config/integral/rc.zsh`
 
-Configuration is still being worked on.
+The configuration options aren't yet documented, but if you have a JSON language server simply add
+```json
+"$schema": "/usr/share/integral/schema.json"
+```
+to the top of your configuration, and the LSP can list all available options. I know that's not ideal, but I
+haven't added [jsonschema](https://github.com/invopop/jsonschema) description fields to the config types. Once that's done, I should be able to generate
+actual documentation as well.
 
 ## Planned Features
 - [x] Configuration files
