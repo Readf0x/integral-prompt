@@ -39,6 +39,8 @@ func main() {
 		sh.Init()
 	case "version":
 		fmt.Printf(VersionString + "\n", Version, Commit)
+	case "char":
+		fmt.Println([]rune(os.Args[2]))
 	default:
 		logger.Fatalln("Unknown command")
 	}

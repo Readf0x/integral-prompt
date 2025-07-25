@@ -15,10 +15,10 @@ elif [[ $1 = "debug" ]]; then
   kill -STOP $pid
   dlv attach $pid & kill -CONT $pid
 else
-  go run *.go render raw $COLUMNS 1 0
+  go run . render raw $COLUMNS 1 0
   export SSH_CONNECTION=asdf
-  go run *.go render raw $COLUMNS 2 1
+  go run . render raw $COLUMNS 2 1
   export CONTAINER_ID=debian
-  go run *.go render raw $COLUMNS 126 2
+  go run . render raw $COLUMNS 126 2
 fi
 
