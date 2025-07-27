@@ -44,12 +44,12 @@ func renderIcon(icon rune, color config.Color) RenderedModule {
 }
 
 type Module interface {
-	initialize(*config.PromptConfig) bool
+	initialize(*config.PromptConfig, chan bool)
 	render(*config.PromptConfig) RenderedModule
 }
 
 type MultiModule interface {
-	initialize(*config.PromptConfig) bool
+	initialize(*config.PromptConfig, chan bool)
 	render(*config.PromptConfig) []RenderedModule
 }
 
@@ -58,22 +58,22 @@ type BatteryModule struct {
 	Charging bool
 }
 
-func (m *BatteryModule) initialize(cfg *config.PromptConfig) bool {
+func (m *BatteryModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	batteries, err := battery.GetAll()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	if len(batteries) == 0 {
-		return false
+		ret <- false
 	}
 	b := batteries[cfg.Battery.Id]
 	if b.Full == 0 {
-		return false
+		ret <- false
 	}
 	m.Charge = uint8(b.Current / b.Full * 100)
 	m.Charging = b.State.Raw == battery.Charging
-	return true
+	ret <- true
 }
 func (m *BatteryModule) render(cfg *config.PromptConfig) RenderedModule {
 	var icon rune
@@ -92,14 +92,14 @@ type CpuModule struct {
 	Usage uint8
 }
 
-func (m *CpuModule) initialize(cfg *config.PromptConfig) bool {
+func (m *CpuModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	percent, err := cpu.Percent(cfg.Cpu.Time, false)
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	m.Usage = uint8(percent[0])
-	return true
+	ret <- true
 }
 func (m *CpuModule) render(cfg *config.PromptConfig) RenderedModule {
 	// [TODO] add multi icon support
@@ -110,12 +110,12 @@ type DirModule struct {
 	CWD string
 }
 
-func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
+func (m *DirModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	var err error
 	m.CWD, err = os.Getwd()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	for _, replaceList := range *cfg.Dir.Replace {
 		m.CWD = strings.ReplaceAll(m.CWD, (*replaceList)[0], (*replaceList)[1])
@@ -123,7 +123,7 @@ func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
 	if cfg.Dir.ReplaceHome {
 		m.CWD = strings.Replace(m.CWD, os.Getenv("HOME"), string(cfg.Dir.HomeIcon), 1)
 	}
-	return true
+	ret <- true
 }
 func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
@@ -137,11 +137,11 @@ func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
 type DirenvModule struct {
 }
 
-func (m *DirenvModule) initialize(cfg *config.PromptConfig) bool {
+func (m *DirenvModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	if _, set := os.LookupEnv("DIRENV_DIR"); set {
-		return true
+		ret <- true
 	}
-	return false
+	ret <- false
 }
 func (m *DirenvModule) render(cfg *config.PromptConfig) RenderedModule {
 	var color config.Color = cfg.Direnv.DefaultIcon.Color
@@ -162,10 +162,10 @@ type DistroboxModule struct {
 	Distro string
 }
 
-func (m *DistroboxModule) initialize(cfg *config.PromptConfig) bool {
+func (m *DistroboxModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	var set bool
 	m.Distro, set = os.LookupEnv("CONTAINER_ID")
-	return set
+	ret <- set
 }
 func (m *DistroboxModule) render(cfg *config.PromptConfig) RenderedModule {
 	color, icon := cfg.Distrobox.DefaultIcon.Color, cfg.Distrobox.DefaultIcon.Icon
@@ -186,17 +186,17 @@ type ErrorModule struct {
 	ExitCode uint64
 }
 
-func (m *ErrorModule) initialize(cfg *config.PromptConfig) bool {
+func (m *ErrorModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	c, err := strconv.ParseUint(os.Args[4], 10, 8)
 	if err != nil {
 		logger.Panicln(err)
-		return false
+		ret <- false
 	}
 	if c != 0 {
 		m.ExitCode = c
-		return true
+		ret <- true
 	}
-	return false
+	ret <- false
 }
 func (m *ErrorModule) render(cfg *config.PromptConfig) RenderedModule {
 	color, icon := cfg.Error.DefaultIcon.Color, cfg.Error.DefaultIcon.Icon
@@ -216,33 +216,33 @@ type GitModule struct {
 	Pull     uint8
 }
 
-func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
+func (m *GitModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	repo, err := git.PlainOpen(cwd)
 	if err != nil {
-		return false
+		ret <- false
 	}
 
 	head, err := repo.Head()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	m.Branch = head.Name().Short()
 
 	wt, err := repo.Worktree()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	status, err := wt.Status()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 
 	for _, entry := range status {
@@ -257,7 +257,7 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 	config, err := repo.Config()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	branchCfg, ok := config.Branches[m.Branch]
 	if ok {
@@ -266,19 +266,19 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 			local, err := getCommits(repo, head.Hash())
 			if err != nil {
 				logger.Println(err)
-				return false
+				ret <- false
 			}
 			remote, err := getCommits(repo, remoteRef.Hash())
 			if err != nil {
 				logger.Println(err)
-				return false
+				ret <- false
 			}
 
 			m.Push, m.Pull = diffCommits(local, remote)
 		}
 	}
 
-	return true
+	ret <- true
 }
 func getCommits(repo *git.Repository, hash plumbing.Hash) ([]plumbing.Hash, error) {
 	var hashes []plumbing.Hash
@@ -344,17 +344,17 @@ type JobsModule struct {
 	Jobs uint8
 }
 
-func (m *JobsModule) initialize(cfg *config.PromptConfig) bool {
+func (m *JobsModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	j, err := strconv.ParseUint(os.Args[5], 10, 8)
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	if j != 0 {
 		m.Jobs = uint8(j)
-		return true
+		ret <- true
 	}
-	return false
+	ret <- false
 }
 func (m *JobsModule) render(cfg *config.PromptConfig) RenderedModule {
 	return renderCounter(m.Jobs, cfg.Jobs.Icon, cfg.Jobs.Color)
@@ -364,13 +364,13 @@ type NixModule struct {
 	InNixShell bool
 }
 
-func (m *NixModule) initialize(cfg *config.PromptConfig) bool {
+func (m *NixModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	path := strings.Split(os.Getenv("PATH"), ":")
 	if strings.HasPrefix(path[0], "/nix/store/") {
 		m.InNixShell = true
-		return true
+		ret <- true
 	}
-	return false
+	ret <- false
 }
 func (m *NixModule) render(cfg *config.PromptConfig) RenderedModule {
 	return renderIcon(cfg.NixShell.Icon, cfg.NixShell.Color)
@@ -381,13 +381,13 @@ type SshModule struct {
 	Host string
 }
 
-func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
+func (m *SshModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	if _, set := os.LookupEnv("SSH_CONNECTION"); set {
 		m.User = os.Getenv("USER")
 		m.Host = os.Getenv("HOSTNAME")
-		return true
+		ret <- true
 	}
-	return false
+	ret <- false
 }
 
 // [TODO] make really fancy wrapping logic to make this wrappable
@@ -419,16 +419,16 @@ type SshPlus struct {
 	Distro string
 }
 
-func (m *SshPlus) initialize(cfg *config.PromptConfig) bool {
+func (m *SshPlus) initialize(cfg *config.PromptConfig, ret chan bool) {
 	if os.Getenv("SSH_CONNECTION") != "" {
 		m.User = os.Getenv("USER")
 		m.Host = os.Getenv("HOSTNAME")
 	}
 	m.Distro, _ = os.LookupEnv("CONTAINER_ID")
 	if m.User != "" || m.Distro != "" {
-		return true
+		ret <- true
 	}
-	return false
+	ret <- false
 }
 func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 	var ssh, db, final string
@@ -478,9 +478,9 @@ type TimeModule struct {
 	Time string
 }
 
-func (m *TimeModule) initialize(cfg *config.PromptConfig) bool {
+func (m *TimeModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	m.Time = time.Now().Format(cfg.Time.Format)
-	return true
+	ret <- true
 }
 func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
@@ -494,14 +494,14 @@ func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 type UptimeModule struct {
 	Uptime time.Duration
 }
-func (m *UptimeModule) initialize(cfg *config.PromptConfig) bool {
+func (m *UptimeModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	raw, err := host.Uptime()
 	if err != nil {
 		logger.Println(err)
-		return false
+		ret <- false
 	}
 	m.Uptime = time.Duration(raw)
-	return true
+	ret <- true
 }
 // m.Uptime = time.Duration(raw).String()
 func (m *UptimeModule) render(cfg *config.PromptConfig) RenderedModule {
@@ -517,10 +517,10 @@ type ViModeModule struct {
 	Mode string
 }
 
-func (m *ViModeModule) initialize(cfg *config.PromptConfig) bool {
+func (m *ViModeModule) initialize(cfg *config.PromptConfig, ret chan bool) {
 	var set bool
 	m.Mode, set = os.LookupEnv("VI_KEYMAP")
-	return set
+	ret <- set
 }
 func (m *ViModeModule) render(cfg *config.PromptConfig) RenderedModule {
 	var final RenderedModule

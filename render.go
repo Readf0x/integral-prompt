@@ -6,8 +6,10 @@ import (
 	"integral/shell"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func render(cfg *config.PromptConfig) {
@@ -180,46 +182,66 @@ func wrapModule(mod RenderedModule, width, currentLineLen int, color config.Colo
 
 func generate(cfg *config.PromptConfig, modules *[]string, c chan []RenderedModule) {
 	rendered := make([]RenderedModule, 0, len(*modules))
+	output := make(chan bool)
+	var currentName string
 	for _, module := range *modules {
 		var m Module
 		var M MultiModule
 		switch module {
 		case "visym":
+			currentName = "visym"
 			m = &ViModeModule{}
 		case "dir":
+			currentName = "dir"
 			m = &DirModule{}
 		case "error":
+			currentName = "error"
 			m = &ErrorModule{}
 		case "git":
+			currentName = "git"
 			M = &GitModule{}
 		case "battery":
+			currentName = "battery"
 			m = &BatteryModule{}
 		case "cpu":
+			currentName = "cpu"
 			m = &CpuModule{}
 		case "direnv":
+			currentName = "direnv"
 			m = &DirenvModule{}
 		case "distrobox":
+			currentName = "distrobox"
 			m = &DistroboxModule{}
 		case "jobs":
+			currentName = "jobs"
 			m = &JobsModule{}
 		case "nix":
+			currentName = "nix"
 			m = &NixModule{}
 		case "ssh":
+			currentName = "ssh"
 			m = &SshModule{}
 		case "ssh+":
 			m = &SshPlus{}
 		case "time":
+			currentName = "time"
 			m = &TimeModule{}
 		}
 		if m != nil {
-			if m.initialize(cfg) {
+			go m.initialize(cfg, output)
+			select {
+			case <-output:
 				rendered = append(rendered, m.render(cfg))
+			case <-time.After(250*time.Millisecond):
+				logger.Printf("%s took too long! Skipping!", currentName)
 			}
 		} else if M != nil {
-			if M.initialize(cfg) {
-				for _, r := range M.render(cfg) {
-					rendered = append(rendered, r)
-				}
+			go M.initialize(cfg, output)
+			select {
+			case <-output:
+				rendered = slices.Concat(rendered, M.render(cfg))
+			case <-time.After(250*time.Millisecond):
+				logger.Printf("%s took too long! Skipping!", currentName)
 			}
 		}
 	}
