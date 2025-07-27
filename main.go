@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"integral/config"
 	"integral/shell"
@@ -38,9 +39,13 @@ func main() {
 		}
 		sh.Init()
 	case "version":
-		fmt.Printf(VersionString + "\n", Version, Commit)
+		fmt.Printf(VersionString+"\n", Version, Commit)
 	case "char":
 		fmt.Println([]rune(os.Args[2]))
+	case "config":
+		if b, err := json.Marshal(cfg); err == nil {
+			fmt.Printf("%s", b)
+		}
 	default:
 		logger.Fatalln("Unknown command")
 	}

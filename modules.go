@@ -234,47 +234,51 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 	}
 	m.Branch = head.Name().Short()
 
-	wt, err := repo.Worktree()
-	if err != nil {
-		logger.Println(err)
-		return false
-	}
-	status, err := wt.Status()
-	if err != nil {
-		logger.Println(err)
-		return false
-	}
+	if cfg.Git.ShowWT {
+		wt, err := repo.Worktree()
+		if err != nil {
+			logger.Println(err)
+			return false
+		}
+		status, err := wt.Status()
+		if err != nil {
+			logger.Println(err)
+			return false
+		}
 
-	for _, entry := range status {
-		switch {
-		case entry.Worktree != git.Unmodified:
-			m.Unstaged++
-		case entry.Staging != git.Unmodified:
-			m.Staged++
+		for _, entry := range status {
+			switch {
+			case entry.Worktree != git.Unmodified:
+				m.Unstaged++
+			case entry.Staging != git.Unmodified:
+				m.Staged++
+			}
 		}
 	}
 
-	config, err := repo.Config()
-	if err != nil {
-		logger.Println(err)
-		return false
-	}
-	branchCfg, ok := config.Branches[m.Branch]
-	if ok {
-		remoteRef, err := repo.Reference(plumbing.NewRemoteReferenceName(branchCfg.Remote, m.Branch), true)
-		if err == nil {
-			local, err := getCommits(repo, head.Hash())
-			if err != nil {
-				logger.Println(err)
-				return false
-			}
-			remote, err := getCommits(repo, remoteRef.Hash())
-			if err != nil {
-				logger.Println(err)
-				return false
-			}
+	if cfg.Git.ShowPP {
+		config, err := repo.Config()
+		if err != nil {
+			logger.Println(err)
+			return false
+		}
+		branchCfg, ok := config.Branches[m.Branch]
+		if ok {
+			remoteRef, err := repo.Reference(plumbing.NewRemoteReferenceName(branchCfg.Remote, m.Branch), true)
+			if err == nil {
+				local, err := getCommits(repo, head.Hash())
+				if err != nil {
+					logger.Println(err)
+					return false
+				}
+				remote, err := getCommits(repo, remoteRef.Hash())
+				if err != nil {
+					logger.Println(err)
+					return false
+				}
 
-			m.Push, m.Pull = diffCommits(local, remote)
+				m.Push, m.Pull = diffCommits(local, remote)
+			}
 		}
 	}
 
@@ -494,6 +498,7 @@ func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
 type UptimeModule struct {
 	Uptime time.Duration
 }
+
 func (m *UptimeModule) initialize(cfg *config.PromptConfig) bool {
 	raw, err := host.Uptime()
 	if err != nil {
@@ -503,13 +508,14 @@ func (m *UptimeModule) initialize(cfg *config.PromptConfig) bool {
 	m.Uptime = time.Duration(raw)
 	return true
 }
+
 // m.Uptime = time.Duration(raw).String()
 func (m *UptimeModule) render(cfg *config.PromptConfig) RenderedModule {
 	str := m.Uptime.String()
 	return RenderedModule{
 		Length: len(str),
-		Fmt: sh.Fg(str + string(cfg.Uptime.Icon), cfg.Uptime.Color),
-		Wrap: false,
+		Fmt:    sh.Fg(str+string(cfg.Uptime.Icon), cfg.Uptime.Color),
+		Wrap:   false,
 	}
 }
 
