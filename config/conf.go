@@ -62,13 +62,14 @@ type LineConfig struct {
 }
 
 type GitConfig struct {
-	Branch   *CounterConfig `json:"branch,omitempty"`
-	Unstaged *CounterConfig `json:"unstaged,omitempty"`
-	Staged   *CounterConfig `json:"staged,omitempty"`
-	Push     *CounterConfig `json:"push,omitempty"`
-	Pull     *CounterConfig `json:"pull,omitempty"`
-	ShowWT   bool						`json:"show_worktree"`
-	ShowPP	 bool						`json:"show_push_pull"`
+	Branch       *CounterConfig `json:"branch,omitempty"`
+	Unstaged     *CounterConfig `json:"unstaged,omitempty"`
+	Staged       *CounterConfig `json:"staged,omitempty"`
+	Push         *CounterConfig `json:"push,omitempty"`
+	Pull         *CounterConfig `json:"pull,omitempty"`
+	ShowWT       bool						`json:"show_worktree"`
+	ShowPP       bool						`json:"show_push_pull"`
+	RecurseCount int  					`json:"recurse_count"`
 }
 
 type CpuConfig struct {
@@ -204,6 +205,7 @@ var defaultConfig = PromptConfig{
 		},
 		ShowWT: true,
 		ShowPP: true,
+		RecurseCount: 3,
 	},
 	NixShell: &SingleIconEntry{
 		Color: Cyan,
