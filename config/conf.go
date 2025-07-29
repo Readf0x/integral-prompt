@@ -112,6 +112,7 @@ type PromptConfig struct {
 	Version      string      `json:"version,omitempty"`
 	Modules      *[]string   `json:"modules,omitempty"`
 	ModulesRight *[]string   `json:"modules_right,omitempty"`
+	WrapMinimum  int				 `json:"wrap_min"`
 	RightSize    int         `json:"right_width"`
 	Length       uint8       `json:"length,omitempty"`
 	Line         *LineConfig `json:"line,omitempty"`
@@ -147,6 +148,7 @@ var defaultConfig = PromptConfig{
 	ModulesRight: &[]string{
 		"time",
 	},
+	WrapMinimum: 6,
 	Line: &LineConfig{
 		Color:   Yellow,
 		Symbols: [4]Char{'⌠', '⎮', '⌡', '∫'},
