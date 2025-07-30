@@ -24,15 +24,6 @@ type RenderedModule struct {
 	Color  config.Color
 }
 
-func renderBigCounter(num uint16, icon config.Char, color config.Color) RenderedModule {
-	raw := fmt.Sprintf("%d%c", num, icon)
-	return RenderedModule{
-		Length: len(raw),
-		Fmt:    sh.Fg(raw, color),
-		Wrap:   false,
-		Color:  color,
-	}
-}
 func renderCounter(num uint8, icon config.Char, color config.Color) RenderedModule {
 	raw := fmt.Sprintf("%d%c", num, icon)
 	return RenderedModule{
@@ -221,8 +212,8 @@ type GitModule struct {
 	Branch   string
 	Unstaged uint8
 	Staged   uint8
-	Push     uint16
-	Pull     uint16
+	Push     uint8
+	Pull     uint8
 }
 
 func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
@@ -262,14 +253,12 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 			return false
 		}
 
-		if len(status) > cfg.Git.MaxFiles {
-			for _, entry := range status {
-				switch {
-				case entry.Worktree != git.Unmodified:
-					m.Unstaged++
-				case entry.Staging != git.Unmodified:
-					m.Staged++
-				}
+		for _, entry := range status {
+			switch {
+			case entry.Worktree != git.Unmodified:
+				m.Unstaged++
+			case entry.Staging != git.Unmodified:
+				m.Staged++
 			}
 		}
 	}
@@ -295,7 +284,7 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 					return false
 				}
 
-				m.Push, m.Pull = diffCommits(local, remote, cfg.Git.MaxCommits)
+				m.Push, m.Pull = diffCommits(local, remote)
 			}
 		}
 	}
@@ -320,10 +309,7 @@ func getCommits(repo *git.Repository, hash plumbing.Hash) ([]plumbing.Hash, erro
 
 	return hashes, nil
 }
-func diffCommits(a, b []plumbing.Hash, maximum int) (onlyInA, onlyInB uint16) {
-	if max(len(a), len(b)) > maximum {
-		return
-	}
+func diffCommits(a, b []plumbing.Hash) (onlyInA, onlyInB uint8) {
 	set := make(map[plumbing.Hash]struct{}, len(a))
 	for _, h := range a {
 		set[h] = struct{}{}
@@ -335,7 +321,7 @@ func diffCommits(a, b []plumbing.Hash, maximum int) (onlyInA, onlyInB uint16) {
 			onlyInB++
 		}
 	}
-	onlyInA = uint16(len(set))
+	onlyInA = uint8(len(set))
 	return
 }
 
@@ -356,10 +342,10 @@ func (m *GitModule) render(cfg *config.PromptConfig) []RenderedModule {
 		list = append(list, renderCounter(m.Staged, cfg.Git.Staged.Icon, cfg.Git.Staged.Color))
 	}
 	if m.Push != 0 {
-		list = append(list, renderBigCounter(m.Push, cfg.Git.Push.Icon, cfg.Git.Push.Color))
+		list = append(list, renderCounter(m.Push, cfg.Git.Push.Icon, cfg.Git.Push.Color))
 	}
 	if m.Pull != 0 {
-		list = append(list, renderBigCounter(m.Pull, cfg.Git.Pull.Icon, cfg.Git.Pull.Color))
+		list = append(list, renderCounter(m.Pull, cfg.Git.Pull.Icon, cfg.Git.Pull.Color))
 	}
 
 	return list
