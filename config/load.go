@@ -3,7 +3,6 @@ package config
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -165,7 +164,6 @@ func LoadConfig(paths []string) *PromptConfig {
 			}
 			defer file.Close()
 
-			fmt.Printf("%s", b)
 			json.Unmarshal(b, conf)
 			return conf
 		}
