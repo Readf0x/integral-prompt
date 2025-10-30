@@ -40,6 +40,12 @@ Install golang and run `./build.sh` to generate a tarball for generic linux.
 For Debian based distros, run `./build.sh deb`.
 
 ## Usage
+Add the following to your `.zshrc`
+```sh
+eval "$(integral init zsh)"
+```
+
+### Configuration
 To configure, add a `~/.integralrc` file. It can also be placed at:
 - `$XDG_CONFIG_HOME/integralrc`
 - `$XDG_CONFIG_HOME/integralrc.json`
