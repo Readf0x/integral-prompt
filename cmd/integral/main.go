@@ -44,6 +44,12 @@ func main() {
 		if b, err := json.Marshal(cfg); err == nil {
 			fmt.Printf("%s", b)
 		}
+	case "--help":
+		fallthrough
+	case "-h":
+		fallthrough
+	case "help":
+		printHelp()
 	default:
 		logger.Fatalln("Unknown command")
 	}
@@ -62,4 +68,20 @@ func getConfig() *config.PromptConfig {
 		c + "/integral/rc.json",
 	})
 	return cfg
+}
+
+func printHelp() {
+	fmt.Print(
+		"usage: integral {transient,render,init,version,config,help} ...\n\n" +
+		"CLI for integral prompt\n\n" +
+		"positional arguments:\n" +
+		"  {transient,render,init,version,config,help}\n" +
+		"    transient\trender transient prompt\n" +
+		"    render\t\trender full prompt\n" +
+		"    init\t\tprint shell init script\n" +
+		"    version\t\tprint version info\n" +
+		"    config\t\tprint config as json\n" +
+		"    help\t\tshow this menu\n",
+	)
+	os.Exit(0)
 }
