@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 if [[ $1 = "benchmark" ]]; then
-  go build
+  go build ./cmd/integral
   hyperfine "./integral 1" -iN --export-json benchmark.json
   if [[ $(jq -r '.results.[].mean' benchmark.json) < 0.05 ]]; then
     print -P "%F{2}Pass!%f"

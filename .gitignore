@@ -4,7 +4,7 @@
 /result
 /integral
 /benchmark.json
-/buildinfo.go
+buildinfo.go
 /share/integral/schema.json
 /build
 /build.tar.xz
