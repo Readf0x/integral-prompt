@@ -243,48 +243,36 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 
 	if cfg.Git.ShowWT {
 		wt, err := repo.Worktree()
-		if err != nil {
-			logger.Println(err)
-			return false
-		}
-		status, err := wt.Status()
-		if err != nil {
-			logger.Println(err)
-			return false
-		}
-
-		for _, entry := range status {
-			switch {
-			case entry.Worktree != git.Unmodified:
-				m.Unstaged++
-			case entry.Staging != git.Unmodified:
-				m.Staged++
+		if err == nil {
+			status, err := wt.Status()
+			if err == nil {
+				for _, entry := range status {
+					switch {
+					case entry.Worktree != git.Unmodified:
+						m.Unstaged++
+					case entry.Staging != git.Unmodified:
+						m.Staged++
+					}
+				}
 			}
 		}
 	}
 
 	if cfg.Git.ShowPP {
 		config, err := repo.Config()
-		if err != nil {
-			logger.Println(err)
-			return false
-		}
-		branchCfg, ok := config.Branches[m.Branch]
-		if ok {
-			remoteRef, err := repo.Reference(plumbing.NewRemoteReferenceName(branchCfg.Remote, m.Branch), true)
-			if err == nil {
-				local, err := getCommits(repo, head.Hash())
-				if err != nil {
-					logger.Println(err)
-					return false
+		if err == nil {
+			branchCfg, ok := config.Branches[m.Branch]
+			if ok {
+				remoteRef, err := repo.Reference(plumbing.NewRemoteReferenceName(branchCfg.Remote, m.Branch), true)
+				if err == nil {
+					local, err := getCommits(repo, head.Hash())
+					if err == nil {
+						remote, err := getCommits(repo, remoteRef.Hash())
+						if err == nil {
+							m.Push, m.Pull = diffCommits(local, remote)
+						}
+					}
 				}
-				remote, err := getCommits(repo, remoteRef.Hash())
-				if err != nil {
-					logger.Println(err)
-					return false
-				}
-
-				m.Push, m.Pull = diffCommits(local, remote)
 			}
 		}
 	}
