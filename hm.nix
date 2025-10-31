@@ -36,7 +36,7 @@ in {
 
     programs.zsh.initContent = lib.mkIf cfg.enableZshIntegration (
       lib.mkOrder 600 ''
-        eval "$(${lib.getExe cfg.package} init zsh)"
+        source <(${lib.getExe cfg.package} init zsh)
       ''
     );
 

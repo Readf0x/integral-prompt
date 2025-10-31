@@ -44,7 +44,7 @@ For Debian based distros, run `./build.sh deb`.
 ### Zsh
 Add the following to your `.zshrc`
 ```sh
-eval "$(integral init zsh)"
+source <(integral init zsh)
 ```
 
 ### Bash
