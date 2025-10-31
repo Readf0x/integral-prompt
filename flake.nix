@@ -57,12 +57,10 @@
             go run ./cmd/integral/gen.go "Nix build" "${version}"
           '';
 
-          installPhase = ''
+          postInstall = ''
             mkdir -p $out/share
             cp -r share/integral $out/share/integral
-          '';
 
-          postInstall = ''
             wrapProgram $out/bin/${pname} \
               --prefix XDG_DATA_DIRS : $out/share
           '';
