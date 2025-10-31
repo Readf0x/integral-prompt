@@ -12,25 +12,40 @@
       inherit (nixpkgs) lib;
     in rec {
       devShells = {
-        test = pkgs.mkShell {
-          packages = with pkgs; [
-            zsh
-            packages.default
-          ];
+        test = {
+          zsh = pkgs.mkShell {
+            packages = with pkgs; [
+              zsh
+              packages.default
+            ];
 
-          shellHook = ''
-            exec zsh
-            export XDG_DATA_DIRS="${builtins.toString ./.}/share:$XDG_DATA_DIRS"
-          '';
+            shellHook = ''
+              exec zsh
+            '';
 
-          ZDOTDIR = builtins.toString ./.;
+            XDG_DATA_DIRS = "${builtins.toString ./.}/share:$XDG_DATA_DIRS";
+            ZDOTDIR = builtins.toString ./.;
+          };
+          bash = pkgs.mkShell {
+            packages = with pkgs; [
+              bash
+              packages.default
+            ];
+
+            shellHook = ''
+              source .bashrc
+            '';
+
+            XDG_DATA_DIRS = "${builtins.toString ./.}/share:$XDG_DATA_DIRS";
+          };
         };
         default = pkgs.mkShell {
           packages = with pkgs; [
+            bash
             delve
+            gcc
             git
             go
-            gcc
             openssh
             zsh
           ];

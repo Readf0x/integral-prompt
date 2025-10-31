@@ -52,6 +52,8 @@ func GetShell(str string) (sh Shell, err error) {
 	switch str {
 	case "zsh":
 		return Zsh, nil
+	case "bash":
+		return Bash, nil
 	case "raw":
 		return Raw, nil
 	}
