@@ -17,9 +17,7 @@
             bash
             delve
             gcc
-            git
             go
-            graphviz
             zsh
           ];
         };
