@@ -16,6 +16,7 @@
           packages = with pkgs; [
             bash
             delve
+            fish
             gcc
             go
             zsh
@@ -58,26 +59,42 @@
         });
         default = integral;
         test = {
-          zsh = pkgs.writeShellScriptBin "debugEnv" ''
-            export XDG_DATA_DIRS="${builtins.toString ./.}/share:$XDG_DATA_DIRS"
-            export ZDOTDIR="${builtins.toString ./.}"
+          debugEnv = pkgs.stdenv.mkDerivation (finalAttrs: {
+            name = "debugEnv";
+
+            src = ./.;
+
+            dontPatch = true;
+            dontConfigure = true;
+            dontBuild = true;
+
+            installPhase = ''
+              mkdir -p $out/.config
+              cat << EOF > $out/.bashrc
+              [[ \$- == *i* ]] &&
+                source -- "${pkgs.blesh}/share/blesh/ble.sh" --attach=none
+              $(cat .bashrc)
+              [[ ! \''${BLE_VERSION-} ]] || ble-attach
+              EOF
+              cp .zshrc $out
+              cp -r .fishrc/fish $out/.config/fish
+            '';
+          });
+          zsh = pkgs.writeShellScriptBin "debug" ''
+            export XDG_DATA_DIRS="${default}/share:$XDG_DATA_DIRS"
+            export ZDOTDIR="${test.debugEnv}"
             export PATH="${lib.makeBinPath [default]}:$PATH"
             zsh
           '';
-          bash = let
-            rcfile = pkgs.writeTextFile {
-              name = "bashrc";
-              text = ''
-                [[ $- == *i* ]] &&
-                  source -- "${pkgs.blesh}/share/blesh/ble.sh" --attach=none
-                ${builtins.readFile ./.bashrc}
-                [[ ! $\{BLE_VERSION-} ]] || ble-attach
-              '';
-            };
-          in pkgs.writeShellScriptBin "debugEnv" ''
-            export XDG_DATA_DIRS="${builtins.toString ./.}/share:$XDG_DATA_DIRS"
+          bash = pkgs.writeShellScriptBin "debug" ''
+            export XDG_DATA_DIRS="${default}/share:$XDG_DATA_DIRS"
             export PATH="${lib.makeBinPath [default]}:$PATH"
-            bash --rcfile ${rcfile}
+            bash --rcfile "${test.debugEnv}/.bashrc"
+          '';
+          fish = pkgs.writeShellScriptBin "debug" ''
+            export XDG_DATA_DIRS="${default}/share:$XDG_DATA_DIRS"
+            export XDG_CONFIG_HOME="${test.debugEnv}"
+            fish
           '';
         };
       };
