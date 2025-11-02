@@ -66,10 +66,20 @@
             export PATH="${lib.makeBinPath [default]}:$PATH"
             zsh
           '';
-          bash = pkgs.writeShellScriptBin "debugEnv" ''
+          bash = let
+            rcfile = pkgs.writeTextFile {
+              name = "bashrc";
+              text = ''
+                [[ $- == *i* ]] &&
+                  source -- "${pkgs.blesh}/share/blesh/ble.sh" --attach=none
+                ${builtins.readFile ./.bashrc}
+                [[ ! $\{BLE_VERSION-} ]] || ble-attach
+              '';
+            };
+          in pkgs.writeShellScriptBin "debugEnv" ''
             export XDG_DATA_DIRS="${builtins.toString ./.}/share:$XDG_DATA_DIRS"
             export PATH="${lib.makeBinPath [default]}:$PATH"
-            bash --rcfile ${builtins.toString ./.bashrc}
+            bash --rcfile ${rcfile}
           '';
         };
       };
