@@ -72,11 +72,12 @@
               mkdir -p $out/.config
               cat << EOF > $out/.bashrc
               [[ \$- == *i* ]] &&
-                source -- "${pkgs.blesh}/share/blesh/ble.sh" --attach=none
+                source -- "${pkgs.blesh}/share/blesh/ble.sh" --attach=none --rcfile $out/.blerc
               $(cat .bashrc)
               [[ ! \''${BLE_VERSION-} ]] || ble-attach
               EOF
               cp .zshrc $out
+              cp .blerc $out
               cp -r .fishrc/fish $out/.config/fish
             '';
           });
