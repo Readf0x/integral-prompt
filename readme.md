@@ -9,9 +9,8 @@ This prompt theme was created mostly due to my dissatisfaction with existing one
 - wrapping issues
 
 ## Installation
-~~Load with your favorite plugin loader (only officially supports [antidote](https://antidote.sh/)), or source `init.zsh` in your `.zshrc`.~~
-
-For the time being it can only be automatically installed with nix.
+<!--Load with your favorite plugin loader (only officially supports [antidote](https://antidote.sh/)), or source `init.zsh` in your `.zshrc`.-->
+Grab [`integral.deb`](https://github.com/Readf0x/integral-prompt/releases/latest/download/integral.deb) for Debian based distros, or [`integral.tar.gz`](https://github.com/Readf0x/integral-prompt/releases/latest/download/integral.tar.gz) for others.
 
 ### Flake install (Home Manager)
 Add to your inputs and add `integral-prompt.homeManagerModules.default` to your home manager imports
@@ -33,7 +32,7 @@ Add to your inputs and add `integral-prompt.homeManagerModules.default` to your 
 }
 ```
 
-### Manual installation
+### Manual build
 Install golang and run `./build.sh` to generate a tarball for generic linux.
 For Debian based distros, run `./build.sh deb`.
 
