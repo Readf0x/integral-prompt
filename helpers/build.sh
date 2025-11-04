@@ -23,7 +23,7 @@ EOF
     strip integral -o build/usr/local/bin/integral
     chmod 755 build/usr/local/bin/*
     cp -r share build/usr
-    dpkg-deb --build build
+    dpkg-deb --root-owner-group --build build
   ;;
   debug)
     go build ./cmd/integral -gcflags="all=-N -l"
