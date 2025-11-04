@@ -87,6 +87,8 @@ programs.integral-prompt = {
   enableZshIntegration = true;
   # for bash
   enableBashIntegration = true;
+  # for fish
+  enableFishIntegration = true;
   config = {
     # JSON config
   };

@@ -5,6 +5,7 @@ in {
     enable = lib.mkEnableOption "integral prompt";
     enableZshIntegration = lib.hm.shell.mkZshIntegrationOption { inherit config; };
     enableBashIntegration = lib.hm.shell.mkBashIntegrationOption { inherit config; };
+    enableFishIntegration = lib.hm.shell.mkFishIntegrationOption { inherit config; };
     package = lib.mkOption {
       type = lib.types.package;
       default = self.packages.${pkgs.system}.default;
@@ -42,6 +43,10 @@ in {
 
     programs.bash.initExtra = lib.mkIf cfg.enableBashIntegration ''
       eval "$(${lib.getExe cfg.package} init bash)"
+    '';
+
+    programs.fish.shellInit = lib.mkIf cfg.enableFishIntegration ''
+      ${lib.getExe cfg.package} init fish | source
     '';
 
     home.file.${cfg.configPath}.text = builtins.toJSON ({
