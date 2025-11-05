@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"integral/config"
 	"os"
+	"strings"
 )
 
 type SshPlus struct {
@@ -15,7 +16,12 @@ type SshPlus struct {
 func (m *SshPlus) Initialize(cfg *config.PromptConfig) bool {
 	if os.Getenv("SSH_CONNECTION") != "" {
 		m.User = os.Getenv("USER")
-		m.Host = os.Getenv("HOSTNAME")
+		file, err := os.ReadFile("/etc/hostname")
+		if err != nil {
+			m.Host = os.Getenv("HOSTNAME")
+		} else {
+			m.Host = strings.ReplaceAll(string(file), "\n", "")
+		}
 	}
 	m.Distro, _ = os.LookupEnv("CONTAINER_ID")
 	if m.User != "" || m.Distro != "" {
