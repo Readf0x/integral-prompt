@@ -125,7 +125,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	sample, err := json.Marshal(config.GetDefault())
+	sample, err := json.MarshalIndent(config.GetDefault(), "", "  ")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -150,6 +150,35 @@ func (Color) JSONSchema() *jsonschema.Schema {
 	}
 }
 
+func (h HostMap) MarshalJSON() ([]byte, error) {
+	tmp := make(map[string]json.RawMessage, len(h))
+	for k, v := range h {
+		b, err := v.MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
+		tmp[k] = b
+	}
+	return json.Marshal(tmp)
+}
+
+func (h *HostMap) UnmarshalJSON(data []byte) error {
+	raw := make(map[string]json.RawMessage)
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	res := make(map[string]Color, len(raw))
+	for k, v := range raw {
+		var c Color
+		if err := c.UnmarshalJSON(v); err != nil {
+			return err
+		}
+		res[k] = c
+	}
+	*h = res
+	return nil
+}
+
 // Returns a pointer to the default configuration.
 func GetDefault() *PromptConfig { return &defaultConfig }
 

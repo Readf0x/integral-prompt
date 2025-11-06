@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
 type Char rune
 
@@ -54,9 +57,31 @@ type CounterConfig struct {
 	Icon  Char  `json:"icon,omitempty"`
 }
 
+type HostMap map[string]Color
 type LineConfig struct {
-	Color   Color   `json:"color,omitempty"`
-	Symbols [4]Char `json:"symbols,omitempty"`
+	Color      Color   `json:"color,omitempty"`
+	SshColor   Color   `json:"ssh,omitempty"`
+	HostColors HostMap `json:"hosts,omitempty"`
+	Symbols    [4]Char `json:"symbols,omitempty"`
+}
+
+// Putting this in this file is probably a sin.
+func (l *LineConfig) GetColor() Color {
+	if _, set := os.LookupEnv("SSH_CONNECTION"); set {
+		host, err := os.Hostname()
+		if err != nil {
+			host, set = os.LookupEnv("HOSTNAME")
+			if !set {
+				return l.Color
+			}
+		}
+		color, ok := l.HostColors[host]
+		if ok {
+			return color
+		}
+		return l.SshColor
+	}
+	return l.Color
 }
 
 type GitConfig struct {
@@ -147,6 +172,7 @@ var defaultConfig = PromptConfig{
 	WrapMinimum: 6,
 	Line: &LineConfig{
 		Color:   Yellow,
+		SshColor: Red,
 		Symbols: [4]Char{'⌠', '⎮', '⌡', '∫'},
 	},
 	Battery: &BatteryConfig{
