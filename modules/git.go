@@ -59,7 +59,7 @@ func (m *GitModule) Initialize(cfg *config.PromptConfig) bool {
 				if x != ' ' && x != '?' {
 					m.Staged++
 				}
-				if y != ' ' && y != '?' {
+				if y != ' ' {
 					m.Unstaged++
 				}
 			}
