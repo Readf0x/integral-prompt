@@ -20,20 +20,25 @@ EOF
 integral:init() {
   # https://github.com/spaceship-prompt/spaceship-prompt/commit/111c6f160c4376001d5469f8e8771ee89ea4158a
   local int_path=${${(%):-%x}:A:h}
-  export integral_plugins=(
+  export core_plugins=(
     "$int_path/lib/config.zsh"
     "$int_path/lib/helpers.zsh"
     "$int_path/lib/module.zsh"
     "$int_path/lib/zle.zsh"
   )
-  for f in $integral_plugins; do
+  for f in $core_plugins; do
     if [[ -f $f ]]; then
       source $f
     else
-      print "Plugin not found: $f"
-      exit 1
+      print "Core plugin not found! Missing file: $f"
+      return 1
     fi
   done
+  if [[ $int_plugins ]]; then
+    for f in $int_plugins; do
+      source $f
+    done
+  fi
   [[ -e $int_path/comp ]] && fpath+="$int_path/comp"
   autoload -Uz add-zsh-hook
   autoload -Uz add-zle-hook-widget
