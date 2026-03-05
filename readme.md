@@ -112,6 +112,8 @@ programs.integral-prompt = {
 - [ ] Plugin Support
 - [ ] Documentation
 - [ ] Module timeouts
+- [ ] Rewrite in Odin (or possibly Jai if it releases this year)
+- [ ] Add [borzoi](https://github.com/readf0x/borzoi) support
 
 ### Planned Modules
 - [x] Background Jobs
