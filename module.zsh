@@ -5,28 +5,35 @@ integral:module:git() {
   local format_str length
   if ! $(git rev-parse --is-bare-repository 2>/dev/null); then
     if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
-      local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+      local branch=$(git branch --show-current 2>/dev/null)
+      if [[ $branch == "" ]]; then
+        x=$(git rev-parse HEAD 2>/dev/null)
+        branch=${x:0:7}
+      fi
+      if [[ $branch == "" ]]; then
+        branch="detached"
+      fi
       length=$((${#branch} + 1))
-      format_str="%{%F{11}%}$branch⎇"
+      format_str="%{%F{${integral_git_colors[1]}}%}$branch${integral_git_icons[1]}"
       if ! git diff --quiet --ignore-submodules 1>/dev/null 2>&1 || [[ $(git ls-files -o --exclude-standard) ]]; then
         local num=$(($(git ls-files -o --exclude-standard | wc -l) + $(git diff --name-only | wc -l)))
         length=$(($length + ${#num} + 2))
-        format_str="$format_str %{%F{9}%}$num✘"
+        format_str="$format_str %{%F{${integral_git_colors[2]}}%}$num${integral_git_icons[2]}"
       fi
       if ! git diff --quiet --ignore-submodules --cached 1>/dev/null 2>&1; then
         local num=$(git diff --ignore-submodules --cached --name-only | wc -l)
         length=$(($length + ${#num} + 2))
-        format_str="$format_str %{%F{11}%}$num+"
+        format_str="$format_str %{%F{${integral_git_colors[3]}}%}$num${integral_git_icons[3]}"
       fi
       if [[ $(git remote) ]] && git cherry >/dev/null 2>&1 && [[ $(git cherry | wc -l) -gt 0 ]]; then
         local num=$(git cherry | wc -l)
         length=$(($length + ${#num} + 2))
-        format_str="$format_str %{%F{14}%}$num↑"
+        format_str="$format_str %{%F{${integral_git_colors[4]}}%}$num${integral_git_icons[4]}"
       fi
       if [[ $(git rev-list origin/${branch} --not HEAD 2>/dev/null) ]]; then
         local num=$(git rev-list origin/${branch} --not HEAD --count)
         length=$(($length + ${#num} + 2))
-        format_str="$format_str %{%F{14}%}$num↓"
+        format_str="$format_str %{%F{${integral_git_colors[5]}}%}$num${integral_git_icons[5]}"
       fi
     fi
   else
@@ -67,17 +74,17 @@ integral:module:visym() {
 }
 
 integral:module:dir() {
-  local dir=${PWD/$HOME/\~}
+  local dir=$(integral_dir_format)
   if [[ $1 == "w" ]]; then
     return 1
   elif [[ $1 == "r" ]]; then
     print "$dir"
   elif [[ $1 == "c" ]]; then
-    print "%{%F{12}%}"
+    print "%{%F{$integral_dir_color}%}"
   elif [[ $1 ]]; then
     print "${#dir}"
   else
-    print "%{%F{12}%}$dir"
+    print "%{%F{$integral_dir_color}%}$dir"
   fi
 }
 
@@ -94,15 +101,7 @@ integral:module:error() {
       print "1"
     fi
   else
-    case $sig in
-      1) format_str="%{%F{9}%}✘" ;;
-      2|127) format_str="%{%F{11}%}?" ;;
-      126) format_str="%{%F{9}%}⚠" ;;
-      130) format_str="%{%F{15}%}☠" ;;
-      *) format_str="%{%F{9}%}✘" ;;
-    esac
-
-    print "$format_str"
+    integral_error_format $sig
   fi
 }
 
@@ -115,7 +114,7 @@ integral:module:jobs() {
       print $((${#num} + 1))
     fi
   else
-    print "%{%F{13}%}$num⚙"
+    print "%{%F{$integral_jobs_color}%}$num$integral_jobs_icon"
   fi
 }
 
@@ -127,31 +126,40 @@ integral:module:nix() {
       print "0"
     fi
   else
-    local color="14"
-    [[ $IN_NIX_SHELL == "impure" ]] && color="13"
+    local color=${integral_nix_color[1]}
+    [[ $IN_NIX_SHELL == "impure" ]] && color=${integral_nix_color[2]}
     if $integral_nerd_fonts; then
-      print "%{%F{$color}%}"
+      print "%{%F{$color}%}${integral_nix_icons[2]}"
     else
-      print "%{%F{$color}%}❄"
+      print "%{%F{$color}%}${integral_nix_icons[1]}"
     fi
   fi
 }
 
+integral:module:time() {
+  if [[ $1 ]]; then
+    print "1"
+  else
+    print "%{%F{12}%}$(date +${integral_time_format:-%T})"
+  fi
+}
+
 # BUG: leaves <space> at end of prompt
+# TODO: add right prompt
 integral:loop_modules() {
   local -i position=0
   local -i max_len=$(($COLUMNS - 1))
 
   local newline=$'\n'
-  PROMPT="$newline$integral_top"
+  PROMPT="$newline%{%F{$integral_prompt_color}%}${integral_prompt[1]}"
 
   for module in $integral_modules; do
     local -i length=$(integral:module:$module 1)
     local format_str=$(integral:module:$module)
 
-    if [[ $length -gt 0 ]]; then
+    if [[ $length > 0 ]]; then
       local new_pos=$(($position + $length + 1))
-      if [[ $length -gt $max_len ]] && ! integral:module:$module w; then
+      if [[ $length > $max_len ]] && ! integral:module:$module w; then
         local raw_str=$(integral:module:$module r)
         local color=$(integral:module:$module c)
         local -i i=0
@@ -159,15 +167,15 @@ integral:loop_modules() {
           if ! [[ $position == 0 ]]; then
             PROMPT+="$color${raw_str:$(($i * $max_len)):$(($max_len - $position))}"
           else
-            PROMPT+="$newline$integral_mid$color${raw_str:$(($i * $max_len + $position)):$max_len}"
+            PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$color${raw_str:$(($i * $max_len + $position)):$max_len}"
           fi
           position=0
           i+=1
         done
         PROMPT+=" "
         position=$((${#raw_str} % $max_len))
-      elif [[ $new_pos -gt $max_len ]]; then
-        PROMPT+="$newline$integral_mid$format_str "
+      elif [[ $new_pos > $max_len ]]; then
+        PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$format_str "
         position=$length
       else
         PROMPT+="$format_str "
@@ -175,6 +183,6 @@ integral:loop_modules() {
       fi
     fi
   done
-  PROMPT+="$newline%{%F{11}%}$integral_bot%{%F{15}%}"
+  PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[3]}%{%F{15}%}"
 }
 

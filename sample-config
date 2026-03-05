@@ -1,5 +1,27 @@
 # Sample .integralrc file
 
+# Module order
+integral_modules=(
+  "nix"
+  "visym"
+  "error"
+  "dir"
+  "git"
+  "jobs"
+)
+integral_right_modules=(
+  "time"
+)
+
+# Integral symbols
+integral_prompt_color="10"
+integral_prompt=(
+  "⎛"
+  "⎜"
+  "⎝"
+  "("
+)
+
 # Indicators used for your current vim keymap
 integral_vim_indicators=(
   "⎀" # insert
@@ -7,6 +29,35 @@ integral_vim_indicators=(
   "⎁" # v-line
   "⎃" # normal
 )
-# Whether or not to use different colors for each indicator
-# if false, will be use exit status of previous command (0 = green, >0 = red)
-integral_vim_color="true"
+# Colors used for your current vim keymap
+integral_vim_colors=(
+  "10" # insert
+  "13" # visual
+  "13" # v-line
+  "9"  # normal
+)
+
+integral_dir_format() { print ${PWD/$HOME/\⌂} }
+
+integral_git_colors=(
+  "10" # branch
+  "13" # unstaged
+  "14" # staged
+  "11" # push
+  "11" # pull
+)
+integral_git_icons=(
+  "" # branch
+  "✎" # unstaged
+  "✓" # staged
+  "↑" # push
+  "↓" # pull
+)
+
+export integral_jobs_color="10"
+
+integral_time_format="%I:%M %p"
+
+# Autodetect if using nerd fonts
+integral_kitty_integration="true"
+
