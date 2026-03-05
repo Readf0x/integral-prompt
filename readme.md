@@ -11,7 +11,7 @@ This prompt theme was created mostly due to my dissatisfaction with existing one
 I have successfully solved these issues (in my opinion).
 
 ## Usage
-Load with your favorite plugin loader (only officially supports [antidote](https://github.com/zsh-users/antidote)), or source `init.zsh` in your `.zshrc`.
+Load with your favorite plugin loader (only officially supports [antidote](https://antidote.sh/)), or source `init.zsh` in your `.zshrc`.
 To configure, add a `~/.integralrc` file. It can also be placed at:
 - `$XDG_CONFIG_HOME/integralrc`
 - `$XDG_CONFIG_HOME/integral/rc`
