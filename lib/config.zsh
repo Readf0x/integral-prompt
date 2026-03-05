@@ -77,7 +77,7 @@ export int_battery_icons=(
   "󰁹"
 )
 export int_battery_color="2"
-export int_ssh_format() { print "%F{13}${USER}%F{12}@%F{14}${HOSTNAME}" }
+export int_ssh_format() { print "%F{13}${USER}%F{8}@%F{14}${HOSTNAME}" }
 export int_cpu_color="3"
 
 export int_separator=" "
@@ -88,7 +88,7 @@ export int_direnv_format() {
   esac
 }
 
-export int_distrobox_color="13"
+export int_distrobox_color="12"
 
 # === CONFIG LOADING ===
 local rc_locations=(
