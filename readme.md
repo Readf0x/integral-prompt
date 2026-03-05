@@ -40,9 +40,17 @@ Install golang and run `./build.sh` to generate a tarball for generic linux.
 For Debian based distros, run `./build.sh deb`.
 
 ## Usage
+
+### Zsh
 Add the following to your `.zshrc`
 ```sh
 eval "$(integral init zsh)"
+```
+
+### Bash
+Add the following to your `.bashrc`
+```sh
+eval "$(integral init bash)"
 ```
 
 ### Configuration

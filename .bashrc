@@ -1,0 +1,1 @@
+eval "$(integral init bash)"
