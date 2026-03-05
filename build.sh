@@ -1,7 +1,9 @@
 #!/usr/bin/env zsh
 
 mkdir -p build
-rm -rf build/*
+if [ build(NF) ]; then
+  rm -rf build/*
+fi
 go generate
 case "$1" in
   deb)
@@ -17,10 +19,14 @@ Maintainer: Jean <https://github.com/readf0x>
 Description: Math themed shell prompt
 EOF
     mkdir -p build/usr/local/bin
+    go build
     strip integral -o build/usr/local/bin/integral
     chmod 755 build/usr/local/bin/*
     cp -r share build/usr
     dpkg-deb --build build
+  ;;
+  debug)
+    go build -gcflags="all=-N -l"
   ;;
   *)
     mkdir -p build/usr/bin
