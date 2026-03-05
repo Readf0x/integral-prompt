@@ -2,8 +2,6 @@ package config
 
 import "time"
 
-const Version = "v0.1"
-
 type Char rune
 
 // [TODO] add jsonschema info
@@ -109,7 +107,6 @@ type TimeConfig struct {
 }
 
 type PromptConfig struct {
-	Version      string      `json:"version,omitempty"`
 	Modules      *[]string   `json:"modules,omitempty"`
 	ModulesRight *[]string   `json:"modules_right,omitempty"`
 	WrapMinimum  int				 `json:"wrap_min"`
@@ -133,7 +130,6 @@ type PromptConfig struct {
 }
 
 var defaultConfig = PromptConfig{
-	Version: Version,
 	RightSize: 30,
 	Modules: &[]string{
 		"direnv",

@@ -44,7 +44,7 @@ func main() {
 	case "version":
 		fmt.Printf(VersionString+"\n", Version, Commit)
 	case "config":
-		if b, err := json.Marshal(cfg); err == nil {
+		if b, err := json.MarshalIndent(cfg, "", "  "); err == nil {
 			fmt.Printf("%s", b)
 		}
 	case "--help":
@@ -75,16 +75,24 @@ func getConfig() *config.PromptConfig {
 
 func printHelp() {
 	fmt.Print(
-		"usage: integral {transient,render,init,version,config,help} ...\n\n" +
-		"CLI for integral prompt\n\n" +
-		"positional arguments:\n" +
-		"  {transient,render,init,version,config,help}\n" +
-		"    transient\trender transient prompt\n" +
-		"    render\t\trender full prompt\n" +
-		"    init\t\tprint shell init script\n" +
-		"    version\t\tprint version info\n" +
-		"    config\t\tprint config as json\n" +
+		"usage: integral {transient,render,init,version,config,help} ...\n",
+		"       integral init <SHELL>\n",
+		"       integral render <SHELL> <COLUMNS> <SIG> <JOBS>\n",
+		"\nCLI for integral prompt\n",
+		"\npositional arguments:\n",
+		"  {transient,render,init,version,config,help}\n",
+		"    transient\trender transient prompt\n",
+		"    render\t\trender full prompt\n",
+		"    init\t\tprint shell init script\n",
+		"    version\t\tprint version info\n",
+		"    config\t\tprint config as json\n",
 		"    help\t\tshow this menu\n",
+		"\nconfig locations:\n",
+		"  ~/.integralrc\n",
+		"  $XDG_CONFIG_HOME/integralrc\n",
+		"  $XDG_CONFIG_HOME/integralrc.json\n",
+		"  $XDG_CONFIG_HOME/integral/rc\n",
+		"  $XDG_CONFIG_HOME/integral/rc.json\n",
 	)
 	os.Exit(0)
 }
