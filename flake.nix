@@ -26,7 +26,7 @@
       packages = rec {
         integral = pkgs.buildGoModule (final: rec {
           pname = "integral";
-          version = "v0.5.0";
+          version = "v0.5.2";
 
           src = ./.;
 
