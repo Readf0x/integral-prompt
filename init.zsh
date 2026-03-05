@@ -48,16 +48,16 @@ integral:prompt() {
   # Variables
   case $VI_KEYMAP in
     INSERT)
-      visym="%{%F{112}%}${integral_vim_indicators[1]}"
+      visym="%{%F{10}%}${integral_vim_indicators[1]}"
       ;;
     VISUAL)
-      visym="%{%F{92}%}${integral_vim_indicators[2]}"
+      visym="%{%F{13}%}${integral_vim_indicators[2]}"
       ;;
     V-LINE)
-      visym="%{%F{92}%}${integral_vim_indicators[3]}"
+      visym="%{%F{13}%}${integral_vim_indicators[3]}"
       ;;
     NORMAL)
-      visym="%{%F{160}%}${integral_vim_indicators[4]}"
+      visym="%{%F{9}%}${integral_vim_indicators[4]}"
       ;;
   esac
   local dir=${PWD/$HOME/\~}
@@ -65,32 +65,44 @@ integral:prompt() {
 
   # Constants
   local newline=$'\n'
-  local prompt_top="$newline%{%F{11}%}⌠$visym "
+  local prompt_top="$newline%{%F{11}%}⌠$visym%(?.. %{%F{9}%}⚠)"
   local prompt_bot="$newline%{%F{11}%}⌡%{%F{255}%}"
 
   if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
-    # TODO: add support for more than just the current branch
-    git="%{%F{11}%}$(git rev-parse --abbrev-ref HEAD)"
+    # TODO: add support for unstaged changes, untracked files, etc
+    git="%{%F{11}%}$(git rev-parse --abbrev-ref HEAD)⎇"
+    if ! git diff --quiet --ignore-submodules 2>/dev/null; then
+      git="$git %{%F{9}%}$(git diff --no-ext-diff --ignore-submodules --stat | tail -n1 | cut -d' ' -f2)✘"
+    fi
+    if ! git diff --quiet --ignore-submodules --cached 2>/dev/null; then
+      git="$git %{%F{11}%}$(git diff --no-ext-diff --ignore-submodules --stat --cached | tail -n1 | cut -d' ' -f2)+"
+    fi
   fi
   # BUG: this will not work if other modules push the prompt past the terminal width
+  # TODO: Change the loop method to be more efficient
+  #   Instead of whatever the hell is happening here, we can create static module
+  #   "classes" (just a function that follows a certain schema in this case) that output
+  #   a preformatted string as well as their raw length. Then we can loop through all
+  #   the modules and add their length to the current length of the line. If it exceeds
+  #   the terminal width, we just insert our newline and set the length back to 0.
   if (( ${#dir} >= $COLUMNS )); then
     # This is where stuff gets messy, shell string concatenation is less than readable.
     # Set the first line, must be done seperately because of the indicator
-    prompt_top="$prompt_top%{%F{32}%}${dir:0:$(($COLUMNS - 3))}"
+    prompt_top="$prompt_top %{%F{12}%}${dir:0:$(($COLUMNS - 3))}"
     # Determine the number of lines the rest of the directory path will take up
     local x=$((${#dir} / $COLUMNS + 1))
     for ((i = 1; i < x; i++)); do
       # Append the correct section of the path by offsetting the substring based on $i
-      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{32}%}${dir:$((($COLUMNS - 1) * $i - 3)):$((($COLUMNS - 1)))}"
+      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{12}%}${dir:$((($COLUMNS - 1) * $i - 3)):$((($COLUMNS - 1)))}"
     done
     # TODO: detect if the last line is short enough to not need a new line and if the
     # rest of the "modules" need to go through a similar process to the directory path.
     if [[ $git ]]; then
-      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{32}%}$git"
+      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{12}%}$git"
     fi
   else
     # real simple if the directory path is short enough
-    prompt_top="$prompt_top%{%F{32}%}$dir $git"
+    prompt_top="$prompt_top %{%F{12}%}$dir $git"
   fi
 
   PROMPT="$prompt_top$prompt_bot"
