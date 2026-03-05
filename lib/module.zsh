@@ -17,26 +17,26 @@ integral:module:git() {
         branch="detached"
       fi
       length=$((${#branch} + 1))
-      format_str="%F{${integral_git_colors[1]}}$branch${integral_git_icons[1]}"
+      format_str="%F{${int_git_colors[1]}}$branch${int_git_icons[1]}"
       if ! git diff --quiet --ignore-submodules 1>/dev/null 2>&1 || [[ $(git ls-files -o --exclude-standard) ]]; then
         local num=$(($(git ls-files -o --exclude-standard | wc -l) + $(git diff --name-only | wc -l)))
-        length=$(($length + ${#num} + ${#integral_git_icons[2]} + 1))
-        format_str="$format_str %F{${integral_git_colors[2]}}$num${integral_git_icons[2]}"
+        length=$(($length + ${#num} + ${#int_git_icons[2]} + 1))
+        format_str="$format_str %F{${int_git_colors[2]}}$num${int_git_icons[2]}"
       fi
       if ! git diff --quiet --ignore-submodules --cached 1>/dev/null 2>&1; then
         local num=$(git diff --ignore-submodules --cached --name-only | wc -l)
-        length=$(($length + ${#num} + ${#integral_git_icons[3]} + 1))
-        format_str="$format_str %F{${integral_git_colors[3]}}$num${integral_git_icons[3]}"
+        length=$(($length + ${#num} + ${#int_git_icons[3]} + 1))
+        format_str="$format_str %F{${int_git_colors[3]}}$num${int_git_icons[3]}"
       fi
       if [[ $(git remote) ]] && git cherry >/dev/null 2>&1 && [[ $(git cherry | wc -l) -gt 0 ]]; then
         local num=$(git cherry | wc -l)
-        length=$(($length + ${#num} + ${#integral_git_icons[4]} + 1))
-        format_str="$format_str %F{${integral_git_colors[4]}}$num${integral_git_icons[4]}"
+        length=$(($length + ${#num} + ${#int_git_icons[4]} + 1))
+        format_str="$format_str %F{${int_git_colors[4]}}$num${int_git_icons[4]}"
       fi
       if [[ $(git rev-list origin/${branch} --not HEAD 2>/dev/null) ]]; then
         local num=$(git rev-list origin/${branch} --not HEAD --count)
-        length=$(($length + ${#num} + ${#integral_git_icons[5]} + 1))
-        format_str="$format_str %F{${integral_git_colors[5]}}$num${integral_git_icons[5]}"
+        length=$(($length + ${#num} + ${#int_git_icons[5]} + 1))
+        format_str="$format_str %F{${int_git_colors[5]}}$num${int_git_icons[5]}"
       fi
     fi
   else
@@ -55,16 +55,16 @@ integral:module:visym() {
   local format_str
   case $VI_KEYMAP in
     INSERT)
-      format_str="%F{10}${integral_vim_indicators[1]}"
+      format_str="%F{10}${int_vim_indicators[1]}"
       ;;
     VISUAL)
-      format_str="%F{13}${integral_vim_indicators[2]}"
+      format_str="%F{13}${int_vim_indicators[2]}"
       ;;
     V-LINE)
-      format_str="%F{13}${integral_vim_indicators[3]}"
+      format_str="%F{13}${int_vim_indicators[3]}"
       ;;
     NORMAL)
-      format_str="%F{9}${integral_vim_indicators[4]}"
+      format_str="%F{9}${int_vim_indicators[4]}"
       ;;
   esac
 
@@ -77,17 +77,17 @@ integral:module:visym() {
 }
 
 integral:module:dir() {
-  local dir=$(integral_dir_format)
+  local dir=$(int_dir_format)
   if [[ $1 == "w" ]]; then
     return 1
   elif [[ $1 == "r" ]]; then
     print "$dir"
   elif [[ $1 == "c" ]]; then
-    print "%F{$integral_dir_color}"
+    print "%F{$int_dir_color}"
   elif [[ $1 ]]; then
     print "${#dir}"
   else
-    print "%F{$integral_dir_color}$dir"
+    print "%F{$int_dir_color}$dir"
   fi
 }
 
@@ -103,7 +103,7 @@ integral:module:error() {
     if [[ $1 ]]; then
       print "1"
     else
-      integral_error_format $sig
+      int_error_format $sig
     fi
   fi
 }
@@ -114,9 +114,9 @@ integral:module:jobs() {
     print "0"
   else
     if [[ $1 ]]; then
-      print $((${#num} + ${#integral_jobs_icon}))
+      print $((${#num} + ${#int_jobs_icon}))
     else
-      print "%F{$integral_jobs_color}$num$integral_jobs_icon"
+      print "%F{$int_jobs_color}$num$int_jobs_icon"
     fi
   fi
 }
@@ -126,12 +126,12 @@ integral:module:nix() {
     if [[ $1 ]]; then
       print "1"
     else
-      local color=${integral_nix_color[1]}
-      [[ $IN_NIX_SHELL == "impure" ]] && color=${integral_nix_color[2]}
-      if $integral_nerd_fonts; then
-        print "%F{$color}${integral_nix_icons[2]}"
+      local color=${int_nix_color[1]}
+      [[ $IN_NIX_SHELL == "impure" ]] && color=${int_nix_color[2]}
+      if $int_nerd_fonts; then
+        print "%F{$color}${int_nix_icons[2]}"
       else
-        print "%F{$color}${integral_nix_icons[1]}"
+        print "%F{$color}${int_nix_icons[1]}"
       fi
     fi
   else
@@ -143,33 +143,33 @@ integral:module:time() {
   if [[ $1 ]]; then
     print "1"
   else
-    print "%F{12}$(date +${integral_time_format:-%T})"
+    print "%F{12}$(date +${int_time_format:-%T})"
   fi
 }
 
 integral:module:uptime() {
   local uptime=$(uptime | awk '{print $1}')
   if [[ $1 ]]; then
-    print $((${#uptime} + ${#integral_uptime_icon}))
+    print $((${#uptime} + ${#int_uptime_icon}))
   else
-    print "%F{$integral_uptime_color}$uptime$integral_uptime_icon"
+    print "%F{$int_uptime_color}$uptime$int_uptime_icon"
   fi
 }
 
 integral:module:battery() {
   local format_str=$(cat /sys/class/power_supply/*([1])/capacity 2>/dev/null)
   if [[ $1 ]] && [[ $format_str ]]; then
-    print "$((${#format_str} + ${#integral_battery_icon}))"
+    print "$((${#format_str} + ${#int_battery_icon}))"
   elif [[ $1 ]]; then
     print "0"
   else
-    print "%F{$integral_battery_color}$format_str$integral_battery_icon"
+    print "%F{$int_battery_color}$format_str$int_battery_icon"
   fi
 }
 
 integral:module:ssh() {
   if [[ $SSH_CONNECTION ]]; then
-    local format_str="${integral_ssh_format:-%F\{12\}${USER}%F\{13\}@%F\{14\}${HOSTNAME}}"
+    local format_str="${int_ssh_format:-%F\{12\}${USER}%F\{13\}@%F\{14\}${HOSTNAME}}"
     if [[ $1 ]]; then
       print ${#format_str};
     else
@@ -185,7 +185,7 @@ integral:module:direnv() {
     if [[ $1 ]]; then
       print "1"
     else
-      print "$(integral_direnv_format $DIRENV_DIR)"
+      print "$(int_direnv_format $DIRENV_DIR)"
     fi
   else
     print "0"
@@ -208,7 +208,7 @@ integral:render() {
 
   integral helpers newline 1 reset
 
-  for module in $integral_modules; do
+  for module in $int_modules; do
     [[ $1 ]] && print -P "%F{15}module: $module"
     local -i length=$(integral module $module 1)
     local format_str=$(integral module $module)
