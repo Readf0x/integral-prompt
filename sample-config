@@ -1,0 +1,12 @@
+# Sample .integralrc file
+
+# Indicators used for your current vim keymap
+integral_vim_indicators=(
+  "⎀" # insert
+  "⎁" # visual
+  "⎁" # v-line
+  "⎃" # normal
+)
+# Whether or not to use different colors for each indicator
+# if false, will be use exit status of previous command (0 = green, >0 = red)
+integral_vim_color="true"
