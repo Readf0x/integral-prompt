@@ -40,7 +40,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 ### Planned Modules
 - [x] Background Jobs
 - [x] Battery
-- [ ] CPU
+- [x] CPU
 - [x] CWD
 - [x] Clock
 - [x] [Direnv](https://github.com/direnv/direnv)
