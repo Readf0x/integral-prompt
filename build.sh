@@ -17,7 +17,7 @@ Maintainer: Jean <https://github.com/readf0x>
 Description: Math themed shell prompt
 EOF
     mkdir -p build/usr/local/bin
-    cp integral build/usr/local/bin
+    strip integral -o build/usr/local/bin/integral
     chmod 755 build/usr/local/bin/*
     cp -r share build/usr
     dpkg-deb --build build
@@ -25,7 +25,7 @@ EOF
   *)
     mkdir -p build/usr/bin
     CGO_ENABLED=0 go build -ldflags="-extldflags=-static"
-    cp integral build/usr/bin
+    strip integral -o build/usr/bin/integral
     cp -r share build/usr
     tar -cJf build.tar.xz -C build .
   ;;
