@@ -6,7 +6,7 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, flake-utils, nixpkgs, ... }@inputs:
+  outputs = { self, flake-utils, nixpkgs, ... }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       inherit (nixpkgs) lib;
@@ -30,16 +30,15 @@
             delve
             git
             go
+            gcc
             openssh
             zsh
-            packages.default
           ];
         };
       };
       packages = rec {
         integral = pkgs.buildGoModule rec {
-          name = "integral";
-          pname = name;
+          pname = "integral";
           version = "v0.3.6";
 
           src = ./.;
@@ -50,14 +49,20 @@
 
           ldflags = [ "-X 'main.VersionString=%s, %s'" ];
 
+          subPackages = [
+            "cmd/integral"
+          ];
+
           preBuild = ''
-            go run gen.go "Nix build" "${version}"
+            go run ./cmd/integral/gen.go "Nix build" "${version}"
+          '';
+
+          installPhase = ''
+            mkdir -p $out/share
+            cp -r share/integral $out/share/integral
           '';
 
           postInstall = ''
-            mkdir -p $out/share
-            cp -r share/integral $out/share/integral
-
             wrapProgram $out/bin/${pname} \
               --prefix XDG_DATA_DIRS : $out/share
           '';
@@ -65,7 +70,7 @@
           meta = {
             description = "Cross shell prompt theme written in Golang";
             homepage = "https://github.com/Readf0x/integral-prompt";
-            license = lib.licenses.gpl3;
+            license = lib.licenses.gpl3Plus;
             mainProgram = pname;
           };
         };

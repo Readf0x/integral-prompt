@@ -12,6 +12,7 @@ import (
 	"integral/config"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 	"time"
 
@@ -20,11 +21,22 @@ import (
 	"github.com/invopop/jsonschema"
 )
 
-const buildFile = "buildinfo.go"
+const buildFile = "cmd/integral/buildinfo.go"
 const schemaFile = "share/integral/schema.json"
 const sampleFile = "sample-config.json"
 
 func main() {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if (strings.HasSuffix(cwd, "/cmd/integral")) {
+		err = os.Chdir(strings.TrimSuffix(cwd, "/cmd/integral"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		cwd = strings.TrimSuffix(cwd, "/cmd/integral")
+	}
 	bFile, err := os.Create(buildFile)
 	if err != nil {
 		log.Fatal(err)
@@ -33,10 +45,6 @@ func main() {
 
 	var hash, tag string
 	if len(os.Args) < 2 {
-		cwd, err := os.Getwd()
-		if err != nil {
-			log.Fatal(err)
-		}
 		repo, err := git.PlainOpen(cwd)
 		if err != nil {
 			log.Fatal(err)
