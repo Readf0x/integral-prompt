@@ -1,7 +1,7 @@
 local version='0.0.5'
 
-local int_path=${(%):-%x}
-int_path=${int_path:s/\/init.zsh//}
+# https://github.com/spaceship-prompt/spaceship-prompt/commit/111c6f160c4376001d5469f8e8771ee89ea4158a
+local int_path=${${(%):-%x}:A:h}
 export integral_plugins=(
   "$int_path/config.zsh"
   "$int_path/helpers.zsh"
