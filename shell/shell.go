@@ -4,34 +4,48 @@ import (
 	"fmt"
 	"integral/config"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func Fg(str string, color config.Color) string {
-	return fmt.Sprintf("\033[%dm%s\033[39m", color, str)
-}
-func Bold(str string) string {
-	return fmt.Sprintf("\033[1m%s\033[0m", str)
-}
-func Underline(str string) string {
-	return fmt.Sprintf("\033[4m%s\033[0m", str)
+type Shell struct {
+	Fg           func(string, config.Color) string
+	Bold         func(string) string
+	Underline    func(string) string
+	PromptFmt    func(prompt []string) string
+	RPromptFmt   func(prompt string) string
+	Init         func()
 }
 
-func PromptFmt(prompt []string) string {
-	return "PROMPT=\"\n%{" + strings.Join(prompt, "%}\n%{%G") + "%}\""
+var Generic = Shell{
+	Fg: gFg,
+	Bold: gBold,
+	Underline: gUnderline,
+	PromptFmt: gPromptFmt,
 }
-func RPromptFmt(prompt string) string {
-	return "RPROMPT=\"" + prompt + "\""
+
+func gFg(str string, color config.Color) string {
+	return fmt.Sprintf("\033[%dm%s\033[39m", color, str)
 }
-func Init() {
-	share, err := findShare()
-	if err != nil {
-		log.Fatal(err)
+func gBold(str string) string {
+	return fmt.Sprintf("\033[1m%s\033[0m", str)
+}
+func gUnderline(str string) string {
+	return fmt.Sprintf("\033[4m%s\033[0m", str)
+}
+func gPromptFmt(prompt []string) string {
+	return strings.Join(prompt, "\n")
+}
+
+func GetShell(str string) (sh Shell, err error) {
+	switch str {
+	case "zsh":
+		return Zsh, nil
+	case "raw":
+		return Generic, nil
 	}
-	printFile(share + "/init.zsh")
+	return Shell{}, fmt.Errorf("Invalid shell name")
 }
 
 func printFile(path string) error {

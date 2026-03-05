@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"integral/config"
-	"integral/shell"
 	"log"
 	"os"
 	"regexp"
@@ -22,7 +21,7 @@ func render(cfg *config.PromptConfig) {
 
 	prompt := finalize(cfg, width)
 
-	fmt.Println(shell.PromptFmt(prompt))
+	fmt.Println(sh.PromptFmt(prompt))
 }
 
 func finalize(cfg *config.PromptConfig, size int) []string {
@@ -39,7 +38,7 @@ func finalize(cfg *config.PromptConfig, size int) []string {
 	//assembly
 	lines := assemble(size, <-main, int(cfg.Length+2), cfg.Line)
 
-	lines = append(lines, shell.Fg(string(cfg.Line.Symbols[2]), cfg.Line.Color))
+	lines = append(lines, sh.Fg(string(cfg.Line.Symbols[2]), cfg.Line.Color))
 	return lines
 }
 
@@ -58,7 +57,7 @@ func digit(num int) int {
 
 func assemble(width int, modules []RenderedModule, maxLines int, cfg *config.LineConfig) []string {
 	lines := make([]string, 0, maxLines)
-	lines = append(lines, shell.Fg(string(cfg.Symbols[0]), cfg.Color))
+	lines = append(lines, sh.Fg(string(cfg.Symbols[0]), cfg.Color))
 
 	currentLine := 0
 	lastIndex := len(modules) - 1
@@ -71,13 +70,13 @@ func assemble(width int, modules []RenderedModule, maxLines int, cfg *config.Lin
 				wrapped := wrapModule(mod, width, lineLen, cfg)
 				for j, segment := range wrapped {
 					if j > 0 {
-						lines = append(lines, shell.Fg(string(cfg.Symbols[1]), cfg.Color))
+						lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
 						currentLine++
 					}
 					lines[currentLine] += segment
 				}
 			} else {
-				lines = append(lines, shell.Fg(string(cfg.Symbols[1]), cfg.Color))
+				lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
 				currentLine++
 				lines[currentLine] += mod.Fmt
 			}
