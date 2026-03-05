@@ -196,16 +196,18 @@ integral:module:cpu() {
   local cpu="$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')%"
   if [[ $1 ]]; then
     print "${#cpu}"
+  else
+    print "%F${int_cpu_color}${cpu}"
   fi
-  print "%F${int_cpu_color}${cpu}"
 }
 
 integral:module:distrobox() {
   if [[ $CONTAINER_ID ]]; then
     if [[ $1 ]]; then
       print ${#CONTAINER_ID}
+    else
+      print "%F${int_distrobox_color}${CONTAINER_ID}"
     fi
-    print "%F${int_distrobox_color}${CONTAINER_ID}"
   else
     print "0"
   fi
