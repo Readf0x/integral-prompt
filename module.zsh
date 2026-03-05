@@ -155,6 +155,9 @@ integral:module:uptime() {
 
 # BUG: leaves <space> at end of prompt
 # TODO: add right prompt
+#   Will require a refactor, this method will introduce complications.
+#   Should create a subfunction to handle inserting newlines that inserts the right prompt.
+#   Might require the entire right prompt to be rendered before the left one.
 integral:loop_modules() {
   local -i position=0
   local -i max_len=$(($COLUMNS - 1))
@@ -173,16 +176,15 @@ integral:loop_modules() {
         local color=$(integral:module:$module c)
         local -i i=0
         while [[ $i -le $((${#raw_str} / $max_len)) ]]; do
-          if ! [[ $position == 0 ]]; then
+          if [[ $i == 0 ]]; then
             PROMPT+="$color${raw_str:$(($i * $max_len)):$(($max_len - $position))}"
           else
-            PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$color${raw_str:$(($i * $max_len + $position)):$max_len}"
+            PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$color${raw_str:$(($i * $max_len - $position)):$max_len}"
           fi
-          position=0
           i+=1
         done
         PROMPT+=" "
-        position=$((${#raw_str} % $max_len))
+        position=$(($position + (${#raw_str} % $max_len)))
       elif [[ $new_pos -gt $max_len ]]; then
         PROMPT+="$newline%{%F{$integral_prompt_color}%}${integral_prompt[2]}$format_str "
         position=$length
