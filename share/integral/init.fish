@@ -5,7 +5,7 @@ function fish_prompt
 		integral transient
 		set -e int_transient
 	else
-		integral render fish $COLUMNS $sig $(jobs | wc -l) | source
+		integral render fish $COLUMNS $sig (count (jobs)) | source
 	end
 end
 function fish_right_prompt

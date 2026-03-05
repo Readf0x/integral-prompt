@@ -1,7 +1,7 @@
 echo -ne '\e[5 q'
 
 __integral_render() {
-  eval "$(integral render bash $COLUMNS $? $(jobs | wc -l))"
+  eval "$(integral render bash $COLUMNS $? $(jobs | grep -c '^\['))"
 }
 
 # Unfortunately just setting PS1 doesn't actually update the prompt

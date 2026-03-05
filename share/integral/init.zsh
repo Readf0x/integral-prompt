@@ -38,7 +38,7 @@ __integral_error_hook() {
 }
 
 __integral_render() {
-  eval "$(integral render zsh $COLUMNS $sig $(jobs | wc -l))"
+  eval "$(integral render zsh $COLUMNS $sig $(jobs | grep -c '^\['))"
 }
 
 __integral_line-pre-redraw() {
