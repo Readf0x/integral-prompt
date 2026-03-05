@@ -10,39 +10,8 @@
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       inherit (nixpkgs) lib;
-    in rec {
+    in {
       devShells = {
-        test = {
-          zsh = pkgs.mkShell {
-            packages = with pkgs; [
-              zsh
-              (packages.default.overrideAttrs (final: prev: {
-                version = "${prev.version}-debug";
-              }))
-            ];
-
-            shellHook = ''
-              exec zsh
-            '';
-
-            XDG_DATA_DIRS = "${builtins.toString ./.}/share:$XDG_DATA_DIRS";
-            ZDOTDIR = builtins.toString ./.;
-          };
-          bash = pkgs.mkShell {
-            packages = with pkgs; [
-              bash
-              (packages.default.overrideAttrs (final: prev: {
-                version = "${prev.version}-debug";
-              }))
-            ];
-
-            shellHook = ''
-              source .bashrc
-            '';
-
-            XDG_DATA_DIRS = "${builtins.toString ./.}/share:$XDG_DATA_DIRS";
-          };
-        };
         default = pkgs.mkShell {
           packages = with pkgs; [
             bash
@@ -90,6 +59,19 @@
           };
         });
         default = integral;
+        test = {
+          zsh = pkgs.writeShellScriptBin "debugEnv" ''
+            export XDG_DATA_DIRS="${builtins.toString ./.}/share:$XDG_DATA_DIRS"
+            export ZDOTDIR="${builtins.toString ./.}"
+            export PATH="${lib.makeBinPath [default]}:$PATH"
+            zsh
+          '';
+          bash = pkgs.writeShellScriptBin "debugEnv" ''
+            export XDG_DATA_DIRS="${builtins.toString ./.}/share:$XDG_DATA_DIRS"
+            export PATH="${lib.makeBinPath [default]}:$PATH"
+            bash --rcfile ${builtins.toString ./.bashrc}
+          '';
+        };
       };
     }) // {
       homeManagerModules = rec {
