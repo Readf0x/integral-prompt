@@ -2,6 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"io"
+	"log"
 	"os"
 )
 
@@ -13,8 +15,10 @@ func LoadConfig(paths []string) *PromptConfig {
 	for _, p := range paths {
 		file, err := os.Open(p)
 		if err == nil {
-			var b []byte
-			file.Read(b)
+			b, err := io.ReadAll(file)
+			if err != nil {
+				log.Fatal(err)
+			}
 			defer file.Close()
 
 			json.Unmarshal(b, conf)
