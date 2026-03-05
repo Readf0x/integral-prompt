@@ -11,6 +11,7 @@ import (
 var logger = log.New(os.Stderr, fmt.Sprintf("\033[%dmError:\033[%dm ", 31, 39), 1)
 var sh = shell.Shell{}
 
+//go:generate go run gen.go
 var VersionString = "%s, built from commit %s"
 
 func main() {
@@ -44,5 +45,16 @@ func main() {
 }
 
 func getConfig() *config.PromptConfig {
-	return config.GetDefault()
+	c := os.Getenv("XDG_CONFIG_HOME")
+	if c == "" {
+		c = os.Getenv("HOME") + "/.config"
+	}
+	cfg := config.LoadConfig([]string{
+		os.Getenv("HOME") + "/.integralrc",
+		c + "/integralrc",
+		c + "/integralrc.json",
+		c + "/integral/rc",
+		c + "/integral/rc.json",
+	})
+	return cfg
 }

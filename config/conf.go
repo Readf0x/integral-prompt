@@ -111,19 +111,19 @@ type PromptConfig struct {
 	Length       uint8       `json:"length,omitempty"`
 	Line         *LineConfig `json:"line,omitempty"`
 	// Per Module Config
-	Battery   *BatteryConfig    `json:"battery,omitempty"`
-	Cpu       *CpuConfig        `json:"cpu,omitempty"`
-	Dir       *DirConfig        `json:"dir,omitempty"`
-	Direnv    *IconConfig       `json:"direnv,omitempty"`
-	Distrobox *DistroboxConfig  `json:"distrobox,omitempty"`
-	Error     *ErrorConfig      `json:"error,omitempty"`
-	Git       *GitConfig        `json:"git,omitempty"`
-	Jobs      *CounterConfig    `json:"jobs,omitempty"`
-	NixShell  *SingleIconEntry  `json:"nix_shell,omitempty"`
-	Ssh       *SshConfig        `json:"ssh,omitempty"`
-	Time      *TimeConfig       `json:"time,omitempty"`
-	Uptime    *CounterConfig    `json:"uptime,omitempty"`
-	ViMode    *ViModeConfig     `json:"vi_mode,omitempty"`
+	Battery   *BatteryConfig   `json:"battery,omitempty"`
+	Cpu       *CpuConfig       `json:"cpu,omitempty"`
+	Dir       *DirConfig       `json:"dir,omitempty"`
+	Direnv    *IconConfig      `json:"direnv,omitempty"`
+	Distrobox *DistroboxConfig `json:"distrobox,omitempty"`
+	Error     *ErrorConfig     `json:"error,omitempty"`
+	Git       *GitConfig       `json:"git,omitempty"`
+	Jobs      *CounterConfig   `json:"jobs,omitempty"`
+	NixShell  *SingleIconEntry `json:"nix_shell,omitempty"`
+	Ssh       *SshConfig       `json:"ssh,omitempty"`
+	Time      *TimeConfig      `json:"time,omitempty"`
+	Uptime    *CounterConfig   `json:"uptime,omitempty"`
+	ViMode    *ViModeConfig    `json:"vi_mode,omitempty"`
 }
 
 var defaultConfig = PromptConfig{
@@ -271,6 +271,3 @@ var defaultConfig = PromptConfig{
 		},
 	},
 }
-
-// Returns a pointer to the default configuration.
-func GetDefault() *PromptConfig { return &defaultConfig }

@@ -58,11 +58,11 @@ func assemble(width int, modules []RenderedModule, rightPrompt []string, maxLine
 
 	currentLine := 0
 	lastIndex := len(modules) - 1
-  maxWidth := width
+	maxWidth := width
 	var rprompt string
 	if len(rightPrompt) > 0 {
 		for _, s := range rightPrompt {
-			maxWidth = min(maxWidth, width - shell.TrueLength(s)) - 1
+			maxWidth = min(maxWidth, width-shell.TrueLength(s)) - 1
 		}
 	}
 
@@ -78,13 +78,13 @@ func assemble(width int, modules []RenderedModule, rightPrompt []string, maxLine
 						currentLine++
 					}
 					lines[currentLine] += segment
-					if len(rightPrompt) - 1 >= currentLine {
+					if len(rightPrompt)-1 >= currentLine {
 						lines[currentLine] += " " + rightPrompt[currentLine]
 					}
 				}
 			} else {
-				if len(rightPrompt) - 1 >= currentLine {
-					lines[currentLine] += strings.Repeat(" ", maxWidth - shell.TrueLength(lines[currentLine]) + 1) + rightPrompt[currentLine]
+				if len(rightPrompt)-1 >= currentLine {
+					lines[currentLine] += strings.Repeat(" ", maxWidth-shell.TrueLength(lines[currentLine])+1) + rightPrompt[currentLine]
 				}
 				lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
 				currentLine++
@@ -97,17 +97,17 @@ func assemble(width int, modules []RenderedModule, rightPrompt []string, maxLine
 		if i != lastIndex {
 			lines[currentLine] += " "
 		} else {
-			if len(rightPrompt) - 1 >= currentLine {
-				lines[currentLine] += strings.Repeat(" ", width - shell.TrueLength(lines[currentLine]) - shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
+			if len(rightPrompt)-1 >= currentLine {
+				lines[currentLine] += strings.Repeat(" ", width-shell.TrueLength(lines[currentLine])-shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
 			}
 		}
 	}
-	if len(rightPrompt) > currentLine + 1 {
-		if len(rightPrompt) - currentLine - 2 > 0 {
-			for i := 0; i < len(rightPrompt) - 1; i++ {
+	if len(rightPrompt) > currentLine+1 {
+		if len(rightPrompt)-currentLine-2 > 0 {
+			for i := 0; i < len(rightPrompt)-1; i++ {
 				lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
 				currentLine++
-				lines[currentLine] += strings.Repeat(" ", width - 1 - shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
+				lines[currentLine] += strings.Repeat(" ", width-1-shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
 			}
 		}
 		if sh.SupportsRP {
@@ -115,7 +115,7 @@ func assemble(width int, modules []RenderedModule, rightPrompt []string, maxLine
 		} else {
 			lines = append(lines, sh.Fg(string(cfg.Symbols[1]), cfg.Color))
 			currentLine++
-			lines[currentLine] += strings.Repeat(" ", width - 1 - shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
+			lines[currentLine] += strings.Repeat(" ", width-1-shell.TrueLength(rightPrompt[currentLine])) + rightPrompt[currentLine]
 		}
 	}
 

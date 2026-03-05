@@ -41,7 +41,7 @@
 
           nativeBuildInputs = [ pkgs.makeWrapper ];
 
-          vendorHash = "sha256-mr41Xq3D5V/T3oWp1TCSykRtu5r703JXY7PYooJtB/s=";
+          vendorHash = "sha256-iwM67cYB1SaJhoXP6OpocarQB1kp0miv+MUS+SyYDFo=";
 
           ldflags = [ "-X 'main.VersionString=%s, %s'" ];
 
