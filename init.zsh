@@ -1,4 +1,4 @@
-local version='0.0.5'
+local version='0.1.0'
 
 # https://github.com/spaceship-prompt/spaceship-prompt/commit/111c6f160c4376001d5469f8e8771ee89ea4158a
 local int_path=${${(%):-%x}:A:h}
