@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"integral/config"
 	"os"
-	"strings"
 )
 
 type SshModule struct {
@@ -14,12 +13,11 @@ type SshModule struct {
 
 func (m *SshModule) Initialize(cfg *config.PromptConfig) bool {
 	if _, set := os.LookupEnv("SSH_CONNECTION"); set {
+		var err error
 		m.User = os.Getenv("USER")
-		file, err := os.ReadFile("/etc/hostname")
+		m.Host, err = os.Hostname()
 		if err != nil {
 			m.Host = os.Getenv("HOSTNAME")
-		} else {
-			m.Host = strings.ReplaceAll(string(file), "\n", "")
 		}
 		return true
 	}
