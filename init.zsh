@@ -1,4 +1,4 @@
-local version='0.0.4'
+local version='0.0.5'
 
 autoload -U colors; colors
 autoload -Uz add-zsh-hook
