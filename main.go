@@ -11,7 +11,7 @@ import (
 var logger = log.New(os.Stderr, fmt.Sprintf("\033[%dmError:\033[%dm ", 31, 39), 1)
 var sh = shell.Shell{}
 
-const version = "v0.3.0"
+var VersionString = "%s, built from commit %s"
 
 func main() {
 	cfg := getConfig()
@@ -37,7 +37,7 @@ func main() {
 		}
 		sh.Init()
 	case "version":
-		fmt.Println(version)
+		fmt.Printf(VersionString + "\n", Version, Commit)
 	default:
 		logger.Fatalln("Unknown command")
 	}

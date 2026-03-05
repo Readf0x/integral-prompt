@@ -35,13 +35,19 @@
         integral = pkgs.buildGoModule rec {
           name = "integral";
           pname = name;
-          version = "v0.3.0";
+          version = "v0.3.1";
 
           src = ./.;
 
           nativeBuildInputs = [ pkgs.makeWrapper ];
 
           vendorHash = "sha256-mr41Xq3D5V/T3oWp1TCSykRtu5r703JXY7PYooJtB/s=";
+
+          ldflags = [ "-X 'main.VersionString=%s, %s'" ];
+
+          preBuild = ''
+            go run gen.go "Nix build" "${version}"
+          '';
 
           postInstall = ''
             mkdir -p $out/share
