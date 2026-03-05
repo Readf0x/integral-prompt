@@ -13,7 +13,7 @@ export int_right_modules=(
   "time"
 )
 export int_kitty_integration="false"
-export int_prompt_color="11"
+export int_prompt_color="3"
 export int_prompt=(
   "⌠"
   "⎮"
@@ -25,8 +25,8 @@ export int_nix_icons=(
   ""
 )
 export int_nix_color=(
-  "14"
-  "13"
+  "6"
+  "5"
 )
 export int_vim_indicators=(
   "○" # insert
@@ -35,23 +35,23 @@ export int_vim_indicators=(
   "●" # normal
 )
 export int_vim_colors=(
-  "10" # insert
-  "13" # visual
-  "13" # v-line
-  "9"  # normal
+  "2" # insert
+  "5" # visual
+  "5" # v-line
+  "1"  # normal
 )
 export int_error_format() {
   case $1 in
-    1) print "%F{9}✘" ;;
-    2|127) print "%F{11}?" ;;
-    126) print "%F{9}⚠" ;;
+    1) print "%F{1}✘" ;;
+    2|127) print "%F{3}?" ;;
+    126) print "%F{1}⚠" ;;
     130) print "%F{15}☠" ;;
-    148) print "%F{13}✱" ;;
-    *) print "%F{9}✘" ;;
+    148) print "%F{5}✱" ;;
+    *) print "%F{1}✘" ;;
   esac
 }
 export int_dir_format() { print ${PWD/$HOME/\~} }
-export int_dir_color="12"
+export int_dir_color="4"
 export int_git_icons=(
   "⎇"
   "✘"
@@ -60,27 +60,27 @@ export int_git_icons=(
   "↓"
 )
 export int_git_colors=(
-  "11"
-  "9"
-  "11"
-  "14"
-  "14"
+  "3"
+  "1"
+  "3"
+  "6"
+  "6"
 )
 export int_jobs_icon="⚙"
-export int_jobs_color="13"
+export int_jobs_color="5"
 export int_time_format="%T"
 export int_uptime_icon="⏲"
-export int_uptime_color="12"
+export int_uptime_color="4"
 export int_battery_icons=(
   "🗲"
   "󰁹"
 )
-export int_battery_color="10"
+export int_battery_color="2"
 export int_ssh_format="%F{12}${USER}%F{13}@%F{14}${HOSTNAME}"
 
 export int_direnv_format() {
   case $1 in
-    *) print "%F{11}⌁" ;;
+    *) print "%F{3}⌁" ;;
   esac
 }
 
