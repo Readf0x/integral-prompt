@@ -78,7 +78,7 @@ integral:prompt() {
       git="$git %{%F{11}%}$(git diff --no-ext-diff --ignore-submodules --stat --cached | tail -n1 | cut -d' ' -f2)+"
     fi
     if [[ $(git cherry | wc -l) -gt 0 ]]; then
-      git="$git %{%F{14}%}↑"
+      git="$git %{%F{14}%}$(git cherry | wc -l)↑"
     fi
   fi
   # BUG: this will not work if other modules push the prompt past the terminal width
