@@ -1,10 +1,12 @@
 local version='0.0.5'
 
+local int_path=${(%):-%x}
+int_path=${int_path:s/\/init.zsh//}
 export integral_plugins=(
-  './config.zsh'
-  './helpers.zsh'
-  './module_loader.zsh'
-  './zle.zsh'
+  "$int_path/config.zsh"
+  "$int_path/helpers.zsh"
+  "$int_path/module_loader.zsh"
+  "$int_path/zle.zsh"
 )
 for f in $integral_plugins; do
   if [[ -f $f ]]; then
@@ -14,7 +16,6 @@ for f in $integral_plugins; do
     exit 1
   fi
 done
-autoload -U colors; colors
 autoload -Uz add-zsh-hook
 autoload -U add-zle-hook-widget
 
@@ -27,9 +28,9 @@ integral:prompt() {
 # === INIT ===
 TRAPWINCH() {
   integral:prompt
-  zle reset-prompt
+  zle .reset-prompt
 }
-add-zsh-hook preexec error_hook
+add-zsh-hook precmd error_hook
 add-zsh-hook precmd integral:prompt
 add-zsh-hook precmd integral:helpers:cursor-shape
 zle -N integral:line-pre-redraw
