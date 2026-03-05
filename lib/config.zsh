@@ -1,4 +1,5 @@
 # Colors are in ansi base16, run the colors.sh script to see what your terminal colors look like.
+# colors.sh is available in the source repo at `helpers/colors.sh`
 # === OPTIONS ===
 export int_modules=(
   "direnv"

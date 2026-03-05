@@ -45,6 +45,7 @@ integral:init() {
 
   export VI_KEYMAP=${VI_KEYMAP:-"INSERT"}
   export HOSTNAME=${HOSTNAME:-"$(hostname)"}
+  export INTEGRAL_INSTALL_PATH=$int_path
 
   # === INIT ===
   TRAPWINCH() {
