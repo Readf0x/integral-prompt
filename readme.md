@@ -10,6 +10,7 @@ This prompt theme was created mostly due to my dissatisfaction with existing one
 
 ## Installation
 ~~Load with your favorite plugin loader (only officially supports [antidote](https://antidote.sh/)), or source `init.zsh` in your `.zshrc`.~~
+
 For the time being it can only be automatically installed with nix.
 
 ### Flake install (Home Manager)
@@ -34,6 +35,9 @@ Add to your inputs and add `integral-prompt.homeManagerModules.default` to your 
 }
 ```
 
+### Manual installation
+Install golang and run `./build.sh` to generate a tarball for generic linux.
+For Debian based distros, run `./build.sh deb`.
 
 ## Usage
 ~~To configure, add a `~/.integralrc` file. It can also be placed at:~~
@@ -47,11 +51,11 @@ Add to your inputs and add `integral-prompt.homeManagerModules.default` to your 
 Configuration is still being worked on.
 
 ## Planned Features
-- [ ] Configuration files
+- [x] Configuration files
 - [x] Transient Prompt
 - [x] Multi-line prompt
 - [x] Rerender on terminal resize
-- [ ] Module loader
+- [x] Module loader
     - [x] Colors
     - [x] Formatting
     - [x] Icons
@@ -71,8 +75,8 @@ Configuration is still being worked on.
 - [x] Clock
 - [x] [Direnv](https://github.com/direnv/direnv)
 - [x] Error Codes
-- [ ] Git
+- [x] Git
 - [x] Nix Shell
 - [x] SSH
-- [ ] Uptime
+- [x] Uptime
 - [x] Vim
