@@ -2,8 +2,6 @@
 
 <img src="https://raw.githubusercontent.com/Readf0x/integral-prompt/refs/heads/main/screenshots/indev_v0.2.1.png">
 
-**Potential users be warned!** This plugin is very new, and has yet to reach feature maturity. Issues are expected, but should hopefully be minor.
-
 ## About
 This prompt theme was created mostly due to my dissatisfaction with existing ones. My main issues were:
 - overcomplicated configuration
