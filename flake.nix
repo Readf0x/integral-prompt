@@ -40,7 +40,7 @@
         integral = pkgs.buildGoModule rec {
           name = "integral";
           pname = name;
-          version = "v0.3.4.1";
+          version = "v0.3.6";
 
           src = ./.;
 
