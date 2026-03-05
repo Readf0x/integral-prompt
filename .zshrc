@@ -1,2 +1,2 @@
-eval "$(integral init zsh)"
+source <(integral init zsh)
 autoload -U compinit && compinit

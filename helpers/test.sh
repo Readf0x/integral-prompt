@@ -2,23 +2,26 @@
 
 if [[ $1 = "benchmark" ]]; then
   go build ./cmd/integral
-  hyperfine "./integral 1" -iN --export-json benchmark.json
+  hyperfine "./integral render zsh 20 1 1" -iN --export-json benchmark.json
   if [[ $(jq -r '.results.[].mean' benchmark.json) < 0.05 ]]; then
     print -P "%F{2}Pass!%f"
   else
     print -P "%F{1}Fail!%f"
   fi
 elif [[ $1 = "debug" ]]; then
-  go build -gcflags="all=-N -l"
+  go build -gcflags="all=-N -l" ./cmd/integral
   ./integral render raw ${2:-20} ${3:-0} ${4:-0} &
   pid=$!
   kill -STOP $pid
   dlv attach $pid & kill -CONT $pid
 else
-  go run . render raw $COLUMNS 1 0
+  go run ./cmd/integral render raw $COLUMNS 1 0
+	print
   export SSH_CONNECTION=asdf
-  go run . render raw $COLUMNS 2 1
+  go run ./cmd/integral render raw $COLUMNS 2 1
+	print
   export CONTAINER_ID=debian
-  go run . render raw $COLUMNS 126 2
+  go run ./cmd/integral render raw $COLUMNS 126 2
+	print
 fi
 
