@@ -20,11 +20,11 @@ end
 function __int_vim_bind --on-variable fish_bind_mode
 	switch $fish_bind_mode
 		case default replace replace-one
-			set -g VI_KEYMAP "NORMAL"
+			set -gx VI_KEYMAP "NORMAL"
 		case insert
-			set -g VI_KEYMAP "INSERT"
+			set -gx VI_KEYMAP "INSERT"
 		case visual
-			set -g VI_KEYMAP "VISUAL"
+			set -gx VI_KEYMAP "VISUAL"
 	end
 	commandline -f repaint
 end
