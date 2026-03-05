@@ -45,7 +45,7 @@ in {
       eval "$(${lib.getExe cfg.package} init bash)"
     '';
 
-    programs.fish.shellInit = lib.mkIf cfg.enableFishIntegration ''
+    programs.fish.interactiveShellInit = lib.mkIf cfg.enableFishIntegration ''
       ${lib.getExe cfg.package} init fish | source
     '';
 
