@@ -21,6 +21,12 @@ local rc_locations=(
   ~/.config/integral/rc
   ~/.config/integral/rc.zsh
 )
+export integral_modules=(
+  "visym"
+  "error"
+  "dir"
+  "git"
+)
 for f in $rc_locations; do
   if [[ -f $f ]]; then
     source $f
