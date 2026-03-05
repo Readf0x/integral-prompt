@@ -495,7 +495,7 @@ type ViModeModule struct {
 func (m *ViModeModule) Initialize(cfg *config.PromptConfig) bool {
 	var set bool
 	m.Mode, set = os.LookupEnv("VI_KEYMAP")
-	return set && os.Args[2] == "zsh"
+	return set
 }
 func (m *ViModeModule) Render(cfg *config.PromptConfig) RenderedModule {
 	var final RenderedModule
