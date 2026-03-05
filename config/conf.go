@@ -65,6 +65,8 @@ type GitConfig struct {
 	Staged   *CounterConfig `json:"staged,omitempty"`
 	Push     *CounterConfig `json:"push,omitempty"`
 	Pull     *CounterConfig `json:"pull,omitempty"`
+	ShowWT   bool						`json:"show_worktree"`
+	ShowPP	 bool						`json:"show_push_pull"`
 }
 
 type CpuConfig struct {
@@ -198,6 +200,8 @@ var defaultConfig = PromptConfig{
 			Color: Cyan,
 			Icon:  '↓',
 		},
+		ShowWT: true,
+		ShowPP: true,
 	},
 	NixShell: &SingleIconEntry{
 		Color: Cyan,

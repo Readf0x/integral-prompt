@@ -133,6 +133,5 @@ const Version = "{{ .Tag }}"
 
 type buildinfo struct {
 	Commit string
-	Tag string
+	Tag    string
 }
-
