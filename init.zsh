@@ -7,11 +7,10 @@ export VI_KEYMAP=${VI_KEYMAP:-"INSERT"}
 # === OPTIONS ===
 export integral_vim_color="true"
 export integral_vim_indicators=(
-  "○"
-  "◒"
-  "◐"
-  "●"
-  "◍"
+  "○" # insert
+  "◒" # visual
+  "◐" # v-line
+  "●" # normal
 )
 
 # === CONFIG LOADING ===
@@ -55,19 +54,16 @@ integral:prompt() {
   # Variables
   case $VI_KEYMAP in
     INSERT)
-      visym="%{%F{112}%}${integral_vim_indicators[0]}"
+      visym="%{%F{112}%}${integral_vim_indicators[1]}"
       ;;
     VISUAL)
-      visym="%{%F{92}%}${integral_vim_indicators[1]}"
-      ;;
-    V-LINE)
       visym="%{%F{92}%}${integral_vim_indicators[2]}"
       ;;
-    NORMAL)
-      visym="%{%F{160}%}${integral_vim_indicators[3]}"
+    V-LINE)
+      visym="%{%F{92}%}${integral_vim_indicators[3]}"
       ;;
-    REPLACE)
-      visym="%{%F{32}%}${integral_vim_indicators[4]}"
+    NORMAL)
+      visym="%{%F{160}%}${integral_vim_indicators[4]}"
       ;;
   esac
   local dir=${PWD/$HOME/\~}
@@ -146,11 +142,7 @@ integral:line-pre-redraw() {
       integral:helpers:cursor-shape 1
       ;;
     viins|main)
-      if [[ $ZLE_KEYSTATE == *overwrite* ]]; then
-        VI_KEYMAP="REPLACE"
-      else
-        VI_KEYMAP="INSERT"
-      fi
+      VI_KEYMAP="INSERT"
       integral:helpers:cursor-shape
       ;;
   esac
