@@ -93,7 +93,7 @@
           '';
           fish = pkgs.writeShellScriptBin "debug" ''
             export XDG_DATA_DIRS="${default}/share:$XDG_DATA_DIRS"
-            export XDG_CONFIG_HOME="${test.debugEnv}"
+            export PATH="${lib.makeBinPath [default]}:$PATH"
             fish
           '';
         };
