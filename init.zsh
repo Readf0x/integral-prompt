@@ -51,6 +51,6 @@ add-zsh-hook precmd integral:render
 add-zsh-hook precmd integral:helpers:cursor-shape
 zle -N integral:line-pre-redraw
 add-zle-hook-widget zle-line-pre-redraw integral:line-pre-redraw
-integral:render
+integral render
 zle -N zle-line-init integral:zle-line-init
 
