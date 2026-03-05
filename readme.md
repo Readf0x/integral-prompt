@@ -50,6 +50,12 @@ Add the following to your `.bashrc`
 eval "$(integral init bash)"
 ```
 
+### Fish
+Add the following to your `config.fish`
+```sh
+integral init fish | source
+```
+
 ### Configuration
 To configure, add a `.integralrc` file.
 ```sh
