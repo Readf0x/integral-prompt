@@ -197,7 +197,17 @@ integral:module:cpu() {
   if [[ $1 ]]; then
     print "${#cpu}"
   fi
-  print "${int_cpu_color}${cpu}"
+  print "%F${int_cpu_color}${cpu}"
+}
+
+integral:module:distrobox() {
+  if [[ $CONTAINER_ID ]]; then
+    if [[ $1 ]]; then
+      print $#CONTAINER_ID
+    fi
+    print "%F${int_distrobox_color}${CONTAINER_ID}"
+  fi
+  print 0
 }
 
 # BUG: leaves <space> at end of prompt
