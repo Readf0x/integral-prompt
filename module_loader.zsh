@@ -122,60 +122,36 @@ export integral_modules=(
 # BUG: leaves <space> at end of prompt
 integral:loop_modules() {
   local -i position=0
-  if [[ $2 ]]; then
-    local -i max_len=$2
-  else
-    local -i max_len=$(($COLUMNS - 1))
-  fi
-
-  [[ $1 ]] && print -P "%{%F{14}%}\$max_len: %{%F{13}%}$max_len"
+  local -i max_len=$(($COLUMNS - 1))
 
   local newline=$'\n'
   PROMPT="$newline$integral_top"
 
   for module in $integral_modules; do
-    [[ $1 ]] && print -P "%{%F{12}%}current module: %{%F{11}%}$module%{%F{15}%}"
     local -i length=$(integral:module:$module 1)
     local format_str=$(integral:module:$module)
 
-    [[ $1 == "1" ]] && print "$length:$format_str"
-    [[ $1 == "2" ]] && print -P "$length:$format_str%{%F{15}%}%}"
-
     if [[ $length -gt 0 ]]; then
       local new_pos=$(($position + $length + 1))
-      [[ $1 ]] && print -P "%{%F{14}%}\$new_pos: %{%F{13}%}$new_pos"
       if [[ $length -gt $max_len ]] && ! integral:module:$module w; then
         local raw_str=$(integral:module:$module r)
         local color=$(integral:module:$module c)
-        [[ $1 ]] && print -P "%{%F{14}%}length > max_len: %{%F{13}%}$length > $max_len"
         local -i i=0
         while [[ $i -le $((${#raw_str} / $max_len)) ]]; do
           PROMPT+="$newline$integral_mid$color${raw_str:$(($i * $max_len)):$max_len}"
-          [[ $1 == "1" ]] && print "${(%):-%F{15}PROMPT: $PROMPT" #}" #idk why but treesitter is freaking out over this
-          [[ $1 == "2" ]] && print -P $PROMPT
           i+=1
         done
         PROMPT+=" "
         position=$((${#raw_str} % $max_len))
-        [[ $1 ]] && print -P "%{%F{14}%}position changed to: %{%F{13}%}$position"
       elif [[ $new_pos -gt $max_len ]]; then
-        [[ $1 ]] && print -P "%{%F{14}%}new_pos > max_len: %{%F{13}%}$new_pos > $max_len"
         PROMPT+="$newline$integral_mid$format_str "
-        [[ $1 == "1" ]] && print "${(%):-%F{15}PROMPT: $PROMPT" #}" #idk why but treesitter is freaking out over this
-        [[ $1 == "2" ]] && print -P $PROMPT
         position=$length
-        [[ $1 ]] && print -P "%{%F{14}%}position changed to: %{%F{13}%}$position"
       else
         PROMPT+="$format_str "
-        [[ $1 == "1" ]] && print "${(%):-%F{15}PROMPT: $PROMPT" #}" #idk why but treesitter is freaking out over this
-        [[ $1 == "2" ]] && print -P $PROMPT
         position=$new_pos
       fi
-    elif [[ $1 ]]; then
-      print -P "%{%F{14}%}length is 0, skipping...$newline"
     fi
   done
   PROMPT+="$newline%{%F{11}%}$integral_bot%{%F{15}%}"
-  [[ $1 ]] && print -P "%{%F{15}%}%====="
 }
 
