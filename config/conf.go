@@ -19,12 +19,12 @@ type SingleIconEntry struct {
 
 type IconConfig struct {
 	DefaultIcon *SingleIconEntry `json:"default_icon,omitempty"`
-	IconEntries *[]IconEntry      `json:"icons,omitempty"`
+	IconEntries *[]IconEntry     `json:"icons,omitempty"`
 }
 
 type BatteryConfig struct {
 	Id          int                `json:"battery,omitempty"`
-	DefaultIcon *SingleIconEntry `json:"default_icon,omitempty"`
+	DefaultIcon *SingleIconEntry   `json:"default_icon,omitempty"`
 	IconEntries *BatteryIconConfig `json:"icons,omitempty"`
 }
 type BatteryIconConfig struct {
@@ -34,7 +34,7 @@ type BatteryIconConfig struct {
 
 type ErrorConfig struct {
 	DefaultIcon *SingleIconEntry `json:"default_icon,omitempty"`
-	IconEntries *[]ErrorEntry     `json:"icons,omitempty"`
+	IconEntries *[]ErrorEntry    `json:"icons,omitempty"`
 }
 type ErrorEntry struct {
 	Code  uint64 `json:"code,omitempty"`
@@ -81,9 +81,9 @@ type DirConfig struct {
 }
 
 type DistroboxConfig struct {
-	TextColor   Color             `json:"color,omitempty"`
+	TextColor   Color            `json:"color,omitempty"`
 	DefaultIcon *SingleIconEntry `json:"default_icon,omitempty"`
-	IconEntries *[]IconEntry      `json:"icons,omitempty"`
+	IconEntries *[]IconEntry     `json:"icons,omitempty"`
 }
 
 type SshConfig struct {
@@ -107,7 +107,7 @@ type PromptConfig struct {
 	Version      string      `json:"version,omitempty"`
 	Modules      *[]string   `json:"modules,omitempty"`
 	ModulesRight *[]string   `json:"modules_right,omitempty"`
-	RightSize    uint8       `json:"right_width"`
+	RightSize    int         `json:"right_width"`
 	Length       uint8       `json:"length,omitempty"`
 	Line         *LineConfig `json:"line,omitempty"`
 	// Per Module Config
@@ -128,6 +128,7 @@ type PromptConfig struct {
 
 var defaultConfig = PromptConfig{
 	Version: Version,
+	RightSize: 30,
 	Modules: &[]string{
 		"direnv",
 		"nix",

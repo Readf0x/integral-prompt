@@ -12,10 +12,11 @@ var Zsh = Shell{
 	PromptFmt:  zshPromptFmt,
 	RPromptFmt: zshRPromptFmt,
 	Init:       zshInit,
+	SupportsRP: false,
 }
 
 func zshPromptFmt(prompt []string) string {
-	return "PROMPT=\"\n%{" + strings.Join(prompt, "%}\n%{%G") + "%}\""
+	return "PROMPT=\"\n%{" + strings.Join(prompt, "%}\n%{%G") + "%}\"\n"
 }
 func zshRPromptFmt(prompt string) string {
 	return "RPROMPT=\"" + prompt + "\""

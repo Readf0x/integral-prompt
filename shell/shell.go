@@ -6,7 +6,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 type Shell struct {
@@ -16,13 +19,16 @@ type Shell struct {
 	PromptFmt    func(prompt []string) string
 	RPromptFmt   func(prompt string) string
 	Init         func()
+	SupportsRP   bool
 }
 
-var Generic = Shell{
-	Fg: gFg,
-	Bold: gBold,
-	Underline: gUnderline,
-	PromptFmt: gPromptFmt,
+var Raw = Shell{
+	Fg:         gFg,
+	Bold:       gBold,
+	Underline:  gUnderline,
+	PromptFmt:  gPromptFmt,
+	RPromptFmt: gRPromptFmt,
+	SupportsRP: true,
 }
 
 func gFg(str string, color config.Color) string {
@@ -37,13 +43,17 @@ func gUnderline(str string) string {
 func gPromptFmt(prompt []string) string {
 	return strings.Join(prompt, "\n")
 }
+func gRPromptFmt(prompt string) string {
+	i, _ := strconv.Atoi(os.Args[3])
+	return strings.Repeat(" ", i - TrueLength(prompt) - 1) + prompt
+}
 
 func GetShell(str string) (sh Shell, err error) {
 	switch str {
 	case "zsh":
 		return Zsh, nil
 	case "raw":
-		return Generic, nil
+		return Raw, nil
 	}
 	return Shell{}, fmt.Errorf("Invalid shell name")
 }
@@ -76,5 +86,11 @@ func findShare() (string, error) {
 		}
 	}
 	return "", fmt.Errorf("share path not found in $XDG_DATA_DIRS")
+}
+
+var ansiRegexp = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+func TrueLength(str string) int {
+	clean := ansiRegexp.ReplaceAllString(str, "")
+	return utf8.RuneCountInString(clean)
 }
 
