@@ -39,7 +39,7 @@ func finalize(cfg *config.PromptConfig, size int) ([]string, string) {
 	go generate(cfg, cfg.Modules, main)
 
 	//assembly
-	lines, rprompt := assemble(size, <-main, assembleRight(<-right, cfg.RightSize), int(cfg.Length+2), cfg.Line)
+	lines, rprompt := assemble(size, <-main, assembleRight(<-right, cfg.RightSize), cfg.WrapMinimum, int(cfg.Length+2), cfg.Line)
 
 	lines = append(lines, sh.Fg(string(cfg.Line.Symbols[2]), cfg.Line.Color))
 	return lines, rprompt
@@ -52,7 +52,7 @@ func digit(num int) int {
 	return 2
 }
 
-func assemble(width int, modules []RenderedModule, rightPrompt []string, maxLines int, cfg *config.LineConfig) ([]string, string) {
+func assemble(width int, modules []RenderedModule, rightPrompt []string, wrapMinimum int, maxLines int, cfg *config.LineConfig) ([]string, string) {
 	lines := make([]string, 0, maxLines)
 	lines = append(lines, sh.Fg(string(cfg.Symbols[0]), cfg.Color))
 
@@ -70,7 +70,7 @@ func assemble(width int, modules []RenderedModule, rightPrompt []string, maxLine
 		lineLen := shell.TrueLength(lines[currentLine])
 
 		if lineLen+mod.Length > maxWidth {
-			if mod.Wrap {
+			if mod.Wrap && mod.Length > wrapMinimum {
 				wrapped := wrapModule(mod, maxWidth, lineLen, cfg.Color)
 				for j, segment := range wrapped {
 					if j > 0 {
