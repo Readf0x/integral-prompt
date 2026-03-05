@@ -32,6 +32,7 @@
             go
             openssh
             zsh
+            packages.default
           ];
         };
       };
