@@ -15,8 +15,6 @@ import (
 
 	"github.com/distatus/battery"
 	git "github.com/go-git/go-git/v6"
-	"github.com/go-git/go-git/v6/plumbing"
-	"github.com/go-git/go-git/v6/plumbing/object"
 	"github.com/shirou/gopsutil/v4/cpu"
 	"github.com/shirou/gopsutil/v4/host"
 )
@@ -271,60 +269,24 @@ func (m *GitModule) Initialize(cfg *config.PromptConfig) bool {
 	}
 
 	if cfg.Git.ShowPP {
-		config, err := repo.Config()
+		cmd := exec.Command("git", "rev-list", "--left-right", "--count", "HEAD...@{upstream}")
+		cmd.Dir = cwd
+		out, err := cmd.Output()
 		if err == nil {
-			branchCfg, ok := config.Branches[m.Branch]
-			if ok {
-				remoteRef, err := repo.Reference(plumbing.NewRemoteReferenceName(branchCfg.Remote, m.Branch), true)
-				if err == nil {
-					local, err := getCommits(repo, head.Hash())
-					if err == nil {
-						remote, err := getCommits(repo, remoteRef.Hash())
-						if err == nil {
-							m.Push, m.Pull = diffCommits(local, remote)
-						}
-					}
-				}
+			// Output format: "A\tB" where:
+			// A = commits ahead (need to push)
+			// B = commits behind (need to pull)
+			fields := strings.Fields(string(out))
+			if len(fields) == 2 {
+				ahead, _ := strconv.Atoi(fields[0])
+				behind, _ := strconv.Atoi(fields[1])
+				m.Push, m.Pull = uint8(ahead), uint8(behind)
 			}
 		}
 	}
 
 	return true
 }
-func getCommits(repo *git.Repository, hash plumbing.Hash) ([]plumbing.Hash, error) {
-	var hashes []plumbing.Hash
-
-	commit, err := repo.CommitObject(hash)
-	if err != nil {
-		return nil, err
-	}
-
-	err = object.NewCommitPreorderIter(commit, nil, nil).ForEach(func(c *object.Commit) error {
-		hashes = append(hashes, c.Hash)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return hashes, nil
-}
-func diffCommits(a, b []plumbing.Hash) (onlyInA, onlyInB uint8) {
-	set := make(map[plumbing.Hash]struct{}, len(a))
-	for _, h := range a {
-		set[h] = struct{}{}
-	}
-	for _, h := range b {
-		if _, ok := set[h]; ok {
-			delete(set, h)
-		} else {
-			onlyInB++
-		}
-	}
-	onlyInA = uint8(len(set))
-	return
-}
-
 func (m *GitModule) Render(cfg *config.PromptConfig) []RenderedModule {
 	list := []RenderedModule{
 		{
