@@ -1,4 +1,4 @@
-complete -c integral -f
+complete -c integral -f -d "math inspired shell prompt"
 
 # Subcommands
 complete -c integral -n '__fish_use_subcommand' -a transient -d 'render transient prompt'
