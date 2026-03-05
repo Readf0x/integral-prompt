@@ -197,7 +197,7 @@ integral:module:cpu() {
   if [[ $1 ]]; then
     print "${#cpu}"
   else
-    print "%F${int_cpu_color}${cpu}"
+    print "%F{${int_cpu_color}}${cpu}"
   fi
 }
 
@@ -206,7 +206,7 @@ integral:module:distrobox() {
     if [[ $1 ]]; then
       print ${#CONTAINER_ID}
     else
-      print "%F${int_distrobox_color}${CONTAINER_ID}"
+      print "%F{${int_distrobox_color}}${CONTAINER_ID}"
     fi
   else
     print "0"
