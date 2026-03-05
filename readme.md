@@ -1,6 +1,6 @@
 # Integral Prompt
 
-<img src="https://raw.githubusercontent.com/Readf0x/integral-prompt/refs/heads/main/screenshots/indev_v0.2.1.png">
+<img src="https://raw.githubusercontent.com/Readf0x/integral-prompt/refs/heads/main/screenshots/indev_v0.3.0.png">
 
 ## About
 This prompt theme was created mostly due to my dissatisfaction with existing ones. My main issues were:
@@ -8,17 +8,43 @@ This prompt theme was created mostly due to my dissatisfaction with existing one
 - feature bloat
 - wrapping issues
 
-I have successfully solved these issues (in my opinion).
+## Installation
+~~Load with your favorite plugin loader (only officially supports [antidote](https://antidote.sh/)), or source `init.zsh` in your `.zshrc`.~~
+For the time being it can only be automatically installed with nix.
+
+### Flake install (Home Manager)
+Add to your inputs and add `integral-prompt.homeManagerModules.default` to your home manager imports
+```nix
+# flake.nix
+{
+  inputs = {
+    integral-prompt.url = "github:readf0x/integral-prompt";
+  };
+}
+```
+
+```nix
+# home.nix
+{ inputs, ... }: {
+  imports = [ inputs.integral-prompt.homeManagerModules.default ];
+
+  programs.zsh = {
+    integral-prompt.enable = true;
+  };
+}
+```
+
 
 ## Usage
-Load with your favorite plugin loader (only officially supports [antidote](https://antidote.sh/)), or source `init.zsh` in your `.zshrc`.
-To configure, add a `~/.integralrc` file. It can also be placed at:
+~~To configure, add a `~/.integralrc` file. It can also be placed at:~~
 - `$XDG_CONFIG_HOME/integralrc`
 - `$XDG_CONFIG_HOME/integral/rc`
 - `$XDG_CONFIG_HOME/integral/rc.zsh`
 - `~/.config/integralrc`
 - `~/.config/integral/rc`
 - `~/.config/integral/rc.zsh`
+
+Configuration is still being worked on.
 
 ## Planned Features
 - [ ] Configuration files
