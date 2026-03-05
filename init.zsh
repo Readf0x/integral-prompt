@@ -1,3 +1,5 @@
+local version='0.0.4'
+
 autoload -U colors; colors
 autoload -Uz add-zsh-hook
 autoload -U add-zle-hook-widget
@@ -41,6 +43,9 @@ integral:helpers:real-length() {
   local x=$(print $1 | sed 's/%{\(%F\|%B\)\{0,2\}{[0-9]*}%}//g')
   export debug_len=$x
   print ${#x}
+}
+integral:helpers:version() {
+  print "v$version"
 }
 # TODO: Create "class" functions
 
