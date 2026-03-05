@@ -55,16 +55,16 @@ integral:module:visym() {
   local format_str
   case $VI_KEYMAP in
     INSERT)
-      format_str="%F{10}${int_vim_indicators[1]}"
+      format_str="%F{${int_vim_colors[1]}}${int_vim_indicators[1]}"
       ;;
     VISUAL)
-      format_str="%F{13}${int_vim_indicators[2]}"
+      format_str="%F{${int_vim_colors[2]}}${int_vim_indicators[2]}"
       ;;
     V-LINE)
-      format_str="%F{13}${int_vim_indicators[3]}"
+      format_str="%F{${int_vim_colors[3]}}${int_vim_indicators[3]}"
       ;;
     NORMAL)
-      format_str="%F{9}${int_vim_indicators[4]}"
+      format_str="%F{${int_vim_colors[4]}}${int_vim_indicators[4]}"
       ;;
   esac
 
