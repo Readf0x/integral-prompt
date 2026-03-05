@@ -31,9 +31,8 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [x] CWD
 - [ ] Clock
 - [x] Error Codes
-- [ ] Execute Time
 - [x] Git
-- [ ] Nix Shell
+- [x] Nix Shell
 - [ ] SSH
 - [ ] Uptime
 - [x] Vim

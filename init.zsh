@@ -5,7 +5,7 @@ local int_path=${${(%):-%x}:A:h}
 export integral_plugins=(
   "$int_path/config.zsh"
   "$int_path/helpers.zsh"
-  "$int_path/module_loader.zsh"
+  "$int_path/module.zsh"
   "$int_path/zle.zsh"
 )
 for f in $integral_plugins; do
