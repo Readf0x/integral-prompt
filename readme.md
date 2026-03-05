@@ -15,21 +15,24 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [x] Transient Prompt
 - [x] Multi-line prompt
 - [x] Rerender on terminal resize
-- [ ] Module loader
+- [x] Module loader
     - [ ] Colors
-    - [ ] Postions
-    - [ ] Order
+    - [ ] Positions
+    - [x] Order
     - [ ] Seperators
     - [ ] Dynamic triggers
-- [ ] Plugin Support
+- [x] Plugin Support
 
 ### Planned Modules
-- [ ] Git
-- [ ] SSH
-- [ ] Vim
-- [ ] Nix Shell
-- [ ] Uptime
-- [ ] CPU
-- [ ] Execute Time
+- [ ] Background Jobs
 - [ ] Battery
+- [ ] CPU
+- [x] CWD
 - [ ] Clock
+- [x] Error Codes
+- [ ] Execute Time
+- [x] Git
+- [ ] Nix Shell
+- [ ] SSH
+- [ ] Uptime
+- [x] Vim
