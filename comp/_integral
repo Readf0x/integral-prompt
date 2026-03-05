@@ -6,7 +6,7 @@ _integral() {
 
   local -a names
   local -A conts
-  for func in $(print -l ${(ok)functions} | grep -e '^integral:'); do
+  for func in $(print -l ${(ok)functions} | awk '/^integral:/'); do
     local name=${func#'integral:'}
     if [[ $name == *:* ]]; then
       local key=${name%:*}
