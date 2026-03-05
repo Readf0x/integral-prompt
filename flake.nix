@@ -12,12 +12,8 @@
       inherit (nixpkgs) lib;
     in rec {
       devShells = {
-        default = pkgs.mkShell {
+        test = pkgs.mkShell {
           packages = with pkgs; [
-            coreutils
-            gawk
-            git
-            openssh
             zsh
             packages.default
           ];
@@ -29,7 +25,15 @@
 
           ZDOTDIR = builtins.toString ./.;
         };
-        direnv = import ./direnv.nix { inherit pkgs; };
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            delve
+            git
+            go
+            openssh
+            zsh
+          ];
+        };
       };
       packages = rec {
         integral = pkgs.buildGoModule rec {
