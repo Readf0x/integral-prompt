@@ -69,9 +69,7 @@ type GitConfig struct {
 	Pull         *CounterConfig `json:"pull,omitempty"`
 	ShowWT       bool						`json:"show_worktree"`
 	ShowPP       bool						`json:"show_push_pull"`
-	RecurseCount int            `json:"recurse_count"`
-	MaxFiles     int            `json:"max_files"`
-	MaxCommits   int            `json:"max_commits"`
+	RecurseCount int  					`json:"recurse_count"`
 }
 
 type CpuConfig struct {
@@ -111,27 +109,27 @@ type TimeConfig struct {
 }
 
 type PromptConfig struct {
-	Version      string           `json:"version,omitempty"`
-	Modules      *[]string        `json:"modules,omitempty"`
-	ModulesRight *[]string        `json:"modules_right,omitempty"`
-	WrapMinimum  int              `json:"wrap_min"`
-	RightSize    int              `json:"right_width"`
-	Length       uint8            `json:"length,omitempty"`
-	Line         *LineConfig      `json:"line,omitempty"`
+	Version      string      `json:"version,omitempty"`
+	Modules      *[]string   `json:"modules,omitempty"`
+	ModulesRight *[]string   `json:"modules_right,omitempty"`
+	WrapMinimum  int				 `json:"wrap_min"`
+	RightSize    int         `json:"right_width"`
+	Length       uint8       `json:"length,omitempty"`
+	Line         *LineConfig `json:"line,omitempty"`
 	// Per Module Config
-	Battery      *BatteryConfig   `json:"battery,omitempty"`
-	Cpu          *CpuConfig       `json:"cpu,omitempty"`
-	Dir          *DirConfig       `json:"dir,omitempty"`
-	Direnv       *IconConfig      `json:"direnv,omitempty"`
-	Distrobox    *DistroboxConfig `json:"distrobox,omitempty"`
-	Error        *ErrorConfig     `json:"error,omitempty"`
-	Git          *GitConfig       `json:"git,omitempty"`
-	Jobs         *CounterConfig   `json:"jobs,omitempty"`
-	NixShell     *SingleIconEntry `json:"nix_shell,omitempty"`
-	Ssh          *SshConfig       `json:"ssh,omitempty"`
-	Time         *TimeConfig      `json:"time,omitempty"`
-	Uptime       *CounterConfig   `json:"uptime,omitempty"`
-	ViMode       *ViModeConfig    `json:"vi_mode,omitempty"`
+	Battery   *BatteryConfig   `json:"battery,omitempty"`
+	Cpu       *CpuConfig       `json:"cpu,omitempty"`
+	Dir       *DirConfig       `json:"dir,omitempty"`
+	Direnv    *IconConfig      `json:"direnv,omitempty"`
+	Distrobox *DistroboxConfig `json:"distrobox,omitempty"`
+	Error     *ErrorConfig     `json:"error,omitempty"`
+	Git       *GitConfig       `json:"git,omitempty"`
+	Jobs      *CounterConfig   `json:"jobs,omitempty"`
+	NixShell  *SingleIconEntry `json:"nix_shell,omitempty"`
+	Ssh       *SshConfig       `json:"ssh,omitempty"`
+	Time      *TimeConfig      `json:"time,omitempty"`
+	Uptime    *CounterConfig   `json:"uptime,omitempty"`
+	ViMode    *ViModeConfig    `json:"vi_mode,omitempty"`
 }
 
 var defaultConfig = PromptConfig{
@@ -210,8 +208,6 @@ var defaultConfig = PromptConfig{
 		ShowWT: true,
 		ShowPP: true,
 		RecurseCount: 3,
-		MaxFiles: 200,
-		MaxCommits: 500,
 	},
 	NixShell: &SingleIconEntry{
 		Color: Cyan,
