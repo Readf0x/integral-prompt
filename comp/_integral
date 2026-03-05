@@ -1,0 +1,30 @@
+#compdef _integral integral
+
+# TODO: make recursive
+_integral() {
+  local line
+
+  local -a names
+  local -A conts
+  for func in $(print -l ${(ok)functions} | rg -e '^integral:'); do
+    local name=${func#'integral:'}
+    if [[ $name == *:* ]]; then
+      local key=${name%:*}
+      if (($+conts[$key])); then
+        conts+=([$key]="$conts[$key] ${name#*:}")
+      else
+        conts+=([$key]="${name#*:}")
+      fi
+    else
+      names+=$name
+    fi
+  done
+
+  _arguments -C \
+    "-h[help]" "--help[help]" \
+    "--version[version]" \
+    "1: :($names)" \
+    "*::args:->args"
+
+  _arguments ": :(${conts[$line[1]]})"
+}
