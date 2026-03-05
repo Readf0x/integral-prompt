@@ -1,6 +1,7 @@
 # === MODULES ===
 integral:module:git() {
   # TODO: improve efficiency by storing repeated calls in variables
+  # Should each icon be it's own module? Would need to export branch name...
   local format_str length
   if ! $(git rev-parse --is-bare-repository 2>/dev/null); then
     if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
@@ -73,7 +74,9 @@ integral:module:dir() {
   #     - hardcode wrapping into module loader (bad idea)
 
   local dir=${PWD/$HOME/\~}
-  if [[ $1 ]]; then
+  if [[ $1 == "w" ]]; then
+    return 1
+  elif [[ $1 ]]; then
     print "${#dir}"
   else
     print "%{%F{12}%}$dir"
@@ -84,14 +87,23 @@ error_hook() {
   export sig=$?
 }
 integral:module:error() {
+  local format_str
   if [[ $1 ]]; then
-    print "$sig"
-  else
-    if [[ $sig -eq 1 ]]; then
-      print "%{%F{11}%}⚠"
+    if [[ $sig == 0 ]]; then
+      print "0"
     else
-      print "%{%F{9}%}✘"
+      print "1"
     fi
+  else
+    case $sig in
+      1) format_str="%{%F{9}%}✘" ;;
+      2|127) format_str="%{%F{11}%}?" ;;
+      126) format_str="%{%F{9}%}⚠" ;;
+      130) format_str="%{%F{15}%}☠" ;;
+      *) format_str="%{%F{9}%}✘" ;;
+    esac
+
+    print "$format_str"
   fi
 }
 
@@ -102,14 +114,35 @@ export integral_modules=(
   "git"
 )
 
+# BUG: leaves <space> at end of prompt
+# BUG: Does not count for 
 integral:loop_modules() {
-  newline=$'\n'
-  PROMPT="$newline%{%F{11}%}$integral_top"
+  export -i position=0
+  export -i max_len=$(($COLUMNS - 1))
+
+  local newline=$'\n'
+  PROMPT="$newline$integral_top"
+
   for module in $integral_modules; do
     local length=$(integral:module:$module 1)
     local format_str=$(integral:module:$module)
+
     if [[ $length -gt 0 ]]; then
-      PROMPT+="$format_str "
+      local new_pos=$(($position + $length))
+      if [[ $length -gt $max_len ]] && ! integral:module:$module w; then
+        local -i i=0
+        while [[ $i -le $(($length / $max_len)) ]]; do
+          PROMPT+="$newline$integral_mid${format_str:$(($i * $max_len)):$max_len}"
+          i+=1
+        done
+        position=$(($length % $max_len))
+      elif [[ $new_pos -gt $max_len ]]; then
+        PROMPT+="$newline$integral_mid$format_str "
+        position=0
+      else
+        PROMPT+="$format_str "
+        position=$new_pos
+      fi
     fi
   done
   PROMPT+="$newline%{%F{11}%}$integral_bot%{${reset_color}%}"

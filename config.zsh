@@ -6,9 +6,9 @@ export integral_vim_indicators=(
   "◐" # v-line
   "●" # normal
 )
-export integral_top="⌠"
-export integral_mid="⎮"
-export integral_bot="⌡"
+export integral_top="%{%F{11}%}⌠"
+export integral_mid="%{%F{11}%}⎮"
+export integral_bot="%{%F{11}%}⌡"
 
 # === CONFIG LOADING ===
 local rc_locations=(
