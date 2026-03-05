@@ -1,0 +1,47 @@
+# bash completion for integral
+
+_integral()
+{
+    local cur prev words cword
+    _init_completion || return
+
+    local subcommands="transient render init version config help"
+
+    case "${COMP_CWORD}" in
+        1)
+            COMPREPLY=( $(compgen -W "${subcommands}" -- "$cur") )
+            return
+            ;;
+    esac
+
+    local cmd="${COMP_WORDS[1]}"
+
+    case "$cmd" in
+        init)
+            COMPREPLY=( $(compgen -W "raw bash zsh fish" -- "$cur") )
+            ;;
+        render)
+            case "${COMP_CWORD}" in
+                2)
+                    COMPREPLY=( $(compgen -W "raw bash zsh fish" -- "$cur") )
+                    ;;
+                3)
+                    COMPREPLY=( $(compgen -W "$COLUMNS" -- "$cur") )
+                    ;;
+                4)
+                    COMPREPLY=( $(compgen -W "0 1 2 126 127 128 130 137 139 143 255" -- "$cur") )
+                    ;;
+                5)
+                    local job_count
+                    job_count=$(jobs 2>/dev/null | grep -c '^\[')
+                    COMPREPLY=( $(compgen -W "$job_count" -- "$cur") )
+                    ;;
+            esac
+            ;;
+        transient|version|config|help)
+            COMPREPLY=()
+            ;;
+    esac
+}
+
+complete -F _integral integral

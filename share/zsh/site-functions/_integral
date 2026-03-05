@@ -1,0 +1,35 @@
+#compdef integral
+
+_arguments -C \
+  '1:command:->cmd' \
+  '*::arg:->args'
+
+case $state in
+  cmd)
+    _values 'subcommands' \
+      'transient[render transient prompt]' \
+      'render[render full prompt]' \
+      'init[print shell init script]' \
+      'version[print version info]' \
+      'config[print config as json]' \
+      'help[show help message]'
+    ;;
+  args)
+    case $words[1] in
+      init)
+        _values 'shells' raw bash zsh fish
+        ;;
+      render)
+        case $CURRENT in
+          2) _values 'shells' raw bash zsh fish ;;
+          3) _values 'number of columns' $COLUMNS ;;
+          4) _values 'exit signal (decimal)' 0 1 2 126 127 128 130 137 139 143 255 ;;
+          5) _values 'number of background jobs' $(jobs | command grep '^\[' | wc -l) ;;
+        esac
+        ;;
+      transient|version|config|help)
+        _message 'no additional arguments'
+        ;;
+    esac
+    ;;
+esac
