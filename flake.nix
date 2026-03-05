@@ -44,7 +44,7 @@
 
           postInstall = ''
             mkdir -p $out/share
-            cp -r share/integral $out/share/integral
+            cp -r share $out
 
             wrapProgram $out/bin/${pname} \
               --prefix XDG_DATA_DIRS : $out/share
