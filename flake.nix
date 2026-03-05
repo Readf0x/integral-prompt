@@ -16,7 +16,9 @@
           zsh = pkgs.mkShell {
             packages = with pkgs; [
               zsh
-              packages.default
+              (packages.default.overrideAttrs (final: prev: {
+                version = "${prev.version}-debug";
+              }))
             ];
 
             shellHook = ''
@@ -29,7 +31,9 @@
           bash = pkgs.mkShell {
             packages = with pkgs; [
               bash
-              packages.default
+              (packages.default.overrideAttrs (final: prev: {
+                version = "${prev.version}-debug";
+              }))
             ];
 
             shellHook = ''
@@ -46,13 +50,13 @@
             gcc
             git
             go
-            openssh
+            graphviz
             zsh
           ];
         };
       };
       packages = rec {
-        integral = pkgs.buildGoModule rec {
+        integral = pkgs.buildGoModule (final: rec {
           pname = "integral";
           version = "v0.4.0";
 
@@ -62,14 +66,12 @@
 
           vendorHash = "sha256-/gzW1vihul19oMf016fhk32JpuTv3ssSoulo5M05I5E=";
 
-          ldflags = [ "-X 'main.VersionString=%s, %s'" ];
-
           subPackages = [
             "cmd/integral"
           ];
 
           preBuild = ''
-            go run ./cmd/integral/gen.go "Nix build" "${version}"
+            go run ./cmd/integral/gen.go "${self.sourceInfo.shortRev or self.sourceInfo.dirtyShortRev}" "${final.version}"
           '';
 
           postInstall = ''
@@ -86,7 +88,7 @@
             license = lib.licenses.gpl3Plus;
             mainProgram = pname;
           };
-        };
+        });
         default = integral;
       };
     }) // {

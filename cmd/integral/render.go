@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"integral/config"
+	m "integral/modules"
 	"integral/shell"
 	"log"
 	"os"
@@ -31,11 +32,11 @@ func finalize(cfg *config.PromptConfig, size int) ([]string, string) {
 	// lines := make([]string, 0, cfg.Length+2)
 
 	// render right prompt
-	right := make(chan []RenderedModule)
+	right := make(chan []m.RenderedModule)
 	go generate(cfg, cfg.ModulesRight, right)
 
 	// render main prompt
-	main := make(chan []RenderedModule)
+	main := make(chan []m.RenderedModule)
 	go generate(cfg, cfg.Modules, main)
 
 	//assembly
@@ -52,7 +53,7 @@ func digit(num int) int {
 	return 2
 }
 
-func assemble(width int, modules []RenderedModule, rightPrompt []string, wrapMinimum int, maxLines int, cfg *config.LineConfig) ([]string, string) {
+func assemble(width int, modules []m.RenderedModule, rightPrompt []string, wrapMinimum int, maxLines int, cfg *config.LineConfig) ([]string, string) {
 	lines := make([]string, 0, maxLines)
 	lines = append(lines, sh.Fg(string(cfg.Symbols[0]), cfg.Color))
 
@@ -121,7 +122,7 @@ func assemble(width int, modules []RenderedModule, rightPrompt []string, wrapMin
 
 	return lines, rprompt
 }
-func assembleRight(modules []RenderedModule, width int) []string {
+func assembleRight(modules []m.RenderedModule, width int) []string {
 	lines := make([]string, 0, 10)
 	lines = append(lines, "")
 
@@ -155,7 +156,7 @@ func assembleRight(modules []RenderedModule, width int) []string {
 
 	return lines
 }
-func wrapModule(mod RenderedModule, width, currentLineLen int, color config.Color) []string {
+func wrapModule(mod m.RenderedModule, width, currentLineLen int, color config.Color) []string {
 	var segments []string
 
 	// ANSI overhead for your coloring
@@ -178,46 +179,46 @@ func wrapModule(mod RenderedModule, width, currentLineLen int, color config.Colo
 	return segments
 }
 
-func generate(cfg *config.PromptConfig, modules *[]string, c chan []RenderedModule) {
-	rendered := make([]RenderedModule, 0, len(*modules))
+func generate(cfg *config.PromptConfig, modules *[]string, c chan []m.RenderedModule) {
+	rendered := make([]m.RenderedModule, 0, len(*modules))
 	for _, module := range *modules {
-		var m Module
-		var M MultiModule
+		var c m.Module
+		var C m.MultiModule
 		switch module {
 		case "visym":
-			m = &ViModeModule{}
+			c = &m.ViModeModule{}
 		case "dir":
-			m = &DirModule{}
+			c = &m.DirModule{}
 		case "error":
-			m = &ErrorModule{}
+			c = &m.ErrorModule{}
 		case "git":
-			M = &GitModule{}
+			C = &m.GitModule{}
 		case "battery":
-			m = &BatteryModule{}
+			c = &m.BatteryModule{}
 		case "cpu":
-			m = &CpuModule{}
+			c = &m.CpuModule{}
 		case "direnv":
-			m = &DirenvModule{}
+			c = &m.DirenvModule{}
 		case "distrobox":
-			m = &DistroboxModule{}
+			c = &m.DistroboxModule{}
 		case "jobs":
-			m = &JobsModule{}
+			c = &m.JobsModule{}
 		case "nix":
-			m = &NixModule{}
+			c = &m.NixModule{}
 		case "ssh":
-			m = &SshModule{}
+			c = &m.SshModule{}
 		case "ssh+":
-			m = &SshPlus{}
+			c = &m.SshPlus{}
 		case "time":
-			m = &TimeModule{}
+			c = &m.TimeModule{}
 		}
-		if m != nil {
-			if m.initialize(cfg) {
-				rendered = append(rendered, m.render(cfg))
+		if c != nil {
+			if c.Initialize(cfg) {
+				rendered = append(rendered, c.Render(cfg))
 			}
-		} else if M != nil {
-			if M.initialize(cfg) {
-				for _, r := range M.render(cfg) {
+		} else if C != nil {
+			if C.Initialize(cfg) {
+				for _, r := range C.Render(cfg) {
 					rendered = append(rendered, r)
 				}
 			}

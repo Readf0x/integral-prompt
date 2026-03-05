@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"integral/config"
+	"integral/modules"
 	"integral/shell"
 	"log"
 	"os"
@@ -16,6 +17,7 @@ var sh = shell.Shell{}
 var VersionString = "%s, built from commit %s"
 
 func main() {
+	modules.Logger = logger
 	cfg := getConfig()
 
 	if len(os.Args) < 2 {
@@ -27,6 +29,7 @@ func main() {
 	case "render":
 		var err error
 		sh, err = shell.GetShell(os.Args[2])
+		modules.Sh = sh
 		if err != nil {
 			logger.Fatal(err)
 		}

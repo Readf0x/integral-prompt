@@ -1,8 +1,12 @@
-package main
+package modules
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"integral/config"
+	"integral/shell"
+	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -17,6 +21,9 @@ import (
 	"github.com/shirou/gopsutil/v4/host"
 )
 
+var Logger *log.Logger
+var Sh shell.Shell
+
 type RenderedModule struct {
 	Length int
 	Fmt    string
@@ -24,33 +31,33 @@ type RenderedModule struct {
 	Color  config.Color
 }
 
-func renderCounter(num uint8, icon config.Char, color config.Color) RenderedModule {
+func RenderCounter(num uint8, icon config.Char, color config.Color) RenderedModule {
 	raw := fmt.Sprintf("%d%c", num, icon)
 	return RenderedModule{
 		Length: len(raw),
-		Fmt:    sh.Fg(raw, color),
+		Fmt:    Sh.Fg(raw, color),
 		Wrap:   false,
 		Color:  color,
 	}
 }
-func renderIcon(icon config.Char, color config.Color) RenderedModule {
+func RenderIcon(icon config.Char, color config.Color) RenderedModule {
 	raw := string(icon)
 	return RenderedModule{
 		Length: 1,
-		Fmt:    sh.Fg(raw, color),
+		Fmt:    Sh.Fg(raw, color),
 		Wrap:   false,
 		Color:  color,
 	}
 }
 
 type Module interface {
-	initialize(*config.PromptConfig) bool
-	render(*config.PromptConfig) RenderedModule
+	Initialize(*config.PromptConfig) bool
+	Render(*config.PromptConfig) RenderedModule
 }
 
 type MultiModule interface {
-	initialize(*config.PromptConfig) bool
-	render(*config.PromptConfig) []RenderedModule
+	Initialize(*config.PromptConfig) bool
+	Render(*config.PromptConfig) []RenderedModule
 }
 
 type BatteryModule struct {
@@ -58,10 +65,10 @@ type BatteryModule struct {
 	Charging bool
 }
 
-func (m *BatteryModule) initialize(cfg *config.PromptConfig) bool {
+func (m *BatteryModule) Initialize(cfg *config.PromptConfig) bool {
 	batteries, err := battery.GetAll()
 	if err != nil {
-		logger.Println(err)
+		Logger.Println(err)
 		return false
 	}
 	if len(batteries) == 0 {
@@ -75,7 +82,7 @@ func (m *BatteryModule) initialize(cfg *config.PromptConfig) bool {
 	m.Charging = b.State.Raw == battery.Charging
 	return true
 }
-func (m *BatteryModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *BatteryModule) Render(cfg *config.PromptConfig) RenderedModule {
 	var icon config.Char
 	var color config.Color
 	if m.Charging {
@@ -85,36 +92,36 @@ func (m *BatteryModule) render(cfg *config.PromptConfig) RenderedModule {
 		icon = cfg.Battery.IconEntries.Discharging.Icon
 		color = cfg.Battery.IconEntries.Discharging.Color
 	}
-	return renderCounter(m.Charge, icon, color)
+	return RenderCounter(m.Charge, icon, color)
 }
 
 type CpuModule struct {
 	Usage uint8
 }
 
-func (m *CpuModule) initialize(cfg *config.PromptConfig) bool {
+func (m *CpuModule) Initialize(cfg *config.PromptConfig) bool {
 	percent, err := cpu.Percent(cfg.Cpu.Time, false)
 	if err != nil {
-		logger.Println(err)
+		Logger.Println(err)
 		return false
 	}
 	m.Usage = uint8(percent[0])
 	return true
 }
-func (m *CpuModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *CpuModule) Render(cfg *config.PromptConfig) RenderedModule {
 	// [TODO] add multi icon support
-	return renderCounter(m.Usage, cfg.Cpu.Icon, cfg.Cpu.Color)
+	return RenderCounter(m.Usage, cfg.Cpu.Icon, cfg.Cpu.Color)
 }
 
 type DirModule struct {
 	CWD string
 }
 
-func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
+func (m *DirModule) Initialize(cfg *config.PromptConfig) bool {
 	var err error
 	m.CWD, err = os.Getwd()
 	if err != nil {
-		logger.Println(err)
+		Logger.Println(err)
 		return false
 	}
 	for _, replaceList := range *cfg.Dir.Replace {
@@ -125,10 +132,10 @@ func (m *DirModule) initialize(cfg *config.PromptConfig) bool {
 	}
 	return true
 }
-func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *DirModule) Render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
 		Length: len(m.CWD),
-		Fmt:    sh.Fg(m.CWD, cfg.Dir.Color),
+		Fmt:    Sh.Fg(m.CWD, cfg.Dir.Color),
 		Wrap:   true,
 		Color:  cfg.Dir.Color,
 	}
@@ -137,13 +144,13 @@ func (m *DirModule) render(cfg *config.PromptConfig) RenderedModule {
 type DirenvModule struct {
 }
 
-func (m *DirenvModule) initialize(cfg *config.PromptConfig) bool {
+func (m *DirenvModule) Initialize(cfg *config.PromptConfig) bool {
 	if _, set := os.LookupEnv("DIRENV_DIR"); set {
 		return true
 	}
 	return false
 }
-func (m *DirenvModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *DirenvModule) Render(cfg *config.PromptConfig) RenderedModule {
 	var color config.Color = cfg.Direnv.DefaultIcon.Color
 	var icon config.Char = cfg.Direnv.DefaultIcon.Icon
 	if cfg.Direnv.IconEntries != nil {
@@ -155,19 +162,19 @@ func (m *DirenvModule) render(cfg *config.PromptConfig) RenderedModule {
 			}
 		}
 	}
-	return renderIcon(icon, color)
+	return RenderIcon(icon, color)
 }
 
 type DistroboxModule struct {
 	Distro string
 }
 
-func (m *DistroboxModule) initialize(cfg *config.PromptConfig) bool {
+func (m *DistroboxModule) Initialize(cfg *config.PromptConfig) bool {
 	var set bool
 	m.Distro, set = os.LookupEnv("CONTAINER_ID")
 	return set
 }
-func (m *DistroboxModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *DistroboxModule) Render(cfg *config.PromptConfig) RenderedModule {
 	color, icon := cfg.Distrobox.DefaultIcon.Color, cfg.Distrobox.DefaultIcon.Icon
 	for _, distro := range *cfg.Distrobox.IconEntries {
 		if m.Distro == distro.Name {
@@ -176,7 +183,7 @@ func (m *DistroboxModule) render(cfg *config.PromptConfig) RenderedModule {
 	}
 	return RenderedModule{
 		Length: len(m.Distro) + 1,
-		Fmt:    fmt.Sprint(sh.Fg(m.Distro, cfg.Distrobox.TextColor), sh.Fg(string(icon), color)),
+		Fmt:    fmt.Sprint(Sh.Fg(m.Distro, cfg.Distrobox.TextColor), Sh.Fg(string(icon), color)),
 		Wrap:   true,
 		Color:  color,
 	}
@@ -186,10 +193,10 @@ type ErrorModule struct {
 	ExitCode uint64
 }
 
-func (m *ErrorModule) initialize(cfg *config.PromptConfig) bool {
+func (m *ErrorModule) Initialize(cfg *config.PromptConfig) bool {
 	c, err := strconv.ParseUint(os.Args[4], 10, 8)
 	if err != nil {
-		logger.Panicln(err)
+		Logger.Panicln(err)
 		return false
 	}
 	if c != 0 {
@@ -198,14 +205,14 @@ func (m *ErrorModule) initialize(cfg *config.PromptConfig) bool {
 	}
 	return false
 }
-func (m *ErrorModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *ErrorModule) Render(cfg *config.PromptConfig) RenderedModule {
 	color, icon := cfg.Error.DefaultIcon.Color, cfg.Error.DefaultIcon.Icon
 	for _, c := range *cfg.Error.IconEntries {
 		if m.ExitCode == c.Code {
 			color, icon = c.Color, c.Icon
 		}
 	}
-	return renderIcon(icon, color)
+	return RenderIcon(icon, color)
 }
 
 type GitModule struct {
@@ -216,10 +223,10 @@ type GitModule struct {
 	Pull     uint8
 }
 
-func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
+func (m *GitModule) Initialize(cfg *config.PromptConfig) bool {
 	cwd, err := os.Getwd()
 	if err != nil {
-		logger.Println(err)
+		Logger.Println(err)
 		return false
 	}
 
@@ -242,17 +249,22 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 	m.Branch = head.Name().Short()
 
 	if cfg.Git.ShowWT {
-		wt, err := repo.Worktree()
+		cmd := exec.Command("git", "status", "--porcelain=v1")
+		cmd.Dir = cwd
+		out, err := cmd.Output()
 		if err == nil {
-			status, err := wt.Status()
-			if err == nil {
-				for _, entry := range status {
-					switch {
-					case entry.Worktree != git.Unmodified:
-						m.Unstaged++
-					case entry.Staging != git.Unmodified:
-						m.Staged++
-					}
+			scanner := bufio.NewScanner(bytes.NewReader(out))
+			for scanner.Scan() {
+				line := scanner.Text()
+				if len(line) < 2 {
+					continue
+				}
+				x, y := line[0], line[1]
+				if x != ' ' && x != '?' {
+					m.Staged++
+				}
+				if y != ' ' && y != '?' {
+					m.Unstaged++
 				}
 			}
 		}
@@ -313,27 +325,27 @@ func diffCommits(a, b []plumbing.Hash) (onlyInA, onlyInB uint8) {
 	return
 }
 
-func (m *GitModule) render(cfg *config.PromptConfig) []RenderedModule {
+func (m *GitModule) Render(cfg *config.PromptConfig) []RenderedModule {
 	list := []RenderedModule{
 		{
 			Length: len(m.Branch),
-			Fmt:    sh.Fg(m.Branch, cfg.Git.Branch.Color),
+			Fmt:    Sh.Fg(m.Branch, cfg.Git.Branch.Color),
 			Wrap:   true,
 			Color:  cfg.Git.Branch.Color,
 		},
 	}
 
 	if m.Unstaged != 0 {
-		list = append(list, renderCounter(m.Unstaged, cfg.Git.Unstaged.Icon, cfg.Git.Unstaged.Color))
+		list = append(list, RenderCounter(m.Unstaged, cfg.Git.Unstaged.Icon, cfg.Git.Unstaged.Color))
 	}
 	if m.Staged != 0 {
-		list = append(list, renderCounter(m.Staged, cfg.Git.Staged.Icon, cfg.Git.Staged.Color))
+		list = append(list, RenderCounter(m.Staged, cfg.Git.Staged.Icon, cfg.Git.Staged.Color))
 	}
 	if m.Push != 0 {
-		list = append(list, renderCounter(m.Push, cfg.Git.Push.Icon, cfg.Git.Push.Color))
+		list = append(list, RenderCounter(m.Push, cfg.Git.Push.Icon, cfg.Git.Push.Color))
 	}
 	if m.Pull != 0 {
-		list = append(list, renderCounter(m.Pull, cfg.Git.Pull.Icon, cfg.Git.Pull.Color))
+		list = append(list, RenderCounter(m.Pull, cfg.Git.Pull.Icon, cfg.Git.Pull.Color))
 	}
 
 	return list
@@ -343,10 +355,10 @@ type JobsModule struct {
 	Jobs uint8
 }
 
-func (m *JobsModule) initialize(cfg *config.PromptConfig) bool {
+func (m *JobsModule) Initialize(cfg *config.PromptConfig) bool {
 	j, err := strconv.ParseUint(os.Args[5], 10, 8)
 	if err != nil {
-		logger.Println(err)
+		Logger.Println(err)
 		return false
 	}
 	if j != 0 {
@@ -355,15 +367,15 @@ func (m *JobsModule) initialize(cfg *config.PromptConfig) bool {
 	}
 	return false
 }
-func (m *JobsModule) render(cfg *config.PromptConfig) RenderedModule {
-	return renderCounter(m.Jobs, cfg.Jobs.Icon, cfg.Jobs.Color)
+func (m *JobsModule) Render(cfg *config.PromptConfig) RenderedModule {
+	return RenderCounter(m.Jobs, cfg.Jobs.Icon, cfg.Jobs.Color)
 }
 
 type NixModule struct {
 	InNixShell bool
 }
 
-func (m *NixModule) initialize(cfg *config.PromptConfig) bool {
+func (m *NixModule) Initialize(cfg *config.PromptConfig) bool {
 	path := strings.Split(os.Getenv("PATH"), ":")
 	if strings.HasPrefix(path[0], "/nix/store/") {
 		m.InNixShell = true
@@ -371,8 +383,8 @@ func (m *NixModule) initialize(cfg *config.PromptConfig) bool {
 	}
 	return false
 }
-func (m *NixModule) render(cfg *config.PromptConfig) RenderedModule {
-	return renderIcon(cfg.NixShell.Icon, cfg.NixShell.Color)
+func (m *NixModule) Render(cfg *config.PromptConfig) RenderedModule {
+	return RenderIcon(cfg.NixShell.Icon, cfg.NixShell.Color)
 }
 
 type SshModule struct {
@@ -380,7 +392,7 @@ type SshModule struct {
 	Host string
 }
 
-func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
+func (m *SshModule) Initialize(cfg *config.PromptConfig) bool {
 	if _, set := os.LookupEnv("SSH_CONNECTION"); set {
 		m.User = os.Getenv("USER")
 		m.Host = os.Getenv("HOSTNAME")
@@ -390,20 +402,20 @@ func (m *SshModule) initialize(cfg *config.PromptConfig) bool {
 }
 
 // [TODO] make really fancy wrapping logic to make this wrappable
-func (m *SshModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *SshModule) Render(cfg *config.PromptConfig) RenderedModule {
 	var user, at, host string
 	var ln int
 	if cfg.Ssh.User.Visible {
 		ln += len(m.User)
-		user = sh.Fg(m.User, cfg.Ssh.User.Color)
+		user = Sh.Fg(m.User, cfg.Ssh.User.Color)
 	}
 	if cfg.Ssh.At.Visible {
 		ln += 1
-		at = sh.Fg("@", cfg.Ssh.At.Color)
+		at = Sh.Fg("@", cfg.Ssh.At.Color)
 	}
 	if cfg.Ssh.Host.Visible {
 		ln += len(m.Host)
-		host = sh.Fg(m.Host, cfg.Ssh.Host.Color)
+		host = Sh.Fg(m.Host, cfg.Ssh.Host.Color)
 	}
 	return RenderedModule{
 		Length: ln,
@@ -418,7 +430,7 @@ type SshPlus struct {
 	Distro string
 }
 
-func (m *SshPlus) initialize(cfg *config.PromptConfig) bool {
+func (m *SshPlus) Initialize(cfg *config.PromptConfig) bool {
 	if os.Getenv("SSH_CONNECTION") != "" {
 		m.User = os.Getenv("USER")
 		m.Host = os.Getenv("HOSTNAME")
@@ -429,22 +441,22 @@ func (m *SshPlus) initialize(cfg *config.PromptConfig) bool {
 	}
 	return false
 }
-func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
+func (m *SshPlus) Render(cfg *config.PromptConfig) RenderedModule {
 	var ssh, db, final string
 	var ln int
 	if m.User != "" {
 		var user, at, host string
 		if cfg.Ssh.User.Visible {
 			ln += len(m.User)
-			user = sh.Fg(m.User, cfg.Ssh.User.Color)
+			user = Sh.Fg(m.User, cfg.Ssh.User.Color)
 		}
 		if cfg.Ssh.At.Visible {
 			ln += 1
-			at = sh.Fg("@", cfg.Ssh.At.Color)
+			at = Sh.Fg("@", cfg.Ssh.At.Color)
 		}
 		if cfg.Ssh.Host.Visible {
 			ln += len(m.Host)
-			host = sh.Fg(m.Host, cfg.Ssh.Host.Color)
+			host = Sh.Fg(m.Host, cfg.Ssh.Host.Color)
 		}
 		ssh = fmt.Sprint(user, at, host)
 	}
@@ -456,10 +468,10 @@ func (m *SshPlus) render(cfg *config.PromptConfig) RenderedModule {
 				color, icon = distro.Color, distro.Icon
 			}
 		}
-		db = fmt.Sprint(sh.Fg(m.Distro, cfg.Distrobox.TextColor), sh.Fg(string(icon), color))
+		db = fmt.Sprint(Sh.Fg(m.Distro, cfg.Distrobox.TextColor), Sh.Fg(string(icon), color))
 	}
 	if ssh != "" && db != "" {
-		final = ssh + sh.Fg("[", cfg.Ssh.At.Color) + db + sh.Fg("]", cfg.Ssh.At.Color)
+		final = ssh + Sh.Fg("[", cfg.Ssh.At.Color) + db + Sh.Fg("]", cfg.Ssh.At.Color)
 		ln += 2
 	} else if ssh != "" {
 		final = ssh
@@ -477,14 +489,14 @@ type TimeModule struct {
 	Time string
 }
 
-func (m *TimeModule) initialize(cfg *config.PromptConfig) bool {
+func (m *TimeModule) Initialize(cfg *config.PromptConfig) bool {
 	m.Time = time.Now().Format(cfg.Time.Format)
 	return true
 }
-func (m *TimeModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *TimeModule) Render(cfg *config.PromptConfig) RenderedModule {
 	return RenderedModule{
 		Length: len(m.Time),
-		Fmt:    sh.Fg(m.Time, cfg.Time.Color),
+		Fmt:    Sh.Fg(m.Time, cfg.Time.Color),
 		Wrap:   true,
 		Color:  cfg.Time.Color,
 	}
@@ -494,10 +506,10 @@ type UptimeModule struct {
 	Uptime time.Duration
 }
 
-func (m *UptimeModule) initialize(cfg *config.PromptConfig) bool {
+func (m *UptimeModule) Initialize(cfg *config.PromptConfig) bool {
 	raw, err := host.Uptime()
 	if err != nil {
-		logger.Println(err)
+		Logger.Println(err)
 		return false
 	}
 	m.Uptime = time.Duration(raw)
@@ -505,11 +517,11 @@ func (m *UptimeModule) initialize(cfg *config.PromptConfig) bool {
 }
 
 // m.Uptime = time.Duration(raw).String()
-func (m *UptimeModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *UptimeModule) Render(cfg *config.PromptConfig) RenderedModule {
 	str := m.Uptime.String()
 	return RenderedModule{
 		Length: len(str),
-		Fmt:    sh.Fg(str+string(cfg.Uptime.Icon), cfg.Uptime.Color),
+		Fmt:    Sh.Fg(str+string(cfg.Uptime.Icon), cfg.Uptime.Color),
 		Wrap:   false,
 	}
 }
@@ -518,22 +530,22 @@ type ViModeModule struct {
 	Mode string
 }
 
-func (m *ViModeModule) initialize(cfg *config.PromptConfig) bool {
+func (m *ViModeModule) Initialize(cfg *config.PromptConfig) bool {
 	var set bool
 	m.Mode, set = os.LookupEnv("VI_KEYMAP")
 	return set && os.Args[2] == "zsh"
 }
-func (m *ViModeModule) render(cfg *config.PromptConfig) RenderedModule {
+func (m *ViModeModule) Render(cfg *config.PromptConfig) RenderedModule {
 	var final RenderedModule
 	switch m.Mode {
 	case "NORMAL":
-		final = renderIcon(cfg.ViMode.Normal.Icon, cfg.ViMode.Normal.Color)
+		final = RenderIcon(cfg.ViMode.Normal.Icon, cfg.ViMode.Normal.Color)
 	case "INSERT":
-		final = renderIcon(cfg.ViMode.Insert.Icon, cfg.ViMode.Insert.Color)
+		final = RenderIcon(cfg.ViMode.Insert.Icon, cfg.ViMode.Insert.Color)
 	case "VISUAL":
-		final = renderIcon(cfg.ViMode.Visual.Icon, cfg.ViMode.Visual.Color)
+		final = RenderIcon(cfg.ViMode.Visual.Icon, cfg.ViMode.Visual.Color)
 	case "V-LINE":
-		final = renderIcon(cfg.ViMode.ViLine.Icon, cfg.ViMode.ViLine.Color)
+		final = RenderIcon(cfg.ViMode.ViLine.Icon, cfg.ViMode.ViLine.Color)
 	}
 	return final
 }
