@@ -3,9 +3,12 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/invopop/jsonschema"
 )
 
 func (r *Char) UnmarshalJSON(data []byte) error {
@@ -18,6 +21,134 @@ func (r *Char) UnmarshalJSON(data []byte) error {
 	}
 	*r = Char(s[0])
 	return nil
+}
+
+func (r *Char) MarshalJSON() ([]byte, error) {
+	return []byte(`"`+string(*r)+`"`), nil
+}
+
+var char_length uint64 = 1
+func (Char) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type: "string",
+		MaxLength: &char_length,
+	}
+}
+
+func (r *Color) UnmarshalJSON(data []byte) error {
+	switch string(data) {
+	case "black":
+		*r = Black
+		return nil
+	case "red":
+		*r = Red
+		return nil
+	case "green":
+		*r = Green
+		return nil
+	case "yellow":
+		*r = Yellow
+		return nil
+	case "blue":
+		*r = Blue
+		return nil
+	case "magenta":
+		*r = Magenta
+		return nil
+	case "cyan":
+		*r = Cyan
+		return nil
+	case "white":
+		*r = White
+		return nil
+	case "bright_black":
+		*r = BrightBlack
+		return nil
+	case "bright_red":
+		*r = BrightRed
+		return nil
+	case "bright_green":
+		*r = BrightGreen
+		return nil
+	case "bright_yellow":
+		*r = BrightYellow
+		return nil
+	case "bright_blue":
+		*r = BrightBlue
+		return nil
+	case "bright_magenta":
+		*r = BrightMagenta
+		return nil
+	case "bright_cyan":
+		*r = BrightCyan
+		return nil
+	case "bright_white":
+		*r = BrightWhite
+		return nil
+	}
+	return errors.New("Not a valid color string")
+}
+
+func (r *Color) MarshalJSON() ([]byte, error) {
+	switch *r {
+	case Black:
+		return []byte(`"black"`), nil
+	case Red:
+		return []byte(`"red"`), nil
+	case Green:
+		return []byte(`"green"`), nil
+	case Yellow:
+		return []byte(`"yellow"`), nil
+	case Blue:
+		return []byte(`"blue"`), nil
+	case Magenta:
+		return []byte(`"magenta"`), nil
+	case Cyan:
+		return []byte(`"cyan"`), nil
+	case White:
+		return []byte(`"white"`), nil
+	case BrightBlack:
+		return []byte(`"bright_black"`), nil
+	case BrightRed:
+		return []byte(`"bright_red"`), nil
+	case BrightGreen:
+		return []byte(`"bright_green"`), nil
+	case BrightYellow:
+		return []byte(`"bright_yellow"`), nil
+	case BrightBlue:
+		return []byte(`"bright_blue"`), nil
+	case BrightMagenta:
+		return []byte(`"bright_magenta"`), nil
+	case BrightCyan:
+		return []byte(`"bright_cyan"`), nil
+	case BrightWhite:
+		return []byte(`"bright_white"`), nil
+	}
+	return []byte{}, errors.New("Not a valid color string")
+}
+
+func (Color) JSONSchema() *jsonschema.Schema {
+	return &jsonschema.Schema{
+		Type: "string",
+		Enum: []any{
+			"black",
+			"red",
+			"green",
+			"yellow",
+			"blue",
+			"magenta",
+			"cyan",
+			"white",
+			"bright_black",
+			"bright_red",
+			"bright_green",
+			"bright_yellow",
+			"bright_blue",
+			"bright_magenta",
+			"bright_cyan",
+			"bright_white",
+		},
+	}
 }
 
 // Returns a pointer to the default configuration.
@@ -34,6 +165,7 @@ func LoadConfig(paths []string) *PromptConfig {
 			}
 			defer file.Close()
 
+			fmt.Printf("%s", b)
 			json.Unmarshal(b, conf)
 			return conf
 		}
