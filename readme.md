@@ -52,12 +52,18 @@ eval "$(integral init bash)"
 ```
 
 ### Configuration
-To configure, add a `~/.integralrc` file. It can also be placed at:
-- `$XDG_CONFIG_HOME/integralrc`
-- `$XDG_CONFIG_HOME/integralrc.json`
-- `$XDG_CONFIG_HOME/integral/rc`
-- `$XDG_CONFIG_HOME/integral/rc.json`
-If `$XDG_CONFIG_HOME` is undefined, it will fall back to `~/.config`
+To configure, add a `.integralrc` file.
+```sh
+integral config > ~/.integralrc
+```
+
+> [!NOTE]
+> It can also be placed at:
+> - `$XDG_CONFIG_HOME/integralrc`
+> - `$XDG_CONFIG_HOME/integralrc.json`
+> - `$XDG_CONFIG_HOME/integral/rc`
+> - `$XDG_CONFIG_HOME/integral/rc.json`
+> If `$XDG_CONFIG_HOME` is undefined, it will fall back to `~/.config`
 
 The configuration options aren't yet documented, but if you have a JSON language server simply add
 ```json
