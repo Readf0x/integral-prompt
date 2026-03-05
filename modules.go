@@ -222,14 +222,21 @@ func (m *GitModule) initialize(cfg *config.PromptConfig) bool {
 		logger.Println(err)
 		return false
 	}
-	repo, err := git.PlainOpen(cwd)
+
+	var repo *git.Repository
+	for i := 0; i < cfg.Git.RecurseCount; i++ {
+		repo, err = git.PlainOpen(cwd)
+		if err == nil {
+			break
+		}
+		cwd += "/.."
+	}
 	if err != nil {
 		return false
 	}
 
 	head, err := repo.Head()
 	if err != nil {
-		logger.Println(err)
 		return false
 	}
 	m.Branch = head.Name().Short()

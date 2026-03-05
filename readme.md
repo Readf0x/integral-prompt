@@ -72,6 +72,7 @@ actual documentation as well.
     - [x] Right prompt
 - [ ] Plugin Support
 - [ ] Documentation
+- [ ] Module timeouts
 
 ### Planned Modules
 - [x] Background Jobs
