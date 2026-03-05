@@ -98,13 +98,13 @@ error_hook() {
 integral:module:error() {
   local format_str
   if [[ $sig == 0 ]]; then
+    print "0"
+  else
     if [[ $1 ]]; then
       print "1"
     else
       integral_error_format $sig
     fi
-  else
-    print "0"
   fi
 }
 
