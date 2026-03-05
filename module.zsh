@@ -1,7 +1,7 @@
 # === MODULES ===
+# BUG: length gets printed to console in some repos
 integral:module:git() {
   # TODO: improve efficiency by storing repeated calls in variables
-  # Should each icon be it's own module? Would need to export branch name...
   local format_str length
   if ! $(git rev-parse --is-bare-repository 2>/dev/null); then
     if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
@@ -141,6 +141,15 @@ integral:module:time() {
     print "1"
   else
     print "%{%F{12}%}$(date +${integral_time_format:-%T})"
+  fi
+}
+
+integral:module:uptime() {
+  local uptime=$(uptime | awk '{print $1}')
+  if [[ $1 ]]; then
+    print $((${#uptime} + 1))
+  else
+    print "%{%F{$integral_uptime_color}%}$uptime$integral_uptime_icon"
   fi
 }
 

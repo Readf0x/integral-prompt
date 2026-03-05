@@ -67,6 +67,8 @@ export integral_git_colors=(
 export integral_jobs_icon="⚙"
 export integral_jobs_color="13"
 export integral_time_format="%T"
+export integral_uptime_icon="⏲"
+export integral_uptime_color="12"
 
 # === CONFIG LOADING ===
 local rc_locations=(
