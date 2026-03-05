@@ -169,7 +169,7 @@ integral:module:battery() {
 
 integral:module:ssh() {
   if [[ $SSH_CONNECTION ]]; then
-    local format_str="${int_ssh_format:-%F\{12\}${USER}%F\{13\}@%F\{14\}${HOSTNAME}}"
+    local format_str=$(int_ssh_format || print "%F{12}${USER}%F{13}@%F{14}${HOSTNAME}" )
     if [[ $1 ]]; then
       print ${#format_str};
     else

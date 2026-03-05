@@ -6,6 +6,7 @@ export int_modules=(
   "visym"
   "error"
   "dir"
+  "ssh"
   "git"
   "jobs"
 )
@@ -76,7 +77,7 @@ export int_battery_icons=(
   "󰁹"
 )
 export int_battery_color="2"
-export int_ssh_format="%F{12}${USER}%F{13}@%F{14}${HOSTNAME}"
+export int_ssh_format() { print "%F{12}${USER}%F{13}@%F{14}${HOSTNAME}" }
 export int_cpu_color="3"
 
 export int_separator=" "
