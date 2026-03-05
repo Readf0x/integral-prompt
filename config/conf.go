@@ -4,17 +4,19 @@ import "time"
 
 const Version = "v0.1"
 
+type Char rune
+
 // [TODO] add jsonschema info
 
 type IconEntry struct {
 	Name  string `json:"name,omitempty"`
 	Color Color  `json:"color,omitempty"`
-	Icon  rune   `json:"icon,omitempty"`
+	Icon  Char   `json:"icon,omitempty"`
 }
 
 type SingleIconEntry struct {
 	Color Color `json:"color,omitempty"`
-	Icon  rune  `json:"icon,omitempty"`
+	Icon  Char  `json:"icon,omitempty"`
 }
 
 type IconConfig struct {
@@ -39,7 +41,7 @@ type ErrorConfig struct {
 type ErrorEntry struct {
 	Code  uint64 `json:"code,omitempty"`
 	Color Color  `json:"color,omitempty"`
-	Icon  rune   `json:"icon,omitempty"`
+	Icon  Char   `json:"icon,omitempty"`
 }
 
 type ViModeConfig struct {
@@ -51,12 +53,12 @@ type ViModeConfig struct {
 
 type CounterConfig struct {
 	Color Color `json:"color,omitempty"`
-	Icon  rune  `json:"icon,omitempty"`
+	Icon  Char  `json:"icon,omitempty"`
 }
 
 type LineConfig struct {
 	Color   Color   `json:"color,omitempty"`
-	Symbols [4]rune `json:"symbols,omitempty"`
+	Symbols [4]Char `json:"symbols,omitempty"`
 }
 
 type GitConfig struct {
@@ -72,14 +74,14 @@ type GitConfig struct {
 type CpuConfig struct {
 	Time  time.Duration `json:"time,omitempty"`
 	Color Color         `json:"color,omitempty"`
-	Icon  rune          `json:"icon,omitempty"`
+	Icon  Char          `json:"icon,omitempty"`
 }
 
 type DirConfig struct {
 	Color       Color         `json:"color,omitempty"`
 	Replace     *[]*[2]string `json:"replace,omitempty"`
 	ReplaceHome bool          `json:"replace_home"`
-	HomeIcon    rune          `json:"home_icon"`
+	HomeIcon    Char          `json:"home_icon"`
 }
 
 type DistroboxConfig struct {
@@ -102,7 +104,7 @@ type DisplayConfig struct {
 type TimeConfig struct {
 	Format string `json:"format,omitempty"`
 	Color  Color  `json:"color,omitempty"`
-	Icon   rune   `json:"icon,omitempty"`
+	Icon   Char   `json:"icon,omitempty"`
 }
 
 type PromptConfig struct {
@@ -146,7 +148,7 @@ var defaultConfig = PromptConfig{
 	},
 	Line: &LineConfig{
 		Color:   Yellow,
-		Symbols: [4]rune{'⌠', '⎮', '⌡', '∫'},
+		Symbols: [4]Char{'⌠', '⎮', '⌡', '∫'},
 	},
 	Battery: &BatteryConfig{
 		Id: 0,

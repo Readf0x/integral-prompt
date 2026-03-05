@@ -24,7 +24,7 @@ type RenderedModule struct {
 	Color  config.Color
 }
 
-func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
+func renderCounter(num uint8, icon config.Char, color config.Color) RenderedModule {
 	raw := fmt.Sprintf("%d%c", num, icon)
 	return RenderedModule{
 		Length: len(raw),
@@ -33,7 +33,7 @@ func renderCounter(num uint8, icon rune, color config.Color) RenderedModule {
 		Color:  color,
 	}
 }
-func renderIcon(icon rune, color config.Color) RenderedModule {
+func renderIcon(icon config.Char, color config.Color) RenderedModule {
 	raw := string(icon)
 	return RenderedModule{
 		Length: 1,
@@ -76,7 +76,7 @@ func (m *BatteryModule) initialize(cfg *config.PromptConfig) bool {
 	return true
 }
 func (m *BatteryModule) render(cfg *config.PromptConfig) RenderedModule {
-	var icon rune
+	var icon config.Char
 	var color config.Color
 	if m.Charging {
 		icon = cfg.Battery.IconEntries.Charging.Icon
@@ -145,7 +145,7 @@ func (m *DirenvModule) initialize(cfg *config.PromptConfig) bool {
 }
 func (m *DirenvModule) render(cfg *config.PromptConfig) RenderedModule {
 	var color config.Color = cfg.Direnv.DefaultIcon.Color
-	var icon rune = cfg.Direnv.DefaultIcon.Icon
+	var icon config.Char = cfg.Direnv.DefaultIcon.Icon
 	if cfg.Direnv.IconEntries != nil {
 		for _, entry := range *cfg.Direnv.IconEntries {
 			_, err := exec.LookPath(entry.Name)
