@@ -21,10 +21,10 @@ EOF
 # https://github.com/spaceship-prompt/spaceship-prompt/commit/111c6f160c4376001d5469f8e8771ee89ea4158a
 local int_path=${${(%):-%x}:A:h}
 export integral_plugins=(
-  "$int_path/config.zsh"
-  "$int_path/helpers.zsh"
-  "$int_path/module.zsh"
-  "$int_path/zle.zsh"
+  "$int_path/lib/config.zsh"
+  "$int_path/lib/helpers.zsh"
+  "$int_path/lib/module.zsh"
+  "$int_path/lib/zle.zsh"
 )
 for f in $integral_plugins; do
   if [[ -f $f ]]; then
