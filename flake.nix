@@ -7,6 +7,8 @@
 
   outputs = { self, nixpkgs, ... }@inputs: 
   {
-    devShells.default = import ./shell.nix
+    devShells."x86_64-linux".default = import ./shell.nix {
+      pkgs = nixpkgs.legacyPackages."x86_64-linux";
+    };
   };
 }
