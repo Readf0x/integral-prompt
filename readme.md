@@ -29,9 +29,7 @@ Add to your inputs and add `integral-prompt.homeManagerModules.default` to your 
 { inputs, ... }: {
   imports = [ inputs.integral-prompt.homeManagerModules.default ];
 
-  programs.zsh = {
-    integral-prompt.enable = true;
-  };
+  programs.integral-prompt.enable = true;
 }
 ```
 
@@ -68,6 +66,21 @@ The configuration options aren't yet documented, but if you have a JSON language
 to the top of your configuration, and the LSP can list all available options. I know that's not ideal, but I
 haven't added [jsonschema](https://github.com/invopop/jsonschema) description fields to the config types. Once that's done, I should be able to generate
 actual documentation as well.
+
+#### Home Manager Configuration
+```nix
+programs.integral-prompt = {
+  enable = true;
+  # enable shell integration here or with 'home.shell.enable<Shell>Integration'
+  # for zsh
+  enableZshIntegration = true;
+  # for bash
+  enableBashIntegration = true;
+  config = {
+    # JSON config
+  };
+}
+```
 
 ## Planned Features
 - [x] Configuration files
