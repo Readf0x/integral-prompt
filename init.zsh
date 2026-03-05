@@ -39,17 +39,18 @@ autoload -Uz add-zsh-hook
 autoload -U add-zle-hook-widget
 
 export VI_KEYMAP=${VI_KEYMAP:-"INSERT"}
+export HOSTNAME=${HOSTNAME:-"$(hostname)"}
 
 # === INIT ===
 TRAPWINCH() {
-  integral loop-modules
+  integral render
   zle && zle reset-prompt
 }
 add-zsh-hook precmd error_hook
-add-zsh-hook precmd integral:loop-modules
+add-zsh-hook precmd integral:render
 add-zsh-hook precmd integral:helpers:cursor-shape
 zle -N integral:line-pre-redraw
 add-zle-hook-widget zle-line-pre-redraw integral:line-pre-redraw
-integral:loop-modules
+integral:render
 zle -N zle-line-init integral:zle-line-init
 

@@ -18,9 +18,9 @@ integral:helpers:add-prompt() {
 integral:helpers:newline() {
   local newline=$'\n'
   if [[ $2 == "reset" ]]; then
-    PROMPT="$newline%{%F{$integral_prompt_color}%}${integral_prompt[${1:-2}]}"
+    PROMPT="$newline%F{$integral_prompt_color}${integral_prompt[${1:-2}]}"
   else
-    integral helpers add-prompt "$newline%{%F{$integral_prompt_color}%}${integral_prompt[${1:-2}]}"
+    integral helpers add-prompt "$newline%F{$integral_prompt_color}${integral_prompt[${1:-2}]}"
   fi
 }
 

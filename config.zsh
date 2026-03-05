@@ -41,11 +41,11 @@ export integral_vim_colors=(
 )
 export integral_error_format() {
   case $1 in
-    1) print "%{%F{9}%}✘" ;;
-    2|127) print "%{%F{11}%}?" ;;
-    126) print "%{%F{9}%}⚠" ;;
-    130) print "%{%F{15}%}☠" ;;
-    *) print "%{%F{9}%}✘" ;;
+    1) print "%F{9}✘" ;;
+    2|127) print "%F{11}?" ;;
+    126) print "%F{9}⚠" ;;
+    130) print "%F{15}☠" ;;
+    *) print "%F{9}✘" ;;
   esac
 }
 export integral_dir_format() { print ${PWD/$HOME/\~} }
@@ -69,6 +69,12 @@ export integral_jobs_color="13"
 export integral_time_format="%T"
 export integral_uptime_icon="⏲"
 export integral_uptime_color="12"
+export integral_battery_icons=(
+  "🗲"
+  "󰁹"
+)
+export integral_battery_color="10"
+export integral_ssh_format="%F{12}${USER}%F{13}@%F{14}${HOSTNAME}"
 
 # === CONFIG LOADING ===
 local rc_locations=(
