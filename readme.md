@@ -45,6 +45,7 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [ ] CPU
 - [x] CWD
 - [x] Clock
+- [x] [Direnv](https://github.com/direnv/direnv)
 - [x] Error Codes
 - [x] Git
 - [x] Nix Shell

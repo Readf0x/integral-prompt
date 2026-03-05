@@ -180,6 +180,18 @@ integral:module:ssh() {
   fi
 }
 
+integral:module:direnv() {
+  if [[ $DIRENV_DIR ]]; then
+    if [[ $1 ]]; then
+      print "1"
+    else
+      print "$(integral_direnv_format $DIRENV_DIR)"
+    fi
+  else
+    print "0"
+  fi
+}
+
 # BUG: leaves <space> at end of prompt
 # TODO: add right prompt
 #   Will require a refactor, this method will introduce complications.

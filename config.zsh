@@ -1,6 +1,7 @@
 # TODO: Make modules configurable
 # === OPTIONS ===
 export integral_modules=(
+  "direnv"
   "nix"
   "visym"
   "error"
@@ -75,6 +76,12 @@ export integral_battery_icons=(
 )
 export integral_battery_color="10"
 export integral_ssh_format="%F{12}${USER}%F{13}@%F{14}${HOSTNAME}"
+
+export integral_direnv_format() {
+  case $1 in
+    *) print "%F{11}⌁" ;;
+  esac
+}
 
 # === CONFIG LOADING ===
 local rc_locations=(
