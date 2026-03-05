@@ -11,6 +11,11 @@ integral:helpers:cursor-shape() {
     echo -ne '\e[5 q'
   fi
 }
+integral:helpers:real-length() {
+  local x=$(print $1 | sed 's/%{\(%F\|%B\)\{0,2\}{[0-9]*}%}//g')
+  export debug_len=$x
+  print ${#x}
+}
 integral:prompt() {
   case $VI_KEYMAP in
     INSERT)
@@ -34,13 +39,21 @@ integral:prompt() {
   local prompt_bot="$newline%{%F{11}%}⌡%{%F{255}%}"
 
   local dir=${PWD/$HOME/\~}
+  local git
+  if [ -d .git ] || git rev-parse --git-dir >/dev/null 2>&1; then
+    git="%{%F{11}%}$(git rev-parse --abbrev-ref HEAD)"
+  fi
   if (( ${#dir} >= $COLUMNS )); then
     prompt_top="$prompt_top%{%F{32}%}${dir:0:$(($COLUMNS - 3))}"
-    for ((i = 1; i < $((${#dir} / $COLUMNS + 1)); i++)); do
-	    prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{32}%}${dir:$((($COLUMNS - 1) * $i - 3)):$((($COLUMNS - 1)))}"
+    local x=$((${#dir} / $COLUMNS + 1))
+    for ((i = 1; i < x; i++)); do
+      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{32}%}${dir:$((($COLUMNS - 1) * $i - 3)):$((($COLUMNS - 1)))}"
     done
+    if [[ $git ]]; then
+      prompt_top="$prompt_top$newline%{%F{11}%}⎮%{%F{32}%}$git"
+    fi
   else
-    prompt_top="$prompt_top%{%F{32}%}$dir"
+    prompt_top="$prompt_top%{%F{32}%}$dir $git"
   fi
 
   PROMPT="$prompt_top$prompt_bot"
