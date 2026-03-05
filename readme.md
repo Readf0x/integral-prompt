@@ -17,10 +17,10 @@ To configure, add a `~/.integralrc` file. It can also be placed at:
 - [x] Rerender on terminal resize
 - [x] Module loader
     - [ ] Colors
-    - [ ] Positions
+    - [x] Positions
     - [x] Order
     - [ ] Seperators
-    - [ ] Dynamic triggers
+    - [x] Dynamic triggers
 - [x] Plugin Support
 - [ ] Documentation
 
