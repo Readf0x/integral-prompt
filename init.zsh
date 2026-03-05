@@ -1,5 +1,6 @@
 local version='0.0.5'
 
+source './module_loader.zsh'
 autoload -U colors; colors
 autoload -Uz add-zsh-hook
 autoload -U add-zle-hook-widget
@@ -185,6 +186,7 @@ TRAPWINCH() {
   integral:prompt
   zle reset-prompt
 }
+add-zsh-hook preexec error_hook
 add-zsh-hook precmd integral:prompt
 add-zsh-hook precmd integral:helpers:cursor-shape
 zle -N integral:line-pre-redraw
