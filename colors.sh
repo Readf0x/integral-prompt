@@ -1,6 +1,5 @@
 #!/usr/bin/env zsh
 
-# Define color names for 0-15 (standard ANSI colors)
 color_names=(
   "Black" "Red" "Green" "Yellow"
   "Blue" "Magenta" "Cyan" "White"
@@ -9,6 +8,9 @@ color_names=(
 )
 
 for i in {0..15}; do
-  # Background block, then number and name in foreground color
-  printf "\e[48;5;%sm  \e[0m \e[38;5;%sm%2d: %-20s\e[0m\n" "$i" "$i" "$i" "${color_names[$i]}"
+  if [[ $i = (0|8) ]]; then
+    print -P "%K{$i}  %k%K{7} %F{$i}$i: ${color_names[$i + 1]}%f%k"
+  else
+    print -P "%K{$i}  %k %F{$i}$i: ${color_names[$i + 1]}%f"
+  fi
 done
