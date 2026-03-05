@@ -15,6 +15,18 @@ in {
       defaultText = "{}";
       description = "JSON attribute set";
     };
+    configPath = lib.mkOption {
+      type = lib.types.enum [
+        ".integralrc"
+        ".config/integralrc"
+        ".config/integralrc.json"
+        ".config/integral/rc"
+        ".config/integral/rc.json"
+      ];
+      default = ".config/integralrc.json";
+      defaultText = ".config/integralrc.json";
+      description = "Path to place your configuration";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -26,7 +38,7 @@ in {
       ''
     );
 
-    home.file.".config/integralrc".text = builtins.toJSON ({
+    home.file.${cfg.configPath}.text = builtins.toJSON ({
       "$schema" = "${self.packages.${pkgs.system}.default}/share/integral/schema.json";
     } // cfg.config);
   };
