@@ -77,6 +77,9 @@ integral:prompt() {
     if ! git diff --quiet --ignore-submodules --cached 2>/dev/null; then
       git="$git %{%F{11}%}$(git diff --no-ext-diff --ignore-submodules --stat --cached | tail -n1 | cut -d' ' -f2)+"
     fi
+    if [[ $(git cherry | wc -l) -gt 0 ]]; then
+      git="$git %{%F{14}%}↑"
+    fi
   fi
   # BUG: this will not work if other modules push the prompt past the terminal width
   # TODO: Change the loop method to be more efficient
