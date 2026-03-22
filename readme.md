@@ -1,6 +1,6 @@
 # Integral Prompt
 
-<img src="https://raw.githubusercontent.com/Readf0x/integral-prompt/refs/heads/main/screenshots/indev_v0.3.0.png">
+![indev_v0.3.0.png](./screenshots/indev_v0.3.0.png)
 
 ## About
 This prompt theme was created mostly due to my dissatisfaction with existing ones. My main issues were:
@@ -10,7 +10,7 @@ This prompt theme was created mostly due to my dissatisfaction with existing one
 
 ## Installation
 <!--Load with your favorite plugin loader (only officially supports [antidote](https://antidote.sh/)), or source `init.zsh` in your `.zshrc`.-->
-Grab [`integral.deb`](https://github.com/Readf0x/integral-prompt/releases/latest/download/integral.deb) for Debian based distros, or [`integral.tar.gz`](https://github.com/Readf0x/integral-prompt/releases/latest/download/integral.tar.gz) for others.
+Grab [`integral.deb`](https://git.gay/readf0x/integral-prompt/releases/latest/download/integral.deb) for Debian based distros, or [`integral.tar.gz`](https://git.gay/readf0x/integral-prompt/releases/latest/download/integral.tar.gz) for others.
 
 ### Flake install (Home Manager)
 Add to your inputs and add `integral-prompt.homeManagerModules.default` to your home manager imports
@@ -18,7 +18,7 @@ Add to your inputs and add `integral-prompt.homeManagerModules.default` to your 
 # flake.nix
 {
   inputs = {
-    integral-prompt.url = "github:readf0x/integral-prompt";
+    integral-prompt.url = "git+ssh://git@git.gay/readf0x/integral-prompt.git";
   };
 }
 ```
@@ -113,7 +113,7 @@ programs.integral-prompt = {
 - [ ] Documentation
 - [ ] Module timeouts
 - [ ] Rewrite in Odin (or possibly Jai if it releases this year)
-- [ ] Add [borzoi](https://github.com/readf0x/borzoi) support
+- [ ] Add [borzoi](https://git.gay/readf0x/borzoi) support
 
 ### Planned Modules
 - [x] Background Jobs

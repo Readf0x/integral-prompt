@@ -15,7 +15,7 @@ Version: ${TAG#v}
 Section: utils
 Priority: optional
 Architecture: amd64
-Maintainer: Jean <https://github.com/readf0x>
+Maintainer: Jean <https://git.gay/readf0x>
 Description: Math themed shell prompt
 EOF
     mkdir -p build/usr/local/bin
